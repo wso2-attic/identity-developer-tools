@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+#target files
+modules/server-endpoints/language-server/target
+
 # Log file
 *.log
 
@@ -17,7 +20,8 @@
 *.ear
 *.zip
 *.tar.gz
+*.idea
 *.rar
-
+*.idea
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
