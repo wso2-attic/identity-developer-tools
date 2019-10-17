@@ -18,28 +18,40 @@
 
 package org.wso2.carbon.identity.developer.lsp.endpoints;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
 import org.wso2.carbon.identity.developer.lsp.completion.CompletionListGenerator;
-import org.wso2.carbon.identity.jsonrpc.*;
+import org.wso2.carbon.identity.jsonrpc.JsonRPC;
+import org.wso2.carbon.identity.jsonrpc.Request;
+import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
 import org.wso2.carbon.identity.parser.ParserT;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.script.ScriptException;
-import javax.websocket.*;
+import javax.websocket.EncodeException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
  * The entry endpoint for language server.
  */
 
-@ServerEndpoint("/lsp")
+@ServerEndpoint(value = "/lsp", configurator = OSGIBindingConfigurator.class )
 public class LspEndpoint {
 
     private JsonRPC jsonRPC;
+
+    @OsgiService
+    private JsFunctionRegistry jsFunctionRegistry;
+
     private LanguageProcessorFactory languageProcessorFactory;
 
     public LspEndpoint() {
@@ -110,7 +122,9 @@ public class LspEndpoint {
 //                response.setId(String.valueOf(line) + " ----> "+ String.valueOf(charPosition));
                     response.setId(scope);
 //                    response.setResult(new JsonParser().parse(parserT.generateParseTree(jsonElement2.getAsJsonObject().get("text").getAsString(),line,charPosition)));
-                    response.setResult(new CompletionListGenerator().getList(scope));
+                    CompletionListGenerator completionListGenerator = new CompletionListGenerator();
+                    completionListGenerator.setJsFunctionRegistry(jsFunctionRegistry);
+                    response.setResult(completionListGenerator.getList(scope));
 
                 }else{
 
