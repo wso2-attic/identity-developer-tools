@@ -22,7 +22,7 @@ import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
 
 /**
- * Contract for a language
+ * Contract for a language.
  */
 public interface LanguageProcessor {
 

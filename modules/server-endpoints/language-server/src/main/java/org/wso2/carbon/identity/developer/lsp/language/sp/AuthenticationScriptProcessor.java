@@ -32,26 +32,23 @@ import org.wso2.carbon.identity.parser.ParserT;
 import javax.script.ScriptException;
 
 /**
- * Language processor for authentication script
+ * Language processor for authentication script.
  */
 public class AuthenticationScriptProcessor implements LanguageProcessor {
+
     private JsFunctionRegistry jsFunctionRegistry;
 
-
+    @Override
     public Response process(Request request) throws LanguageException {
 
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setId(request.getId());
 
-        if(request.getMethod().equals("onCompletion")) {
-            int line = request.getParameterAsInt("line",
-                    0);//Integer.parseInt(paramsElement.getAsJsonObject().get("line").getAsString());
-            int charPosition = request.getParameterAsInt("character",
-                    0);//Integer.parseInt(paramsElement.getAsJsonObject().get("character").getAsString());
-
+        if (request.getMethod().equals("onCompletion")) {
+            int line = request.getParameterAsInt("line", 0);
+            int charPosition = request.getParameterAsInt("character", 0);
             ParserT parserT = new ParserT();
-            String text = request.getParameter(
-                    "text");//parserT.generateParseTree(paramsElement.getAsJsonObject().get("text").getAsString(),line,charPosition);
+            String text = request.getParameter("text");
             try {
                 String scope = parserT.generateParseTree(text, line, charPosition);
 
@@ -65,6 +62,11 @@ public class AuthenticationScriptProcessor implements LanguageProcessor {
         return successResponse;
     }
 
+    /**
+     * Sets the function registry.
+     *
+     * @param jsFunctionRegistry
+     */
     public void setJsFunctionRegistry(
             JsFunctionRegistry jsFunctionRegistry) {
 
