@@ -19,11 +19,16 @@
 package org.wso2.carbon.identity.jsonrpc;
 
 import com.google.gson.stream.JsonReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.developer.lsp.endpoints.OSGIBindingConfigurator;
 
 /**
  * JSON RPC Request
  */
 public class Request {
+
+    private static final Log log = LogFactory.getLog(Request.class);
 
     /**
      * The id of the request
@@ -82,5 +87,29 @@ public class Request {
     public void setParamsList(ParametersList paramsList) {
 
         this.paramsList = paramsList;
+    }
+
+    public String getParameter(String name) {
+
+        if (paramsList == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parameter List is null. Unable to get value for parameter: " + name);
+            }
+            return null;
+        }
+
+        return paramsList.getParameter(name);
+    }
+
+    public int getParameterAsInt(String name, int defaultValue) {
+
+        if (paramsList == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parameter List is null. Unable to get value for parameter: " + name);
+            }
+            return defaultValue;
+        }
+
+        return paramsList.getParameterAsInt(name, defaultValue);
     }
 }

@@ -16,20 +16,28 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp;
+package org.wso2.carbon.identity.developer.lsp.endpoints;
 
-import org.wso2.carbon.identity.jsonrpc.Request;
-import org.wso2.carbon.identity.jsonrpc.Response;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Contract for a language.
+ * Annotation used to bind any other class to any bean defined, and initialized via annotation processing.
+ *
+ * usage
+ * <code>
+ *     public class LspEndpoint {
+ *
+ *          @Inject
+ *          private JsFunctionRegistry jsFunctionRegistry;
+ *          ...
+ *          ...
+ * </code>
  */
-public interface LanguageProcessor {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Inject {
 
-    /**
-     * Processes the given request.
-     * @param request
-     * @return
-     */
-    Response process(Request request) throws LanguageException;
 }

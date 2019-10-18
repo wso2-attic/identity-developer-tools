@@ -18,20 +18,58 @@
 
 package org.wso2.carbon.identity.developer.lsp.language.sp;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
+import org.wso2.carbon.identity.developer.lsp.LanguageException;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
+import org.wso2.carbon.identity.developer.lsp.completion.CompletionListGenerator;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
 import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
+import org.wso2.carbon.identity.parser.ParserT;
+
+import javax.script.ScriptException;
 
 /**
- * Language processor for authentication script
+ * Language processor for authentication script.
  */
 public class AuthenticationScriptProcessor implements LanguageProcessor {
 
-    public Response process(Request request) {
+    private JsFunctionRegistry jsFunctionRegistry;
+
+    @Override
+    public Response process(Request request) throws LanguageException {
 
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setId(request.getId());
+
+        if (request.getMethod().equals("onCompletion")) {
+            int line = request.getParameterAsInt("line", 0);
+            int charPosition = request.getParameterAsInt("character", 0);
+            ParserT parserT = new ParserT();
+            String text = request.getParameter("text");
+            try {
+                String scope = parserT.generateParseTree(text, line, charPosition);
+
+                CompletionListGenerator completionListGenerator = new CompletionListGenerator();
+                completionListGenerator.setJsFunctionRegistry(jsFunctionRegistry);
+                successResponse.setResult(completionListGenerator.getList(scope));
+            } catch (ScriptException e) {
+                throw new LanguageException("Unable to parse the scope :" + text, e);
+            }
+        }
         return successResponse;
+    }
+
+    /**
+     * Sets the function registry.
+     *
+     * @param jsFunctionRegistry
+     */
+    public void setJsFunctionRegistry(
+            JsFunctionRegistry jsFunctionRegistry) {
+
+        this.jsFunctionRegistry = jsFunctionRegistry;
     }
 }

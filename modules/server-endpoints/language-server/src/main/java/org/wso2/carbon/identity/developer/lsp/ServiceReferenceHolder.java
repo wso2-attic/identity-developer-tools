@@ -18,18 +18,34 @@
 
 package org.wso2.carbon.identity.developer.lsp;
 
-import org.wso2.carbon.identity.jsonrpc.Request;
-import org.wso2.carbon.identity.jsonrpc.Response;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Contract for a language.
- */
-public interface LanguageProcessor {
+public class ServiceReferenceHolder {
+
+    private static final ServiceReferenceHolder instance = new ServiceReferenceHolder();
+
+    private Map<Class, Object> services = new HashMap<>();
+
+    public void addService(Class clazz, Object instance) {
+
+        services.put(clazz, instance);
+    }
+
+    public <T> T getService(Class<T> clazz) {
+
+        return (T) services.get(clazz);
+    }
 
     /**
-     * Processes the given request.
-     * @param request
-     * @return
+     * Prevents instantiation
      */
-    Response process(Request request) throws LanguageException;
+    private ServiceReferenceHolder() {
+
+    }
+
+    public static ServiceReferenceHolder getInstance() {
+
+        return instance;
+    }
 }

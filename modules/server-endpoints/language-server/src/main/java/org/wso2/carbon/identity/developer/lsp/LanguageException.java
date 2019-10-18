@@ -18,18 +18,32 @@
 
 package org.wso2.carbon.identity.developer.lsp;
 
-import org.wso2.carbon.identity.jsonrpc.Request;
-import org.wso2.carbon.identity.jsonrpc.Response;
-
 /**
- * Contract for a language.
+ * Exception thrown processing the language LSP.
  */
-public interface LanguageProcessor {
+public class LanguageException extends Exception {
 
-    /**
-     * Processes the given request.
-     * @param request
-     * @return
-     */
-    Response process(Request request) throws LanguageException;
+    public LanguageException() {
+
+    }
+
+    public LanguageException(String message) {
+
+        super(message);
+    }
+
+    public LanguageException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    public LanguageException(Throwable cause) {
+
+        super(cause);
+    }
+
+    public LanguageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }
