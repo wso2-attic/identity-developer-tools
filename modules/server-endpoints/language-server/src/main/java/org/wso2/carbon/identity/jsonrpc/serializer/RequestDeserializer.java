@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.identity.jsonrpc.serializer;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import org.wso2.carbon.identity.jsonrpc.Parameter;
 import org.wso2.carbon.identity.jsonrpc.ParametersList;
 import org.wso2.carbon.identity.jsonrpc.Request;
@@ -73,6 +75,17 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
                 for (Map.Entry<String, JsonElement> entry : paramObj.entrySet()) {
                     JsonElement element0 = entry.getValue();
                     params.add(new Parameter(entry.getKey(), element0.getAsString()));
+                }
+            } else if (paramsElement.isJsonPrimitive()) {
+                JsonPrimitive jsonPrimitive = paramsElement.getAsJsonPrimitive();
+                String jsonValueStr = jsonPrimitive.getAsString();
+
+                Gson gson = new Gson();
+                JsonObject subObject  = gson.fromJson(jsonValueStr, JsonObject.class);
+
+                for (Map.Entry<String, JsonElement> entry: subObject.entrySet() ) {
+                    Parameter parameter = new Parameter(entry.getKey(), entry.getValue().getAsString());
+                    params.add(parameter);
                 }
             }
         }

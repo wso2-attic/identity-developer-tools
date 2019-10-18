@@ -22,11 +22,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
+import org.wso2.carbon.identity.developer.lsp.LanguageException;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
 import org.wso2.carbon.identity.developer.lsp.completion.CompletionListGenerator;
 import org.wso2.carbon.identity.jsonrpc.JsonRPC;
 import org.wso2.carbon.identity.jsonrpc.Request;
+import org.wso2.carbon.identity.jsonrpc.Response;
 import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
 import org.wso2.carbon.identity.parser.ParserT;
 
@@ -52,6 +54,7 @@ public class LspEndpoint {
     @OsgiService
     private JsFunctionRegistry jsFunctionRegistry;
 
+    @Inject
     private LanguageProcessorFactory languageProcessorFactory;
 
     public LspEndpoint() {
@@ -59,8 +62,7 @@ public class LspEndpoint {
         this.jsonRPC = new JsonRPC();
         jsonRPC.init();
 
-        this.languageProcessorFactory = new LanguageProcessorFactory();
-        languageProcessorFactory.init();
+
     }
 
     /**
@@ -104,46 +106,19 @@ public class LspEndpoint {
         try {
             Request request = jsonRPC.decode(message);
             LanguageProcessor languageProcessor = languageProcessorFactory.getProcessor(request);
-            SuccessResponse response = new SuccessResponse();
+            Response response = new SuccessResponse();
             if(languageProcessor == null) {
                 //TODO: Descriptive error, no processor found
                 response = new SuccessResponse();
             } else {
-                if(request.getMethod().equals("onCompletion")){
-                    JsonElement jsonElement1 = new JsonParser().parse(message);
-                    JsonElement jsonElement2 = new JsonParser().parse(jsonElement1.getAsJsonObject().get("params").getAsString());
-                    int line = Integer.parseInt(jsonElement2.getAsJsonObject().get("line").getAsString());
-                    int charPosition = Integer.parseInt(jsonElement2.getAsJsonObject().get("character").getAsString());
-
-
-                    ParserT parserT = new ParserT();
-                    String scope = parserT.generateParseTree(jsonElement2.getAsJsonObject().get("text").getAsString(),line,charPosition);
-
-//                response.setId(String.valueOf(line) + " ----> "+ String.valueOf(charPosition));
-                    response.setId(scope);
-//                    response.setResult(new JsonParser().parse(parserT.generateParseTree(jsonElement2.getAsJsonObject().get("text").getAsString(),line,charPosition)));
-                    CompletionListGenerator completionListGenerator = new CompletionListGenerator();
-                    completionListGenerator.setJsFunctionRegistry(jsFunctionRegistry);
-                    response.setResult(completionListGenerator.getList(scope));
-
-                }else{
-
-                    JsonElement jsonElement1 = new JsonParser().parse(message);
-                    JsonElement jsonElement2 = new JsonParser().parse(jsonElement1.getAsJsonObject().get("params").getAsString());
-
-                    ParserT parserT = new ParserT();
-//                response.setId(String.valueOf(line) + " ----> "+ String.valueOf(charPosition));
-                    response.setId(request.getMethod());
-//                response.setResult(new JsonParser().parse(parserT.generateParseTree(jsonElement2.getAsJsonObject().get("text").getAsString(),line,charPosition)));
-
-                }
+                response = languageProcessor.process(request);
             }
             if(response == null) {
                 //TODO: Descriptive error
                 response = new SuccessResponse();
             }
             session.getBasicRemote().sendText(jsonRPC.encode(response));
-        } catch (IOException | ScriptException ex) {
+        } catch (IOException | LanguageException ex) {
             ex.printStackTrace();
         }
     }

@@ -28,12 +28,13 @@ public class LanguageProcessorFactory {
 
     private Map<String, LanguageProcessor> languageProcessorMap = new HashMap<String, LanguageProcessor>();
 
+    public LanguageProcessor getProcessor(Request request) {
 
-    public void init() {
-        languageProcessorMap.put("Application", new AuthenticationScriptProcessor())   ;
+        return languageProcessorMap.get("Application");
     }
 
-    public LanguageProcessor getProcessor(Request request) {
-        return languageProcessorMap.get("Application");
+    public void addProcessor(String application, AuthenticationScriptProcessor authenticationScriptProcessor) {
+
+        languageProcessorMap.put(application, authenticationScriptProcessor);
     }
 }

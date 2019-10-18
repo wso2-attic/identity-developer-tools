@@ -32,13 +32,17 @@ public class RequestDeserializerTest {
 
     @BeforeTest
     public void setUp() {
+
         jsonRPC = new JsonRPC();
         jsonRPC.init();
     }
 
     @Test
     public void testDeserialize() throws JsonRpcParseException {
-        String requestString1 = " {\"jsonrpc\":\"2.0\",\"method\":\"testNotification\",\"params\":\"Hello World\"}";
+
+        String requestString1 = "{\"jsonrpc\":\"2.0\",\"method\":\"testNotification\"," +
+                "\"params\":\"{\\\"text\\\":\\\"function fff (){\\\\n    \\\\n}\\\\n\\\"," +
+                "\\\"line\\\":2,\\\"character\\\":4}\"}";
 
         Request request = jsonRPC.decode(requestString1);
         assertNotNull(request);

@@ -18,15 +18,26 @@
 
 package org.wso2.carbon.identity.jsonrpc;
 
-import java.util.Collections;
-import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Parameter list in JSON RPC Request.
+ *
+ */
 public class ParametersList {
+
+    private static final Log log = LogFactory.getLog(ParametersList.class);
 
     /**
      * List of parameters in the request
      */
-    private  List<Parameter> parameters;
+    private Map<String, Parameter> parameters;
 
     /**
      * Default constructor for un-marshallers
@@ -37,6 +48,31 @@ public class ParametersList {
 
     public ParametersList(List<Parameter> parameters) {
 
-        this.parameters = Collections.unmodifiableList(parameters);
+        this.parameters = new HashMap<>();
+        if(parameters != null) {
+            for(Parameter parameter: parameters) {
+                this.parameters.put(parameter.getName(), parameter);
+            }
+        }
+    }
+
+    public String getParameter(String name) {
+        Parameter parameter = parameters.get(name);
+        if (parameter == null) {
+            if(log.isDebugEnabled()) {
+                log.debug("Parameter List is null. Unable to get value for parameter: "+name);
+            }
+            return null;
+        }
+
+        return  parameter.getValue();
+    }
+
+    public int getParameterAsInt(String name, int defaultValue) {
+        String s = getParameter(name);
+        if(s == null) {
+            return defaultValue;
+        }
+        return Integer.parseInt(s);
     }
 }

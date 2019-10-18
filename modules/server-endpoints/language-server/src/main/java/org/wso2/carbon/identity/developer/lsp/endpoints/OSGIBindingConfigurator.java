@@ -21,8 +21,10 @@ package org.wso2.carbon.identity.developer.lsp.endpoints;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.developer.lsp.ServiceReferenceHolder;
 
 import java.lang.reflect.Field;
+import java.util.function.BiConsumer;
 import javax.websocket.server.ServerEndpointConfig;
 
 /**
@@ -61,8 +63,32 @@ public class OSGIBindingConfigurator extends ServerEndpointConfig.Configurator {
                     }
                 }
             }
+
+            if (field.isAnnotationPresent(Inject.class)) {
+                Class type = field.getType();
+                if (log.isDebugEnabled()) {
+                    log.debug("Lookup service for Field: " + field.getName() + ", type: " + type);
+                }
+                Object service = ServiceReferenceHolder.getInstance().getService(type);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Assigning Service: " + service + ", for field: " + field.getName());
+                }
+                if (service != null) {
+                    field.setAccessible(true);
+                    try {
+                        field.set(result, service);
+                    } catch (IllegalAccessException e) {
+                        log.error(
+                                "Could not assign the service to the field: " + endpointClass.getName() + ":" + field.getName() + ", service :" + service,
+                                e);
+                    }
+                }
+            }
         }
 
         return (T) result;
     }
+
+
 }
