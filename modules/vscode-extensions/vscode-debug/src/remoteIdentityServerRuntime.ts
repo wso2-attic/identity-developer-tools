@@ -58,7 +58,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			// we just start to run until we hit a breakpoint or an exception
 			this.continue();
 		}
-	}
+	}x
 
 	/**
 	 * Continue execution to the end/beginning.
