@@ -73,3 +73,4 @@ public class AuthenticationScriptProcessor implements LanguageProcessor {
         this.jsFunctionRegistry = jsFunctionRegistry;
     }
 }
+
