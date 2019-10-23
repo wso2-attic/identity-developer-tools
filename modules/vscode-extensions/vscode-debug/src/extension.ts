@@ -29,6 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const provider = new MockConfigurationProvider();
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
 
+	console.log("EMBED_DEBUG_ADAPTER "+EMBED_DEBUG_ADAPTER);
 	if (EMBED_DEBUG_ADAPTER) {
 		// The following use of a DebugAdapter factory shows how to run the debug adapter inside the extension host (and not as a separate process).
 		const factory = new IdentityServerDebugAdapterDescriptorFactory();
