@@ -14,10 +14,39 @@
 		"vscode": "^1.33.0"
 	},
 	"activationEvents": [
-		"onLanguage:plaintext"
+		"onLanguage:plaintext",
+		"onCommand:extension.diagram"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
+		"languages": [
+			{
+				"id": "IAM",
+				"aliases": [
+					"IAM"
+				],
+				"extensions": [
+					".auth",
+					".iam"
+				]
+			}
+		],
+		"menus": {
+			"editor/title": [
+				{
+				  "when": "resourceLangId == IAM",
+				  "command": "extension.diagram",
+				  "alt": "markdown.showPreviewToSide",
+				  "group": "navigation"
+				}
+			  ]
+		},
+		"commands": [
+			{
+				"command": "extension.diagram",
+				"title": "Show Diagram"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Identity Server",

@@ -1,0 +1,231 @@
+<html lang="en">
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.12.0/js/jsplumb.min.js"></script>
+
+    <meta charset="UTF-8">
+
+    <title>Diagram</title>
+    <style>
+        .item {
+            height: auto;
+            width: 300px;
+            border-radius: 40px;
+            border: 1px solid rgb(202, 202, 245);
+            float: left;
+        }
+
+        .inner {
+            height: auto;
+            width: 100px;
+            margin-left: 30px;
+            border: 1px solid rgb(245, 187, 187);
+            border-radius: 20px;
+            float: left;
+        }
+
+        .block {
+            height: auto;
+            width: 100%;
+            margin-bottom: 30px;
+            float: left;            
+        }
+
+        .item_start {
+            height: auto;
+            width: 80px;
+            margin-left: 110px;
+            border-radius: 40px;
+            border: 1px solid rgb(165, 165, 197);
+            float: left;
+        }
+
+        .ds {
+            width: 100px;
+            height: 100px;
+            border: 1px solid brown;
+            float: left;
+            margin-left: 50px;
+        }
+
+        .down {
+            width: 100%;
+            height: auto;
+            float: left;
+        }
+
+        .itemin {
+            margin-top: 10px;            
+            border: 2px pink solid;
+            width: 300px;
+            border-radius: 40px;
+            height: auto;
+            float: left;
+        }
+
+        .body {            
+            margin-left: 20%;
+            position: fixed;
+        }
+
+        .txt {
+            color: rgb(253, 251, 251);
+            font-size: 11;
+        }
+
+        .circleText {
+            margin-top:20px;
+            margin-left:20px
+        }
+    </style>
+
+</head>
+
+<body class="body">
+    <p id="a"></p>
+    <div class="block">
+        <div id="start" class="item_start">
+            <p class="circleText">Start </p>
+        </div>
+    </div>
+
+    <div class="block">
+        <div id="item_1" class="item"><span class="txt">Inbound Authentication Config</span> 
+
+        </div>
+    </div>
+
+    <div class="block">
+        
+        <div id="item_input" class="itemin"><span class="txt">Local And OutBound Authentication Config</span> 
+           
+        </div>
+    </div>
+
+    <div class="block">
+        <div id="stop" class="item_start">
+            <p class="circleText">Stop </p>
+        </div>
+    </div>
+    
+</body>
+<script>
+    
+    $(document).ready(function () {  
+       var text = `myXML`
+        
+        xmlDoc = $.parseXML(text);
+        $xml = $(xmlDoc);
+
+        x = document.getElementById("item_1");
+        y = document.getElementById("item_input");
+        $xml.find("InboundAuthenticationConfig").find("InboundAuthenticationRequestConfigs").find("InboundAuthenticationRequestConfig").each(function () {
+
+            var $row = $(this),
+                name = $row.find("column1").text(),
+                job = $row.find("InboundAuthType").text();
+            x.innerHTML += ' <div class="block"><div id="item_1" class="inner"><span class="txt">' + job + '</span></div></div>'
+
+        });
+
+        $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationSteps").find("AuthenticationStep").each(function () {
+
+            var $row = $(this),
+                name = $row.find("column1").text(),
+                job = $row.find("LocalAuthenticatorConfigs").find("Name").text();
+            y.innerHTML += '<div class="block"> <div id="item_1" class="inner"><span class="txt">' + job + '</span> </div></div>';
+        });
+
+        var code = $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationScript").text()
+
+        if(code.length >0){
+            z= document.getElementById("item_input");
+            z.innerHTML += ' <button style="margin-right:180px;">Script</button>';
+        }
+        
+        
+        
+
+        jsPlumb.ready(function () {
+            /*First Instance*/
+            var zeroInstance = jsPlumb.getInstance();
+
+            zeroInstance.importDefaults({
+                ConnectionsDetachable: false,
+                Connector: ["Straight", {
+                    curviness: 150
+                }
+
+                ],
+                Anchors: ["BottomCenter", "TopCenter"]
+            }
+
+            );
+
+            zeroInstance.connect({
+                ConnectionsDetachable: false,
+                source: "start",
+                target: "item_1",
+                scope: "someScope"
+            }
+
+            );
+
+            var firstInstance = jsPlumb.getInstance();
+
+            firstInstance.importDefaults({
+                ConnectionsDetachable: false,                
+                Connector: ["Straight", {
+                    curviness: 20,
+                    stub:12
+                }
+
+                ],
+                Anchors: ["BottomCenter", "TopCenter"]
+            }
+
+            );
+
+
+            firstInstance.connect({
+                source: "item_1",
+                target: "item_input",
+                scope: "someScope"
+            }
+
+            );
+
+            /*Second Instance*/
+            var secondInstance = jsPlumb.getInstance();
+
+            secondInstance.importDefaults({
+                ConnectionsDetachable: false,
+                Connector: ["Straight", {
+                    curviness: 150
+                }
+
+                ],
+                Anchors: ["BottomCenter", "TopCenter"]
+            }
+
+            );
+
+            secondInstance.connect({
+                source: "item_input",
+                target: "stop",
+                scope: "someScope"
+            }
+
+            );
+        }
+
+        );
+        var xmlText = new XMLSerializer().serializeToString(text);
+        console.log(xmlText)
+
+    })
+
+</script>
+
+</html>

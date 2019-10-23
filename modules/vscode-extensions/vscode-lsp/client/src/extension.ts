@@ -5,16 +5,15 @@
 
 import * as path from 'path';
 import { workspace, ExtensionContext } from 'vscode';
-
+import * as vscode from 'vscode';
 import {
 	LanguageClient,
 	LanguageClientOptions,
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient';
-
 let client: LanguageClient;
-
+import * as fs from 'fs';
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(
@@ -38,12 +37,45 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
-		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
+		documentSelector: [{ scheme: 'file', language: 'IAM' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	};
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.diagram', () => {
+
+			const { activeTextEditor } = vscode.window;
+			const { document } = activeTextEditor;
+			const code = document.getText(); //get the text of the file		
+			const pathToHtml = vscode.Uri.file(
+				path.join(context.extensionPath, 'client', 'src', 'diagram.html')
+			);
+			const pathUri = pathToHtml.with({ scheme: 'vscode-resource' });
+			const panel = vscode.window.createWebviewPanel(
+				'Diagram',
+				'Show Diagram',
+				vscode.ViewColumn.Two,
+				{
+					enableScripts: true,
+					retainContextWhenHidden: true
+
+				}
+			);
+
+			console.log(pathUri.fsPath);
+
+			// And set its HTML content
+			panel.webview.html = getWebviewContent(code, pathUri);
+
+
+
+		})
+	);
+
+
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
@@ -52,6 +84,7 @@ export function activate(context: ExtensionContext) {
 		serverOptions,
 		clientOptions
 	);
+
 
 	// Start the client. This will also launch the server
 	client.start();
@@ -62,4 +95,11 @@ export function deactivate(): Thenable<void> | undefined {
 		return undefined;
 	}
 	return client.stop();
+}
+
+function getWebviewContent(code, path) {
+	var html = fs.readFileSync(path.fsPath, 'utf8');
+	var re = /myXML/gi;
+	var newHtml = html.replace(re, code);
+	return newHtml;	
 }

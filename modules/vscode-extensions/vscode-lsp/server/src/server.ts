@@ -188,7 +188,7 @@ connection.onCompletion(
 		// info and always provide the same completion items.		
 		var WebSocket = require('ws');		
 		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp',{ rejectUnauthorized: false });	
-	
+		
 		var obj:any = {
 			"text" : text,
 			"line" : _textDocumentPosition.position.line+1,

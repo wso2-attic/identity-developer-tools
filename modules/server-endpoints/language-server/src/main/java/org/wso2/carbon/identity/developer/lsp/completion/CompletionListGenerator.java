@@ -10,6 +10,7 @@ public class CompletionListGenerator {
 
     private JsFunctionRegistry jsFunctionRegistry;
 
+
     public void setJsFunctionRegistry(
             JsFunctionRegistry jsFunctionRegistry) {
 
