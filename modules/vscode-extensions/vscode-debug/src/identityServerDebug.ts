@@ -11,6 +11,10 @@ import {
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
 import { RemoteIdentityServerRuntime, RemoteBreakpoint } from './remoteIdentityServerRuntime';
+import * as rpc from 'vscode-ws-jsonrpc';
+import { NotificationType } from 'vscode-ws-jsonrpc';
+
+var WebSocket = require('ws');
 const { Subject } = require('await-notify');
 
 function timeout(ms) {
@@ -47,12 +51,17 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	private _cancelationTokens = new Map<number, boolean>();
 	private _isLongrunning = new Map<number, boolean>();
 
+	private  webSocket: WebSocket;
+	private messageConnection: rpc.MessageConnection;
+
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
 	 * We configure the default implementation of a debug adapter here.
 	 */
 	public constructor() {
 		super("mock-debug.txt");
+
+		this.connectWebsocket();
 
 		// this debugger uses zero-based lines and columns
 		this.setDebuggerLinesStartAt1(false);
@@ -171,6 +180,11 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			return bp;
 		});
 
+		if(this.messageConnection != null) {
+			var notification = new rpc.NotificationType("setBreakpoint")
+			this.messageConnection.sendNotification(notification, args);;
+		}
+
 		// send back the actual breakpoint positions
 		response.body = {
 			breakpoints: actualBreakpoints
@@ -238,6 +252,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
 		const variables: DebugProtocol.Variable[] = [];
+
 
 		if (this._isLongrunning.get(args.variablesReference)) {
 			// long running
@@ -439,5 +454,27 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
+	}
+
+	private connectWebsocket() :void {
+		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',{ rejectUnauthorized: false });
+		this.webSocket = webSocket;
+		console.log("Listening.. " );
+		rpc.listen({
+			webSocket,
+			onConnection: (rpcConnection: rpc.MessageConnection) => {
+				console.log("connected+ " );
+				this.messageConnection = rpcConnection;
+			},
+		});
+
+	}
+
+	public sendEvent(event: DebugProtocol.Event): void {
+		super.sendEvent(event);
+		// if(this.messageConnection != null) {
+			// var notification = new rpc.NotificationType("event");
+			// this.messageConnection.sendNotification(notification, event);
+		// }
 	}
 }
