@@ -14,37 +14,56 @@
 		"vscode": "^1.33.0"
 	},
 	"activationEvents": [
-		"onLanguage:plaintext",
-		"onCommand:extension.diagram"
+		"onLanguage:javascript",
+		"onCommand:extension.diagram",
+		"onCommand:extension.script"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
 		"languages": [
+			{
+				"id": "javascript",
+				"aliases": [
+					"javascript"
+				],
+				"extensions": [
+					".authjs"
+				]
+			},
 			{
 				"id": "IAM",
 				"aliases": [
 					"IAM"
 				],
 				"extensions": [
-					".auth",
-					".iam"
+					".auth"
 				]
 			}
 		],
 		"menus": {
 			"editor/title": [
 				{
-				  "when": "resourceLangId == IAM",
-				  "command": "extension.diagram",
-				  "alt": "markdown.showPreviewToSide",
-				  "group": "navigation"
+					"when": "resourceLangId == IAM",
+					"command": "extension.diagram",
+					"alt": "markdown.showPreviewToSide",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == javascript",
+					"command": "extension.script",
+					"alt": "markdown.showPreviewToSide",
+					"group": "navigation"
 				}
-			  ]
+			]
 		},
 		"commands": [
 			{
 				"command": "extension.diagram",
 				"title": "Show Diagram"
+			},
+			{
+				"command": "extension.script",
+				"title": "Sync"
 			}
 		],
 		"configuration": {
@@ -86,6 +105,8 @@
 	},
 	"dependencies": {
 		"core-util-is": "^1.0.2",
-		"vscode": "^1.1.36"
+		"vscode": "^1.1.36",
+		"xml-query": "^1.5.0",
+		"xml-reader": "^2.4.3"
 	}
 }

@@ -34,9 +34,9 @@ let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 
-declare var text : String;
+declare var text: String;
 
-connection.onInitialize((params: InitializeParams) => {	
+connection.onInitialize((params: InitializeParams) => {
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
 	// If not, we will fall back using global settings
@@ -67,7 +67,7 @@ connection.onInitialized(() => {
 	if (hasConfigurationCapability) {
 		// Register for all configuration changes.
 		connection.client.register(DidChangeConfigurationNotification.type, undefined);
-	}	
+	}
 });
 
 // The example settings
@@ -118,19 +118,23 @@ documents.onDidClose(e => {
 	documentSettings.delete(e.document.uri);
 });
 
-var text:String;
-
+var text: String;
+var file: String;
+var extension: string;
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 	text = change.document.getText();
+	file = change.document.uri;
+	var xtension = file.split('.').pop();
+	extension = String(xtension);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	// In this simple example we get the settings for every validate run.
-	let settings = await getDocumentSettings(textDocument.uri);	
+	let settings = await getDocumentSettings(textDocument.uri);
 
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	let text = textDocument.getText();
@@ -178,57 +182,68 @@ connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
 	connection.console.log('We received an file change event');
 });
-var recieveData:any = "hi";
+var recieveData: any = "hi";
 // This handler provides the initial list of the completion items.
-let completionList:CompletionItem[] = [];
+let completionList: CompletionItem[] = [];
 connection.onCompletion(
 	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.		
-		var WebSocket = require('ws');		
-		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp',{ rejectUnauthorized: false });	
-		
-		var obj:any = {
-			"text" : text,
-			"line" : _textDocumentPosition.position.line+1,
-			"character":_textDocumentPosition.position.character
-		};
-		var output = <JSON>obj;
-		rpc.listen({
-			webSocket,
-			onConnection: (rpcConnection: rpc.MessageConnection) => {
-				const notification = new rpc.NotificationType<any, void>('onCompletion');
-				rpcConnection.listen();				
-				rpcConnection.sendNotification(notification, JSON.stringify(output));
-				console.log("yawwa spaams+ " + output);				
-			},
-		});	
+		if (extension === "authjs") {
 
-		await webSocket.on('message', function incoming(data: any) {				
-			console.log("Recieved "+data);
-			console.log("Recieved data type "+ typeof data);
-			let obj = JSON.parse(data);			
-			console.log("Recieved id type "+ JSON.stringify(obj.result.re));
-			recieveData = obj.result;	
-			var jsonData = JSON.parse(JSON.stringify(obj.result.re));
-			completionList=[];
-			for (var i = 0; i < jsonData.length; i++) {
-				var counter = jsonData[i];
-				// var snip:any = new SnippetString(counter.insertText);
-				var jsonob = {
-					label: String(counter.label),
-					kind: counter.kind,					
-					insertText: counter.insertText,										
-				};
-				completionList.push(jsonob);
-				console.log(counter.id);
-			}		
-		});	
 
-		var initialize = "null";
-		return completionList;
-		
+			var WebSocket = require('ws');
+			var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
+
+			var obj: any = {
+				"text": text,
+				"line": _textDocumentPosition.position.line + 1,
+				"character": _textDocumentPosition.position.character,
+				"path": file
+			};
+			var output = <JSON>obj;
+			rpc.listen({
+				webSocket,
+				onConnection: (rpcConnection: rpc.MessageConnection) => {
+					const notification = new rpc.NotificationType<any, void>('onCompletion');
+					rpcConnection.listen();
+					rpcConnection.sendNotification(notification, JSON.stringify(output));
+					console.log("yawwa spaams+ " + output);
+				},
+			});
+
+			await webSocket.on('message', function incoming(data: any) {
+				console.log("Recieved " + data);
+				console.log("Recieved data type " + typeof data);
+				let obj = JSON.parse(data);
+				console.log("Recieved id type " + JSON.stringify(obj.result.re));
+				recieveData = obj.result;
+				var jsonData = JSON.parse(JSON.stringify(obj.result.re));
+				completionList = [];
+				for (var i = 0; i < jsonData.length; i++) {
+					var counter = jsonData[i];
+					// var snip:any = new SnippetString(counter.insertText);
+					var jsonob = {
+						label: String(counter.label),
+						kind: counter.kind,
+						insertText: counter.insertText,
+					};
+					completionList.push(jsonob);
+					console.log(counter.id);
+				}
+			});
+
+			var initialize = "null";
+			return completionList;
+		} else {
+			completionList = [
+				{
+					label:"extension"
+				}
+			];
+			return completionList;
+		}
 
 	}
 );
