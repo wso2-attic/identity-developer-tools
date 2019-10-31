@@ -29,7 +29,7 @@
             height: auto;
             width: 100%;
             margin-bottom: 30px;
-            float: left;            
+            float: left;
         }
 
         .item_start {
@@ -56,7 +56,7 @@
         }
 
         .itemin {
-            margin-top: 10px;            
+            margin-top: 10px;
             border: 2px pink solid;
             width: 300px;
             border-radius: 40px;
@@ -64,7 +64,7 @@
             float: left;
         }
 
-        .body {            
+        .body {
             margin-left: 20%;
             position: fixed;
         }
@@ -75,8 +75,8 @@
         }
 
         .circleText {
-            margin-top:20px;
-            margin-left:20px
+            margin-top: 20px;
+            margin-left: 20px
         }
     </style>
 
@@ -91,15 +91,15 @@
     </div>
 
     <div class="block">
-        <div id="item_1" class="item"><span class="txt">Inbound Authentication Config</span> 
+        <div id="item_1" class="item"><span class="txt">Inbound Authentication Config</span>
 
         </div>
     </div>
 
     <div class="block">
-        
-        <div id="item_input" class="itemin"><span class="txt">Local And OutBound Authentication Config</span> 
-           
+
+        <div id="item_input" class="itemin"><span class="txt">Local And OutBound Authentication Config</span>
+
         </div>
     </div>
 
@@ -108,16 +108,17 @@
             <p class="circleText">Stop </p>
         </div>
     </div>
-    
+
 </body>
 <script>
-    
-    $(document).ready(function () {  
-       var text = `myXML`
-        
+
+    $(document).ready(function () {
+        const vscode = acquireVsCodeApi();
+        var filepath = 'myfilepath';
+        var text = `myXML`
         xmlDoc = $.parseXML(text);
         $xml = $(xmlDoc);
-
+        console.log(filepath);
         x = document.getElementById("item_1");
         y = document.getElementById("item_input");
         $xml.find("InboundAuthenticationConfig").find("InboundAuthenticationRequestConfigs").find("InboundAuthenticationRequestConfig").each(function () {
@@ -138,14 +139,20 @@
         });
 
         var code = $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationScript").text()
-
-        if(code.length >0){
-            z= document.getElementById("item_input");
-            z.innerHTML += ' <button style="margin-right:180px;">Script</button>';
+        console.log(code)
+        if (code.length > 0) {
+            z = document.getElementById("item_input");
+            z.innerHTML += ' <input type="button" value="script" id="openUndefine" >';
         }
-        
-        
-        
+
+        $('#openUndefine').click(function () {            
+            vscode.postMessage({
+                command: 'scriptFile',
+                text: code
+            })
+            console.log("done")
+        });        
+
 
         jsPlumb.ready(function () {
             /*First Instance*/
@@ -175,10 +182,10 @@
             var firstInstance = jsPlumb.getInstance();
 
             firstInstance.importDefaults({
-                ConnectionsDetachable: false,                
+                ConnectionsDetachable: false,
                 Connector: ["Straight", {
                     curviness: 20,
-                    stub:12
+                    stub: 12
                 }
 
                 ],
