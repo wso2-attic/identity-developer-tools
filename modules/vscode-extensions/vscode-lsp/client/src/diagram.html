@@ -118,7 +118,6 @@
         var text = `myXML`
         xmlDoc = $.parseXML(text);
         $xml = $(xmlDoc);
-        console.log(filepath);
         x = document.getElementById("item_1");
         y = document.getElementById("item_input");
         $xml.find("InboundAuthenticationConfig").find("InboundAuthenticationRequestConfigs").find("InboundAuthenticationRequestConfig").each(function () {
@@ -137,21 +136,18 @@
                 job = $row.find("LocalAuthenticatorConfigs").find("Name").text();
             y.innerHTML += '<div class="block"> <div id="item_1" class="inner"><span class="txt">' + job + '</span> </div></div>';
         });
-
         var code = $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationScript").text()
-        console.log(code)
+
         if (code.length > 0) {
             z = document.getElementById("item_input");
             z.innerHTML += ' <input type="button" value="script" id="openUndefine" >';
         }
 
-        $('#openUndefine').click(function () {            
+        $('#openUndefine').click(function () {
             vscode.postMessage({
-                command: 'scriptFile',
-                text: code
+                command: 'scriptFile'
             })
-            console.log("done")
-        });        
+        });
 
 
         jsPlumb.ready(function () {

@@ -117,8 +117,8 @@ export function activate(context: ExtensionContext) {
 			const code = document.getText(); // get the text of the \file
 			var xml = String(fs.readFileSync(xmlFilePath, 'utf8')); // get the xml from the file
 			var ast = XmlReader.parseSync(String(xml));
-			var linecount = xml.split(/\r\n|\r|\n/).length+1; // get the line count of the xml file
-		
+			var linecount = xml.split(/\r\n|\r|\n/).length + 1; // get the line count of the xml file
+
 			// Extract the adaptive script
 			var adaptive = xmlQuery(ast).find('LocalAndOutBoundAuthenticationConfig').find("AuthenticationScript").text();
 
