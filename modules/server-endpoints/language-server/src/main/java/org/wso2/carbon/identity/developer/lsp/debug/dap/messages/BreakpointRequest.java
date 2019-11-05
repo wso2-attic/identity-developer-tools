@@ -36,7 +36,7 @@ public class BreakpointRequest extends Request {
     public BreakpointRequest(long seq, String type, String command,
                              List<Argument> arguments) {
 
-        super(seq, type, command, arguments);
+        super(type, seq, command, arguments);
     }
 
     public String getSourceName() {

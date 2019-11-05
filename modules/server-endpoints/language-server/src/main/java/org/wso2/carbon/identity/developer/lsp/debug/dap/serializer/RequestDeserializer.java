@@ -27,6 +27,7 @@ import com.google.gson.JsonParseException;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.EventRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 
 import java.lang.reflect.Type;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * Deserialize the JSON RPC Request
  */
-public class RequestDeserializer implements JsonDeserializer<Request> {
+public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private static final String LOCAL_NAME_SEQ = "seq";
     private static final String LOCAL_NAME_TYPE = "type";
@@ -58,7 +59,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
     private static final String LOCAL_NAME_BODY = "body";
     private static final String LOCAL_NAME_UNKNOWN = "unknown";
 
-    public Request deserialize(JsonElement jsonElement, Type type,
+    public ProtocolMessage deserialize(JsonElement jsonElement, Type type,
                                JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 
         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -82,7 +83,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
                 return constructSetBreakpointRequest(LOCAL_NAME_SETBREAKPOINT, paramsObject);
         }
 
-        return new Request(0, LOCAL_NAME_UNKNOWN, LOCAL_NAME_UNKNOWN, null);
+        return new Request( LOCAL_NAME_UNKNOWN, 0, LOCAL_NAME_UNKNOWN, null);
     }
 
     private Request constructSetBreakpointRequest(String method, JsonObject paramsObject) {
@@ -121,7 +122,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
         return request;
     }
 
-    private Request createEventRequest(JsonObject jsonObject, long seqId) {
+    private ProtocolMessage createEventRequest(JsonObject jsonObject, long seqId) {
 
         JsonObject paramsObject = jsonObject.get(LOCAL_NAME_PARAMS).getAsJsonObject();
 
@@ -132,17 +133,14 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
             case LOCAL_NAME_EVENT:
                 return constructEventRequest(seqId, paramsObject);
         }
-        return new Request(seqId, msgType, command, null);
+        return new Request(msgType, seqId, command, null);
     }
 
-    private Request constructEventRequest(long seq, JsonObject paramsObject) {
+    private ProtocolMessage constructEventRequest(long seq, JsonObject paramsObject) {
 
         String event = getAsString(paramsObject, LOCAL_NAME_EVENT);
-        String command = getAsString(paramsObject, LOCAL_NAME_COMMAND);
-        JsonElement bodyElement = paramsObject.get(LOCAL_NAME_BODY);
-        ArrayList<Argument> params = new ArrayList<>();
 
-        return new EventRequest(seq, LOCAL_NAME_EVENT, event, params);
+        return new EventRequest(LOCAL_NAME_EVENT, event);
     }
 
     private String getAsString(JsonObject jsonObject, String key) {

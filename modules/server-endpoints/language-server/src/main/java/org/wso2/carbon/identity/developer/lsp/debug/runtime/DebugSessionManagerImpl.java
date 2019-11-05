@@ -66,6 +66,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     }
 
     public void destroy() {
+
         interceptionEngine.removeListener(this);
     }
 
@@ -86,7 +87,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             case "setBreakpoint":
                 return setBreakpoints(debugSession, (BreakpointRequest) request);
         }
-        Response response = new Response(request.getSeq(), request.getType(), request.getSeq(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getSeq(), request.getSeq(), true, "", "", null);
         return response;
     }
 
@@ -125,14 +126,15 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         //This is just simple implementation.
         BreakpointInfo[] breakpointInfos = debugSession.getBreakpointInfos();
-        if (breakpointInfos.length >0) {
+        if (breakpointInfos.length > 0) {
             BreakpointInfo breakpointInfo = breakpointInfos[0];
-            Argument argument = new Argument(breakpointInfo.getBreakpointLocations()[0]);
-            StoppedEvent stoppedEvent = new StoppedEvent(0, "breakpoint", "breakpoint", argument);
+            StoppedEvent stoppedEvent = new StoppedEvent("breakpoint", "breakpoint",
+                    breakpointInfo.getBreakpointLocations()[0],
+                    breakpointInfo.getResourceName());
             return stoppedEvent;
         }
 
-        return  null;
+        return null;
     }
 
     private void sendRequestToClient(Session websocketSession, ProtocolMessage message) {
@@ -177,10 +179,9 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         activeDebugSessions.remove(session);
     }
 
-
     private Response setBreakpoints(DebugSession debugSession, BreakpointRequest request) {
 
-        Response response = new Response(request.getSeq(), request.getType(), request.getSeq(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getSeq(), request.getSeq(), true, "", "", null);
 
         debugSession.setBreakpoints(request.getSourceName(), request.getBreakpoints());
         return response;

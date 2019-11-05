@@ -20,11 +20,10 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 import java.util.List;
 
-public class EventRequest extends Request {
+public class EventRequest extends ProtocolMessage {
 
-    public EventRequest(long seq, String type, String command,
-                        List<Argument> arguments) {
+    public EventRequest(String type, String command) {
 
-        super(seq, type, command, arguments);
+        super(type);
     }
 }

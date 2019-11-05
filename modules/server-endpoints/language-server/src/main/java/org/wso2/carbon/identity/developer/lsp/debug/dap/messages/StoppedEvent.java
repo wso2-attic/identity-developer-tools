@@ -20,13 +20,27 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
  * Stopped event for the debug session.
- *
  */
 public class StoppedEvent extends Event {
 
-    public StoppedEvent(long seq, String type, String event,
-                        Argument body) {
+    private int line;
+    private String resourceName;
 
-        super(seq, type, event, body);
+    public StoppedEvent(String type, String event,
+                        int line, String resourceName) {
+
+        super(type, event);
+        this.resourceName = resourceName;
+        this.line = line;
+    }
+
+    public int getLine() {
+
+        return line;
+    }
+
+    public String getResourceName() {
+
+        return resourceName;
     }
 }
