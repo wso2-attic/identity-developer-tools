@@ -23,6 +23,8 @@ import com.google.gson.Gson;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSession;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManager;
 
 import java.io.IOException;
 import javax.websocket.EncodeException;
@@ -42,6 +44,9 @@ public class DebugEndpoint {
 
     private JsonDap jsonDap;
 
+    @Inject
+    private DebugSessionManager debugSessionManager;
+
     public DebugEndpoint() {
 
         this.jsonDap = new JsonDap();
@@ -57,7 +62,7 @@ public class DebugEndpoint {
     @OnOpen
     public void onOpen(Session session) {
 
-        System.out.println(session.getId() + " has opened a connection");
+        debugSessionManager.addSession(session);
         try {
             Gson gson = new Gson();
 //            session.getBasicRemote().sendText("enwada");
@@ -78,6 +83,7 @@ public class DebugEndpoint {
     public void onClose(Session session) {
 
         System.out.println("Session " + session.getId() + " has ended");
+        debugSessionManager.removeSession(session);
     }
 
     /**
@@ -89,7 +95,7 @@ public class DebugEndpoint {
 
         try {
             Request request = jsonDap.decode(message);
-            Response response = new Response(request.getSeq(), request.getType(), request.getSeq(), true, "", "", null);
+            Response response = debugSessionManager.handle(session, request);
             session.getBasicRemote().sendText(jsonDap.encode(response));
         } catch (IOException ex) {
             ex.printStackTrace();

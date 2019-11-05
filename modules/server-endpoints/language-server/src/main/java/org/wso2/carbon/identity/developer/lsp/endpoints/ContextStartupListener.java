@@ -22,6 +22,8 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
 import org.wso2.carbon.identity.developer.lsp.ServiceReferenceHolder;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManager;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManagerImpl;
 import org.wso2.carbon.identity.developer.lsp.language.sp.AuthenticationScriptProcessor;
 
 import javax.servlet.ServletContextEvent;
@@ -35,11 +37,12 @@ import javax.servlet.annotation.WebListener;
 public class ContextStartupListener implements ServletContextListener {
 
     private LanguageProcessorFactory languageProcessorFactory;
+    private DebugSessionManagerImpl debugSessionManager;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
-        bindRequiredServices();
+        bindRequiredServices(JsFunctionRegistry.class);
 
         AuthenticationScriptProcessor authenticationScriptProcessor = new AuthenticationScriptProcessor();
         authenticationScriptProcessor.setJsFunctionRegistry(
@@ -48,18 +51,28 @@ public class ContextStartupListener implements ServletContextListener {
         languageProcessorFactory.addProcessor("Application", authenticationScriptProcessor);
 
         ServiceReferenceHolder.getInstance().addService(LanguageProcessorFactory.class, languageProcessorFactory);
+        debugSessionManager = new DebugSessionManagerImpl();
+        debugSessionManager.init();
+        ServiceReferenceHolder.getInstance().addService(DebugSessionManager.class, debugSessionManager);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-
+        debugSessionManager.destroy();
     }
 
-    private void bindRequiredServices() {
+    private void bindRequiredServices(Class... types) {
 
-        Object service = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(JsFunctionRegistry.class, null);
+        if (types == null) {
+            return;
+        }
+        for (Class type : types) {
+            Object service = PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .getOSGiService(type, null);
 
-        ServiceReferenceHolder.getInstance().addService(JsFunctionRegistry.class, service);
+            if (service != null) {
+                ServiceReferenceHolder.getInstance().addService(type, service);
+            }
+        }
     }
 }
