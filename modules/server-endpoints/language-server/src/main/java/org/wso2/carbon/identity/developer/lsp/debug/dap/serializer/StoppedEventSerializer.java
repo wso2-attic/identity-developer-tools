@@ -28,7 +28,8 @@ public class StoppedEventSerializer extends EventSerializer<StoppedEvent> {
     protected JsonElement formatParams(StoppedEvent event) {
 
         JsonObject object = new JsonObject();
-        object.addProperty("line", String.valueOf(event.getBody()));
+        object.addProperty("line", event.getLine());
+        object.addProperty("source", event.getResourceName());
         return object;
     }
 }

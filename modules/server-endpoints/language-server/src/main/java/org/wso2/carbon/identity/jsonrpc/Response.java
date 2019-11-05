@@ -61,6 +61,4 @@ public abstract class Response {
 
         return jsonrpc;
     }
-
-
 }

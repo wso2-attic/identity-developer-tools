@@ -26,17 +26,17 @@ import java.util.List;
 /**
  * JSON Debug Request
  */
-public class Request extends ProtocolMessage {
+public class Request extends Message {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
     private String command;
     private List<Argument> arguments;
 
-    public Request(long seq, String type, String command,
+    public Request(String type, long seq, String command,
                    List<Argument> arguments) {
 
-        super(seq, type);
+        super(type, seq);
         this.command = command;
         this.arguments = arguments;
     }
