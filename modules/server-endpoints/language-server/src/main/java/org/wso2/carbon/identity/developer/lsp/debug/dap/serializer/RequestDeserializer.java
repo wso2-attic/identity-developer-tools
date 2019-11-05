@@ -25,11 +25,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.EventRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,6 +49,9 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
     private static final String LOCAL_NAME_METHOD = "method";
     private static final String LOCAL_NAME_SETBREAKPOINT = "setBreakpoint";
     private static final String LOCAL_NAME_LINES = "lines";
+    private static final String LOCAL_NAME_SOURCE = "source";
+    private static final String LOCAL_NAME_NAME = "name";
+    private static final String LOCAL_NAME_PATH = "path";
     private static final String LOCAL_NAME_LINE = "line";
     private static final String LOCAL_NAME_BREAKPOINTS = "breakpoints";
     private static final String LOCAL_NAME_SOURCEMODIFIED = "sourceModified";
@@ -83,13 +88,26 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
     private Request constructSetBreakpointRequest(String method, JsonObject paramsObject) {
 
         JsonElement linesElement = paramsObject.get(LOCAL_NAME_LINES);
+        JsonObject sourceElement = (JsonObject) paramsObject.get(LOCAL_NAME_SOURCE);
+        JsonElement nameElement = sourceElement.get(LOCAL_NAME_NAME);
+        JsonElement pathElement = sourceElement.get(LOCAL_NAME_PATH);
         JsonElement breakpointsElements = paramsObject.get(LOCAL_NAME_BREAKPOINTS);
         JsonElement sourceModifiedElement = paramsObject.get(LOCAL_NAME_SOURCEMODIFIED);
 
-        Request request = new Request(0, LOCAL_NAME_MESSAGE, method, null);
+        BreakpointRequest request = new BreakpointRequest(0, LOCAL_NAME_MESSAGE, method, null);
 
-        List<Argument> arguments = new ArrayList<>();
-        request.setArguments(arguments);
+        JsonArray linesArray = linesElement.getAsJsonArray();
+        int[] lines = new int[linesArray.size()];
+        for (int i=0; i< lines.length; i++) {
+            lines[i] = linesArray.get(i).getAsInt();
+        }
+        request.setLines(lines);
+
+        request.setSourceName(nameElement.getAsString());
+        request.setSourcePath(pathElement.getAsString());
+        request.setSourceModified(sourceModifiedElement.getAsBoolean());
+
+        request.setArguments(Collections.EMPTY_LIST);
 
         if (breakpointsElements.isJsonArray()) {
             JsonArray jsonArray = breakpointsElements.getAsJsonArray();
@@ -97,8 +115,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
             for (int i = 0; i < breakpointsArray.length; i++) {
                 breakpointsArray[i] = jsonArray.get(i).getAsJsonObject().get(LOCAL_NAME_LINE).getAsInt();
             }
-            Argument argument = new Argument(breakpointsArray);
-            arguments.add(argument);
+            request.setBreakpoints(breakpointsArray);
         }
 
         return request;
