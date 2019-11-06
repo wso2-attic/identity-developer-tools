@@ -16,28 +16,29 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent;
+
+import org.wso2.carbon.identity.java.agent.connect.InterceptionEngine;
+import org.wso2.carbon.identity.java.agent.host.DefaultInterceptionEngine;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Helper class to get hold of the interception engine.
  */
-public class ProtocolMessage {
+public class AgentHelper {
 
-    private String type;
+    private InterceptionEngine interceptionEngine;
+    private static AgentHelper instance = new AgentHelper();
 
-    public ProtocolMessage(String type) {
-
-        this.type = type;
+    private AgentHelper() {
+        interceptionEngine = new DefaultInterceptionEngine();
     }
 
-    public String getType() {
-
-        return type;
+    public static AgentHelper getInstance () {
+        return instance;
     }
 
-    public void setType(String type) {
-
-        this.type = type;
+    public InterceptionEngine getInterceptionEngine() {
+        return interceptionEngine;
     }
+
 }

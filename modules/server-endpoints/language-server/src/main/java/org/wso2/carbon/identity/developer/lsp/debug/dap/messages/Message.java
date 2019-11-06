@@ -19,25 +19,25 @@
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * A message, which have a sequence number.
  */
-public class ProtocolMessage {
+public class Message extends ProtocolMessage {
 
-    private String type;
+    private long seq;
 
-    public ProtocolMessage(String type) {
+    public Message(String type, long seq) {
 
-        this.type = type;
+        super(type);
+        this.seq = seq;
     }
 
-    public String getType() {
+    public long getSeq() {
 
-        return type;
+        return seq;
     }
 
-    public void setType(String type) {
+    public void setSeq(long seq) {
 
-        this.type = type;
+        this.seq = seq;
     }
 }

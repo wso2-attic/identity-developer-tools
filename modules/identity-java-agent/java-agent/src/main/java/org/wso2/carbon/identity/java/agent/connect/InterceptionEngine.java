@@ -16,28 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.connect;
 
 /**
- * Generic protocol message for Debug protocol.
+ * Interception engine which will be used by other components to listen to execution.
  *
  */
-public class ProtocolMessage {
+public interface InterceptionEngine {
 
-    private String type;
+    /**
+     * Adds an interception listener to the engine.
+     * The listener is fired if the filter is applied.
+     *
+     * @param filter
+     * @param listener
+     */
+    void addListener(MethodEntryInterceptionFilter filter, InterceptionListener listener);
 
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+    /**
+     * Removed the listener from the engine.
+     *
+     * @param listener
+     */
+    void removeListener(InterceptionListener listener);
 }

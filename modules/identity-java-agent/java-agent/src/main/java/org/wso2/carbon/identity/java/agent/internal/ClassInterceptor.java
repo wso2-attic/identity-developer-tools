@@ -16,28 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.internal;
 
-/**
- * Generic protocol message for Debug protocol.
- *
- */
-public class ProtocolMessage {
+public interface ClassInterceptor {
 
-    private String type;
-
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
 }

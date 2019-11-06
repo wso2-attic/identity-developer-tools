@@ -16,28 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.connect;
 
-/**
- * Generic protocol message for Debug protocol.
- *
- */
-public class ProtocolMessage {
+import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
+import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
-    private String type;
+public interface InterceptionFilter {
 
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+    boolean shouldIntercept(InterceptionEventType type, MethodContext methodContext);
 }

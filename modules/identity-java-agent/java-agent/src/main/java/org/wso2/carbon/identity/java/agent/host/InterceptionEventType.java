@@ -16,28 +16,11 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.host;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Type of the interception event
  */
-public class ProtocolMessage {
-
-    private String type;
-
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+public enum InterceptionEventType {
+    METHOD_ENTRY
 }

@@ -16,28 +16,21 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.internal;
+
+import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
+import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Agents instrumentation event publisher.
  */
-public class ProtocolMessage {
+public interface EventPublisher {
 
-    private String type;
-
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+    /**
+     * Publishes an event.
+     *
+     * @param type
+     * @param context
+     */
+    void fireEvent(InterceptionEventType type, MethodContext context);
 }

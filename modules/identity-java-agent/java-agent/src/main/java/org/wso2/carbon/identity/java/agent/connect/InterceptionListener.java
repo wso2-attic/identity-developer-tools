@@ -16,28 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.connect;
+
+import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
+import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Listener for instrumentation event.
+ * Should be implemented by any class want to listen to any execution event on class or method.
  */
-public class ProtocolMessage {
+public interface InterceptionListener {
 
-    private String type;
-
-    public ProtocolMessage(String type) {
-
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+    /**
+     * Handles the event.
+     * Implementor may block the thread or handle it asynchronously.
+     *
+     * @param type
+     * @param methodContext
+     */
+    void handleEvent(InterceptionEventType type, MethodContext methodContext);
 }

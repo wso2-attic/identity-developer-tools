@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
-public class Response extends ProtocolMessage {
+public class Response extends Message {
 
     private long requestSeq;
     private boolean success;
@@ -27,10 +27,10 @@ public class Response extends ProtocolMessage {
 
     private Argument body;
 
-    public Response(long seq, String type, long requestSeq, boolean success, String command, String message,
+    public Response(String type, long seq, long requestSeq, boolean success, String command, String message,
                     Argument body) {
 
-        super(seq, type);
+        super(type, seq);
         this.requestSeq = requestSeq;
         this.success = success;
         this.command = command;

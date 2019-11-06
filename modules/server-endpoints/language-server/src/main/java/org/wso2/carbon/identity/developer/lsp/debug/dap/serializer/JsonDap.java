@@ -25,8 +25,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Event;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -50,6 +54,7 @@ public class JsonDap {
         gson = new GsonBuilder()
                 .registerTypeAdapter(Request.class, new RequestDeserializer())
                 .registerTypeAdapter(Response.class, new ResponseSerializer())
+                .registerTypeAdapter(StoppedEvent.class, new StoppedEventSerializer())
                 .create();
     }
 
@@ -75,7 +80,7 @@ public class JsonDap {
      * @param response
      * @return
      */
-    public String encode(Response response) throws JsonDapSerializeException {
+    public String encode(ProtocolMessage response) throws JsonDapSerializeException {
 
         JsonElement jsonElement = gson.toJsonTree(response);
 

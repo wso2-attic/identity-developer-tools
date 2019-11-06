@@ -16,28 +16,20 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.developer.lsp.debug.dap.serializer;
 
-/**
- * Generic protocol message for Debug protocol.
- *
- */
-public class ProtocolMessage {
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 
-    private String type;
+public class StoppedEventSerializer extends EventSerializer<StoppedEvent> {
 
-    public ProtocolMessage(String type) {
+    @Override
+    protected JsonElement formatParams(StoppedEvent event) {
 
-        this.type = type;
-    }
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
+        JsonObject object = new JsonObject();
+        object.addProperty("line", event.getLine());
+        object.addProperty("source", event.getResourceName());
+        return object;
     }
 }

@@ -465,16 +465,21 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			onConnection: (rpcConnection: rpc.MessageConnection) => {
 				console.log("connected+ " );
 				this.messageConnection = rpcConnection;
-			},
+				let notification = new rpc.NotificationType<string, void>('breakpoint');
+
+				rpcConnection.onNotification(notification, (param: any) => {
+					console.log("got notificaiton breakpoint.. "+param );
+					this._runtime.fireBreakpoint(param.line);
+				});
+				rpcConnection.onNotification( (param: any) => {
+					console.log("got notificaiton any .. "+param );;
+				});
+				rpcConnection.onRequest((param: any) => {
+					console.log("got Request.. "+param );
+				});
+				rpcConnection.listen();
+			}
 		});
 
-	}
-
-	public sendEvent(event: DebugProtocol.Event): void {
-		super.sendEvent(event);
-		// if(this.messageConnection != null) {
-			// var notification = new rpc.NotificationType("event");
-			// this.messageConnection.sendNotification(notification, event);
-		// }
 	}
 }

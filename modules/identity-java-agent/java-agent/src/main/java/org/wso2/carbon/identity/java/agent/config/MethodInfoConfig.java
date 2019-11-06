@@ -16,28 +16,28 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.java.agent.config;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Configuration for method and method signature
  */
-public class ProtocolMessage {
+public class MethodInfoConfig {
+    private String methodName;
+    private String signature;
 
-    private String type;
+    public MethodInfoConfig(String methodName, String signature) {
 
-    public ProtocolMessage(String type) {
-
-        this.type = type;
+        this.methodName = methodName;
+        this.signature = signature;
     }
 
-    public String getType() {
+    public String getMethodName() {
 
-        return type;
+        return methodName;
     }
 
-    public void setType(String type) {
+    public String getSignature() {
 
-        this.type = type;
+        return signature;
     }
 }

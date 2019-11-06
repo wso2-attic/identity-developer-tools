@@ -303,4 +303,10 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			this.emit(event, ...args);
 		});
 	}
+
+	public fireBreakpoint(ln: number) {
+		// send 'stopped' event
+		this._currentLine = ln;
+		this.sendEvent('stopOnBreakpoint');
+	}
 }

@@ -19,25 +19,28 @@
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Stopped event for the debug session.
  */
-public class ProtocolMessage {
+public class StoppedEvent extends Event {
 
-    private String type;
+    private int line;
+    private String resourceName;
 
-    public ProtocolMessage(String type) {
+    public StoppedEvent(String type, String event,
+                        int line, String resourceName) {
 
-        this.type = type;
+        super(type, event);
+        this.resourceName = resourceName;
+        this.line = line;
     }
 
-    public String getType() {
+    public int getLine() {
 
-        return type;
+        return line;
     }
 
-    public void setType(String type) {
+    public String getResourceName() {
 
-        this.type = type;
+        return resourceName;
     }
 }

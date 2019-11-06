@@ -16,28 +16,36 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.developer.lsp.debug.runtime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Generic protocol message for Debug protocol.
- *
+ * Holder for the breakpoint.
  */
-public class ProtocolMessage {
+public class BreakpointInfo {
 
-    private String type;
+    private String resourceName;
+    private int[] breakpointLocations;
 
-    public ProtocolMessage(String type) {
+    public String getResourceName() {
 
-        this.type = type;
+        return resourceName;
     }
 
-    public String getType() {
+    public void setResourceName(String resourceName) {
 
-        return type;
+        this.resourceName = resourceName;
     }
 
-    public void setType(String type) {
+    public int[] getBreakpointLocations() {
 
-        this.type = type;
+        return breakpointLocations;
+    }
+
+    public void setBreakpoints(int[] breakpoints) {
+
+        breakpointLocations = breakpoints;
     }
 }

@@ -25,14 +25,11 @@ public class Event extends ProtocolMessage {
 
     private String event;
 
-    private Argument body;
 
-    public Event(long seq, String type, String event,
-                 Argument body) {
+    public Event(String type, String event) {
 
-        super(seq, type);
+        super(type);
         this.event = event;
-        this.body = body;
     }
 
     public String getEvent() {
@@ -45,13 +42,4 @@ public class Event extends ProtocolMessage {
         this.event = event;
     }
 
-    public Argument getBody() {
-
-        return body;
-    }
-
-    public void setBody(Argument body) {
-
-        this.body = body;
-    }
 }
