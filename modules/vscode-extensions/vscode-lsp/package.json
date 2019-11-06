@@ -14,9 +14,12 @@
 		"vscode": "^1.33.0"
 	},
 	"activationEvents": [
+		"onDebug",
+		"onCommand:extension.mock-debug.getProgramName",
 		"onLanguage:javascript",
 		"onCommand:extension.diagram",
-		"onCommand:extension.script"
+		"onCommand:extension.script",
+		"onCommand:extension.auth"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
@@ -40,6 +43,68 @@
 				]
 			}
 		],
+		"breakpoints": [
+			{
+				"language": "markdown"
+			}
+		],
+		"debuggers": [
+			{
+				"type": "mock",
+				"label": "WSO2 IAM Debug",
+				"program": "./out/debugAdapter.js",
+				"runtime": "node",
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Absolute path to a text file.",
+								"default": "${workspaceFolder}/${command:AskForProgramName}"
+							},
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Automatically stop after launch.",
+								"default": true
+							},
+							"trace": {
+								"type": "boolean",
+								"description": "Enable logging of the Debug Adapter Protocol.",
+								"default": true
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"type": "mock",
+						"request": "launch",
+						"name": "Ask for file name",
+						"program": "${workspaceFolder}/${command:AskForProgramName}",
+						"stopOnEntry": true
+					}
+				],
+				"configurationSnippets": [
+					{
+						"label": "WSO2 IAM Debug: Launch",
+						"description": "A new configuration for 'debugging' a user selected markdown file.",
+						"body": {
+							"type": "mock",
+							"request": "launch",
+							"name": "Ask for file name",
+							"program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+							"stopOnEntry": true
+						}
+					}
+				],
+				"variables": {
+					"AskForProgramName": "extension.mock-debug.getProgramName"
+				}
+			}
+		],
 		"menus": {
 			"editor/title": [
 				{
@@ -57,6 +122,10 @@
 			]
 		},
 		"commands": [
+			{
+				"command": "extension.auth",
+				"title": "WSO2 Auth"
+			},
 			{
 				"command": "extension.diagram",
 				"title": "Show Diagram"
@@ -98,15 +167,24 @@
 		"test": "sh ./scripts/e2e.sh"
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.0",
-		"@types/node": "^8.0.0",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^10.11.0",
 		"tslint": "^5.16.0",
-		"typescript": "^3.5.1"
+		"vscode-debugadapter-testsupport": "1.37.0",
+		"typescript": "^3.5.1",
+		"mocha": "6.2.0",
+		"vsce": "1.66.0"
 	},
 	"dependencies": {
+		"axios": "^0.19.0",
+		"client-oauth2": "^4.2.5",
 		"core-util-is": "^1.0.2",
+		"express": "^4.17.1",
+		"gapi-client": "0.0.3",
+		"oauth": "^0.9.15",
 		"vscode": "^1.1.36",
 		"xml-query": "^1.5.0",
-		"xml-reader": "^2.4.3"
+		"xml-reader": "^2.4.3",
+		"vscode-languageclient": "^5.2.1"
 	}
 }

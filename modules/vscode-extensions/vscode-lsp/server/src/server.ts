@@ -21,7 +21,7 @@ import {
 
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
-
+const fs = require('fs');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -37,6 +37,23 @@ let hasDiagnosticRelatedInformationCapability: boolean = false;
 declare var text: String;
 
 connection.onInitialize((params: InitializeParams) => {
+	const templates = params.rootPath + '/.conf/templates/';
+
+	try{
+		fs.readdirSync(templates).forEach((file: any) => {
+			var filepath = templates+file;
+			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
+				if (err) throw err;
+				console.log('OK: ' + file);
+				console.log(data);
+			});
+			console.log(file);
+		});
+	}catch(e){
+		console.log(e);
+	}
+	
+
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
 	// If not, we will fall back using global settings
@@ -196,6 +213,8 @@ connection.onCompletion(
 			var WebSocket = require('ws');
 			var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
 
+
+
 			var obj: any = {
 				"text": text,
 				"line": _textDocumentPosition.position.line + 1,
@@ -223,7 +242,6 @@ connection.onCompletion(
 				completionList = [];
 				for (var i = 0; i < jsonData.length; i++) {
 					var counter = jsonData[i];
-					// var snip:any = new SnippetString(counter.insertText);
 					var jsonob = {
 						label: String(counter.label),
 						kind: counter.kind,
@@ -239,7 +257,7 @@ connection.onCompletion(
 		} else {
 			completionList = [
 				{
-					label:"extension"
+					label: "extension"
 				}
 			];
 			return completionList;
