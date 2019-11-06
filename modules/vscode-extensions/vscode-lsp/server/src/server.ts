@@ -39,15 +39,20 @@ declare var text: String;
 connection.onInitialize((params: InitializeParams) => {
 	const templates = params.rootPath + '/.conf/templates/';
 
-	fs.readdirSync(templates).forEach((file: any) => {
-		var filepath = templates+file;
-		fs.readFile(filepath, 'utf8', function (err: any, data: any) {
-			if (err) throw err;
-			console.log('OK: ' + file);
-			console.log(data);
+	try{
+		fs.readdirSync(templates).forEach((file: any) => {
+			var filepath = templates+file;
+			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
+				if (err) throw err;
+				console.log('OK: ' + file);
+				console.log(data);
+			});
+			console.log(file);
 		});
-		console.log(file);
-	});
+	}catch(e){
+		console.log(e);
+	}
+	
 
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
