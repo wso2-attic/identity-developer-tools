@@ -4,6 +4,12 @@
 #target files
 modules/server-endpoints/language-server/target
 
+#nodemodules
+node_modules
+
+#out
+out
+
 # Log file
 *.log
 
