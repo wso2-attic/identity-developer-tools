@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext,  WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { workspace, ExtensionContext, WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
 import { IdentityServerDebugSession } from './identityServerDebug';
 import * as vscode from 'vscode';
 import {
@@ -16,12 +16,11 @@ import {
 let client: LanguageClient;
 import * as fs from 'fs';
 import * as Net from 'net';
-import { Http2ServerRequest } from 'http2';
 const xmlQuery = require('xml-query');
 const XmlReader = require('xml-reader');
-const ClientOAuth2 = require('client-oauth2');
-const axios = require('axios');
 var xmlFilePath;
+import { FileHandler } from './lspModules/fileHandler';
+import { PreviewManager } from './lspModules/PreviewManager';
 
 /*
  * Set the following compile time flag to true if the
@@ -30,6 +29,10 @@ var xmlFilePath;
  */
 const EMBED_DEBUG_ADAPTER = true;
 export function activate(context: ExtensionContext) {
+	// The Object Of the FileHandler
+	const fileHandler = new FileHandler();
+	// The Object Of the previewManager
+	const previewManager = new PreviewManager();
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
@@ -60,132 +63,60 @@ export function activate(context: ExtensionContext) {
 	};
 
 	context.subscriptions.push(
-		
+		// File open event hadler
+		vscode.workspace.onDidOpenTextDocument(async (file) => {			
+			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
+			console.log(extensionOfOpenedFile);			
+			if (extensionOfOpenedFile == ".authxml") {
+				xmlFilePath = file.uri.fsPath.split(".git")[0];
+				await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+				previewManager.generateWebViewPanel(xmlFilePath, context);
+			}
+		}),
+
+		// Show Diagram command registration.
 		vscode.commands.registerCommand('extension.diagram', () => {
 			const { activeTextEditor } = vscode.window;
 			const { document } = activeTextEditor;
 			const filepath = document.uri;
 			xmlFilePath = filepath.fsPath;
-			const code = document.getText(); //get the text of the file		
-			const pathToHtml = vscode.Uri.file(
-				path.join(context.extensionPath, 'client', 'src', 'diagram.html')
-			);
-			const pathUri = pathToHtml.with({ scheme: 'vscode-resource' });
-			const panel = vscode.window.createWebviewPanel(
-				'Diagram',
-				'Show Diagram',
-				vscode.ViewColumn.Two,
-				{
-					enableScripts: true,
-					retainContextWhenHidden: true
-
-				}
-			);
-			panel.webview.html = getWebviewContent(code, pathUri, filepath);
-			panel.webview.onDidReceiveMessage(
-				message => {
-					switch (message.command) {
-						case 'scriptFile':
-
-							var xml = String(fs.readFileSync(xmlFilePath, 'utf8'));
-							var ast = XmlReader.parseSync(String(xml));
-							var adaptive = xmlQuery(ast).find('LocalAndOutBoundAuthenticationConfig').find("AuthenticationScript").text();
-							if (fs.existsSync(path.join(vscode.workspace.rootPath, 'temp.authjs'))) {
-								var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'temp.authjs'));
-								vscode.workspace.openTextDocument(file).then(document => {
-									vscode.window.showTextDocument(document, 3, false);
-								});
-							} else {
-								var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, 'temp.authjs'));
-								vscode.workspace.openTextDocument(newFile).then(document => {
-									const edit = new vscode.WorkspaceEdit();
-									edit.insert(newFile, new vscode.Position(0, 0), adaptive);
-									return vscode.workspace.applyEdit(edit).then(async success => {
-										if (success) {
-											await document.save();
-											const newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'temp.authjs'));
-											vscode.workspace.openTextDocument(newFile).then(document => {
-												vscode.window.showTextDocument(document, 3, false);
-											});
-										} else {
-											vscode.window.showInformationMessage('Error!');
-										}
-									});
-								});
-								return;
-							}
-					}
-				},
-				undefined,
-				context.subscriptions
-			);
-
+			previewManager.generateWebViewPanel(xmlFilePath, context);
 		}),
+
+		// Sync command registration.
 		vscode.commands.registerCommand('extension.script', async () => {
-			const { activeTextEditor } = vscode.window;
-			const { document } = activeTextEditor;
-			document.save(); // save the document before sync			
-
-
-			const code = document.getText(); // get the text of the \file
-			var xml = String(fs.readFileSync(xmlFilePath, 'utf8')); // get the xml from the file
-			var ast = XmlReader.parseSync(String(xml));
-			var linecount = xml.split(/\r\n|\r|\n/).length + 1; // get the line count of the xml file
-
-			// Extract the adaptive script
-			var adaptive = xmlQuery(ast).find('LocalAndOutBoundAuthenticationConfig').find("AuthenticationScript").text();
-
-			// Sync two documents
-			var newXml = xml.replace(adaptive, code);
-			const newFile = vscode.Uri.parse('file:' + path.join(xmlFilePath));
-			vscode.workspace.openTextDocument(newFile).then(async document => {
-				const edit = new vscode.WorkspaceEdit();
-				await edit.delete(newFile, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(linecount, 0)));
-				await edit.insert(newFile, new vscode.Position(0, 0), newXml);
-				return vscode.workspace.applyEdit(edit).then(async success => {
-					if (success) {
-						await document.save();
-					} else {
-						vscode.window.showInformationMessage('Error!');
-					}
-				});
-			});
+			fileHandler.syncServiceProviderWithAdaptiveScript(xmlFilePath);			
 		}),
+
+		// List the service providers in command plate
 		vscode.commands.registerCommand('extension.auth', async () => {
-			const result = await vscode.window.showInputBox({
-				placeHolder: 'Enter your acess token'
-			});
-			
-			var text = 
-			`{
-	"name": "wso2 Service Provider",
-	"token": "${result}"
-}`;
-			var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, '.config.json'));
-			vscode.workspace.openTextDocument(newFile).then(document => {
-				const edit = new vscode.WorkspaceEdit();
-				edit.insert(newFile, new vscode.Position(0, 0), text);
-				return vscode.workspace.applyEdit(edit).then(async success => {
-					if (success) {					
-						await document.save();						
-					} else {
-						vscode.window.showInformationMessage('Error!');
-					}
+			// Path of the service providers directory.
+			const serviceProvidersDirectory = vscode.workspace.rootPath + '/.conf/sp/';
+			var services = [];			
+			try {
+				// Add the service names to the services array.
+				fs.readdirSync(serviceProvidersDirectory).forEach((file: any) => {
+					var serviceName = String(file).replace(/\.[^/.]+$/, "");
+					services.push(serviceName);
 				});
-			});
-			vscode.window.showInformationMessage(`Access Token Saved Successfully`);
-		}),
-		vscode.commands.registerCommand('extension.mock-debug.getProgramName', config => {
-			return vscode.window.showInputBox({
-				placeHolder: "Please enter the name of a markdown file in the workspace folder",
-				value: "readme.md"
-			});
+			} catch (e) {
+				console.log(e);
+			}
+
+			// Show thelist of services in command pallet.
+			var result = await vscode.window.showQuickPick(
+				services,
+				{ placeHolder: 'Select Service' }
+			);
+			xmlFilePath = serviceProvidersDirectory + result + '.authxml';
+			previewManager.generateWebViewPanel(xmlFilePath, context);
+
 		})
 	);
 	// register a configuration provider for 'mock' debug type
 	const provider = new MockConfigurationProvider();
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
-	console.log("EMBED_DEBUG_ADAPTER "+EMBED_DEBUG_ADAPTER);
+	console.log("EMBED_DEBUG_ADAPTER " + EMBED_DEBUG_ADAPTER);
 	if (EMBED_DEBUG_ADAPTER) {
 		// The following use of a DebugAdapter factory shows how to run the debug adapter inside the extension host (and not as a separate process).
 		const factory = new IdentityServerDebugAdapterDescriptorFactory();
@@ -235,14 +166,6 @@ export function deactivate(): Thenable<void> | undefined {
 		return undefined;
 	}
 	return client.stop();
-}
-
-function getWebviewContent(code, path, filepath) {
-	var html = fs.readFileSync(path.fsPath, 'utf8');
-	var re = /myXML/gi;
-	var pa = /myfilepath/gi;
-	var newHtml = html.replace(re, code).replace(pa, filepath);
-	return newHtml;
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {

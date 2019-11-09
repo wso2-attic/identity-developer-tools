@@ -14,6 +14,7 @@
 		"vscode": "^1.33.0"
 	},
 	"activationEvents": [
+		"onWebviewEditor:imagePreview.previewEditor",
 		"onDebug",
 		"onCommand:extension.mock-debug.getProgramName",
 		"onLanguage:javascript",
@@ -22,7 +23,7 @@
 		"onCommand:extension.auth"
 	],
 	"main": "./client/out/extension",
-	"contributes": {
+	"contributes": {		
 		"languages": [
 			{
 				"id": "javascript",
@@ -34,12 +35,12 @@
 				]
 			},
 			{
-				"id": "IAM",
+				"id": "xml",
 				"aliases": [
-					"IAM"
+					"xml"
 				],
 				"extensions": [
-					".auth"
+					".authxml"
 				]
 			}
 		],
@@ -108,7 +109,7 @@
 		"menus": {
 			"editor/title": [
 				{
-					"when": "resourceLangId == IAM",
+					"when": "resourceLangId == xml",
 					"command": "extension.diagram",
 					"alt": "markdown.showPreviewToSide",
 					"group": "navigation"
@@ -124,7 +125,7 @@
 		"commands": [
 			{
 				"command": "extension.auth",
-				"title": "WSO2 Auth"
+				"title": "IAM Service Providers"
 			},
 			{
 				"command": "extension.diagram",
