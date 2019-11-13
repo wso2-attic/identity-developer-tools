@@ -16,7 +16,8 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	Position,
-	VersionedTextDocumentIdentifier
+	VersionedTextDocumentIdentifier,
+	CompletionList
 } from 'vscode-languageserver';
 
 // import {SnippetString} from 'vscode';
@@ -35,24 +36,38 @@ let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 
 declare var text: String;
-
+const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
 connection.onInitialize((params: InitializeParams) => {
 	const templates = params.rootPath + '/.conf/templates/';
 
-	try{
+	try {
 		fs.readdirSync(templates).forEach((file: any) => {
-			var filepath = templates+file;
-			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
-				if (err) throw err;
-				console.log('OK: ' + file);
-				console.log(data);
+			var filepath = templates + file;
+			fs.readFile(filepath, 'utf8', function 	(err: any, data: any) {
+				if (err) throw err;	
+				console.log(file);			
+				var obj = JSON.parse(String(data));
+				var codeArray = obj.code;
+				var description = obj.summary;
+				var name = obj.name;
+				var code: String = "";
+				for (var i in codeArray) {
+					code += codeArray[i] + "\n";					
+				}
+				var snippentObj = {
+					label: name,
+					detail: description,
+					insertText: code
+				};
+				completionTemplates.push(snippentObj);
+
+				console.log('OK: ' + completionTemplates[0].label);
 			});
-			console.log(file);
 		});
-	}catch(e){
+	} catch (e) {
 		console.log(e);
 	}
-	
+
 
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
@@ -231,7 +246,7 @@ connection.onCompletion(
 					console.log("yawwa spaams+ " + output);
 				},
 			});
-
+			
 			await webSocket.on('message', function incoming(data: any) {
 				console.log("Recieved " + data);
 				console.log("Recieved data type " + typeof data);
@@ -240,6 +255,9 @@ connection.onCompletion(
 				recieveData = obj.result;
 				var jsonData = JSON.parse(JSON.stringify(obj.result.re));
 				completionList = [];
+				for (var j in completionTemplates) {				
+					completionList.push(completionTemplates[j]);					
+				}
 				for (var i = 0; i < jsonData.length; i++) {
 					var counter = jsonData[i];
 					var jsonob = {
@@ -251,6 +269,8 @@ connection.onCompletion(
 					console.log(counter.id);
 				}
 			});
+			
+			
 
 			var initialize = "null";
 			return completionList;
