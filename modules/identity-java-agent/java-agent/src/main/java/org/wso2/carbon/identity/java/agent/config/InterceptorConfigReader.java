@@ -18,32 +18,58 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
+
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
+    public static final String filename = "/home/piyumi/identity-developer-tools/modules/identity-java-agent/java-agent/src/main/resources/instrumentation-config.properties";
+    private String className;
+    private String methodName;
+    private String signature;
 
     /**
      * Reads the configs in the class resource
-     * "instrumentation-config.json".
+     * "instrumentation-config.properties".
      *
      * @return
      */
-    public List<InterceptorConfig> readConfig() {
+    public List<InterceptorConfig> readConfig(){
+
+
+            Properties properties = new Properties();
+            try {
+                FileInputStream fileReader = new FileInputStream(filename);
+                properties.load(fileReader);
+
+                this.className = properties.getProperty("class.1.className");
+                this.methodName= properties.getProperty("class.1.methodName");
+                this.signature=properties.getProperty("class.1.signature");
+
+            }catch (IOException e){
+                e.printStackTrace();
+
+            }
+
 
         ArrayList<InterceptorConfig> result = new ArrayList<>();
+            ClassLoader classLoader = getClass().getClassLoader();
+            //TODO: Read the instrumentation-config.properties
 
-        //TODO: Read the instrumentation-config.json
-        InterceptorConfig interceptorConfig = new InterceptorConfig();
-        interceptorConfig.setClassName(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator");
-        interceptorConfig.addMethodSignature("handle",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
+            InterceptorConfig interceptorConfig = new InterceptorConfig();
+            interceptorConfig.setClassName(className);
+            interceptorConfig.addMethodSignature(methodName,signature);
 
-        result.add(interceptorConfig);
-        return result;
+            result.add(interceptorConfig);
+            return result;
+
     }
+
 }
