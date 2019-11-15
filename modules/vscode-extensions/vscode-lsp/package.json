@@ -11,19 +11,21 @@
 		"multi-root ready"
 	],
 	"engines": {
-		"vscode": "^1.33.0"
+		"vscode": "^1.39.0"
 	},
 	"activationEvents": [
-		"onWebviewEditor:imagePreview.previewEditor",
+		"onWebviewEditor:qqq",
 		"onDebug",
 		"onCommand:extension.mock-debug.getProgramName",
 		"onLanguage:javascript",
+		"onLanguage:xml",
 		"onCommand:extension.diagram",
 		"onCommand:extension.script",
-		"onCommand:extension.auth"
+		"onCommand:extension.auth",
+		"onCommand:extension.oAuth"
 	],
 	"main": "./client/out/extension",
-	"contributes": {		
+	"contributes": {
 		"languages": [
 			{
 				"id": "javascript",
@@ -109,13 +111,27 @@
 		"menus": {
 			"editor/title": [
 				{
-					"when": "resourceLangId == xml",
+					"when": "resourceExtname == .authxml",
 					"command": "extension.diagram",
 					"alt": "markdown.showPreviewToSide",
 					"group": "navigation"
 				},
 				{
-					"when": "resourceLangId == javascript",
+					"when": "resourceExtname == .authjs",
+					"command": "extension.script",
+					"alt": "markdown.showPreviewToSide",
+					"group": "navigation"
+				}
+			],
+			"editor/context": [
+				{
+					"when": "resourceExtname == .authxml",
+					"command": "extension.diagram",
+					"alt": "markdown.showPreviewToSide",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceExtname == .authjs",
 					"command": "extension.script",
 					"alt": "markdown.showPreviewToSide",
 					"group": "navigation"
@@ -134,6 +150,10 @@
 			{
 				"command": "extension.script",
 				"title": "Sync"
+			},
+			{
+				"command": "extension.oAuth",
+				"title": "Login With Wso2 IS"
 			}
 		],
 		"configuration": {
@@ -156,6 +176,16 @@
 					],
 					"default": "off",
 					"description": "Traces the communication between VS Code and the language server."
+				},
+				"IAM.acessToken": {
+					"type": "string",
+					"default": "",
+					"description": "Access Token"
+				},
+				"IAM.URL": {
+					"type": "string",
+					"default": "",
+					"description": "URL of the WSO2 Identity Server"
 				}
 			}
 		}
@@ -182,10 +212,13 @@
 		"core-util-is": "^1.0.2",
 		"express": "^4.17.1",
 		"gapi-client": "0.0.3",
+		"https": "^1.0.0",
 		"oauth": "^0.9.15",
+		"openurl": "^1.1.1",
+		"passport-oauth2": "^1.5.0",
 		"vscode": "^1.1.36",
+		"vscode-languageclient": "^5.2.1",
 		"xml-query": "^1.5.0",
-		"xml-reader": "^2.4.3",
-		"vscode-languageclient": "^5.2.1"
+		"xml-reader": "^2.4.3"
 	}
 }
