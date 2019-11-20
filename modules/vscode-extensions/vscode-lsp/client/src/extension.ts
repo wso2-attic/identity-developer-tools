@@ -21,12 +21,13 @@ const XmlReader = require('xml-reader');
 var xmlFilePath;
 import { FileHandler } from './lspModules/fileHandler';
 import { PreviewManager } from './lspModules/PreviewManager';
-
+import { Wso2OAuth } from './lspModules/oAuthService';
 /*
  * Set the following compile time flag to true if the
  * debug adapter should run inside the extension host.
  * Please note: the test suite does not (yet) work in this mode.
  */
+
 const EMBED_DEBUG_ADAPTER = true;
 export function activate(context: ExtensionContext) {
 	// The Object Of the FileHandler
@@ -62,14 +63,25 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
-	context.subscriptions.push(
+	var accessToken;
+	context.subscriptions.push(		
+
+		// Show oAuth to wso2.
+		vscode.commands.registerCommand('extension.oAuth', () => {
+			previewManager.generateOAuthPreview(context);
+			new Wso2OAuth(8010).StartProcess();
+		}),
+		
 		// File open event hadler
-		vscode.workspace.onDidOpenTextDocument(async (file) => {			
+		vscode.workspace.onDidOpenTextDocument(async (file) => {		
+			
+			accessToken = vscode.workspace.getConfiguration().get('IAM.acessToken');
 			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
-			console.log(extensionOfOpenedFile);			
+			console.log(extensionOfOpenedFile);
 			if (extensionOfOpenedFile == ".authxml") {
-				xmlFilePath = file.uri.fsPath.split(".git")[0];
 				await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+				xmlFilePath = file.uri.fsPath.split(".git")[0];
+				vscode.window.showInformationMessage(String(accessToken));
 				previewManager.generateWebViewPanel(xmlFilePath, context);
 			}
 		}),
@@ -85,14 +97,14 @@ export function activate(context: ExtensionContext) {
 
 		// Sync command registration.
 		vscode.commands.registerCommand('extension.script', async () => {
-			fileHandler.syncServiceProviderWithAdaptiveScript(xmlFilePath);			
+			fileHandler.syncServiceProviderWithAdaptiveScript(xmlFilePath);
 		}),
 
 		// List the service providers in command plate
 		vscode.commands.registerCommand('extension.auth', async () => {
 			// Path of the service providers directory.
 			const serviceProvidersDirectory = vscode.workspace.rootPath + '/.conf/sp/';
-			var services = [];			
+			var services = [];
 			try {
 				// Add the service names to the services array.
 				fs.readdirSync(serviceProvidersDirectory).forEach((file: any) => {
@@ -167,6 +179,8 @@ export function deactivate(): Thenable<void> | undefined {
 	}
 	return client.stop();
 }
+
+
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 

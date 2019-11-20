@@ -19,7 +19,7 @@ export class PreviewManager {
 			// Get the text of the file.
 			const code = String(data); 				
 			const pathToHtml = vscode.Uri.file(
-				path.join(context.extensionPath, 'client', 'src', 'diagram.html')
+				path.join(context.extensionPath, 'client', 'src','ui','diagram.html')
 			);			
 			const pathUri = pathToHtml.with({ scheme: 'vscode-resource' });
 			const panel = vscode.window.createWebviewPanel(
@@ -55,6 +55,27 @@ export class PreviewManager {
 		// Replace the xml code and the filepath in html code.	
 		var newHtml = htmlCode.replace(re, xmlCode).replace(pa, filepath);		
 		return newHtml;
+	}
+
+	/**
+	 * getWebviewContent() to generate the html of oAuth web.
+	 */
+	public generateOAuthPreview(context){
+		var htmlFilePath = vscode.Uri.file(
+			path.join(context.extensionPath, 'client', 'src', 'ui','oAuth.html')
+		);
+		var html = fileHandler.getHTMLCode(htmlFilePath.fsPath);
+		const panel = vscode.window.createWebviewPanel(
+			'WSO2 Login',
+			'WSO2 Login',
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				retainContextWhenHidden: true
+
+			}
+		);
+		panel.webview.html = html;
 	}
 	
 }
