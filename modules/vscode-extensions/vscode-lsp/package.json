@@ -177,14 +177,14 @@
 					"default": "off",
 					"description": "Traces the communication between VS Code and the language server."
 				},
-				"IAM.acessToken": {
+				"IAM.ServiceClientID": {
 					"type": "string",
 					"default": "",
-					"description": "Access Token"
+					"description": "Client ID of the Service"
 				},
 				"IAM.URL": {
 					"type": "string",
-					"default": "",
+					"default": "https://localhost:9443",
 					"description": "URL of the WSO2 Identity Server"
 				}
 			}
@@ -213,6 +213,7 @@
 		"express": "^4.17.1",
 		"gapi-client": "0.0.3",
 		"https": "^1.0.0",
+		"keytar": "^5.0.0",
 		"oauth": "^0.9.15",
 		"openurl": "^1.1.1",
 		"passport-oauth2": "^1.5.0",
