@@ -16,12 +16,9 @@ import {
 let client: LanguageClient;
 import * as fs from 'fs';
 import * as Net from 'net';
-const xmlQuery = require('xml-query');
-const XmlReader = require('xml-reader');
-var xmlFilePath;
 import { FileHandler } from './lspModules/fileHandler';
 import { PreviewManager } from './lspModules/PreviewManager';
-import { Wso2OAuth } from './lspModules/oAuthService';
+var xmlFilePath;
 /*
  * Set the following compile time flag to true if the
  * debug adapter should run inside the extension host.
@@ -64,17 +61,16 @@ export function activate(context: ExtensionContext) {
 	};
 
 	var accessToken;
-	context.subscriptions.push(		
+	context.subscriptions.push(
 
-		// Show oAuth to wso2.
+		// Show oAuth webview.
 		vscode.commands.registerCommand('extension.oAuth', () => {
 			previewManager.generateOAuthPreview(context);
-			new Wso2OAuth(8010).StartProcess();
 		}),
-		
+
 		// File open event hadler
-		vscode.workspace.onDidOpenTextDocument(async (file) => {		
-			
+		vscode.workspace.onDidOpenTextDocument(async (file) => {
+
 			accessToken = vscode.workspace.getConfiguration().get('IAM.acessToken');
 			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
 			console.log(extensionOfOpenedFile);

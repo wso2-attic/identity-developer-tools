@@ -2,16 +2,64 @@
 <html lang="en">
 
 <head>
+	<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<meta charset="utf-8">
-	<meta http-equiv="Content-Security-Policy"
+	<!-- <meta http-equiv="Content-Security-Policy"
 		content="default-src vscode-resource:; form-action vscode-resource:; frame-ancestors vscode-resource:; img-src vscode-resource: https:; script-src 'self' 'unsafe-inline' vscode-resource:; style-src 'self' 'unsafe-inline' vscode-resource:;" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
 </head>
 
 <body>
-	<a
-		href="https://localhost:9443/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=0aT4RyRSYOqsBKwsbmHsIcYwq1ca"><button>Login
-			with WSO2 IS</button></a>
+
+	<!-- Masthead -->
+	<header class="masthead text-white text-center">
+		<div class="overlay"></div>
+		<div class="container">
+			<div class="row">
+				<div class="col-xl-9 mx-auto">
+					<h1 class="mb-5">IAM VS code Extension</h1>
+				</div>
+				<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+					<form>
+						<div class="col-md-12">
+							<input id="url" input type="url" pattern="https?://.+" class="form-control form-control-lg"
+								placeholder="Enter your IS url" required>
+						</div><br />
+						<div class="col-md-12">
+							<input id="clientID" type="text" class="form-control form-control-lg"
+								placeholder="Client ID" required>
+						</div><br />
+						<div class="col-md-12">
+							<input id="clientSecret" type="password" class="form-control form-control-lg"
+								placeholder="Client Secret" required>
+						</div><br />
+						<div class="col-12 col-md-3 mx-auto">
+							<button id="login" type="submit" class="btn btn-block btn-lg btn-primary">Sign
+								In!</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="col-xl-9 mx-auto">
+					<h1 class="mb-5" style="margin-top: 15px;">OR</h1>
+				</div>
+
+				<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+					<form>
+						<div class="col-12 col-md-12 mb-2 mb-md-0">
+							<input id="acesstoken" type="password" class="form-control form-control-lg"
+								placeholder="Enter your IS Access Token" required>
+						</div><br />
+						<div class="col-12 col-md-3 mx-auto">
+							<button id="acess" type="submit" class="btn btn-block btn-lg btn-primary">Sumit</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</header>
 
 	<style>
 		html,
@@ -26,6 +74,54 @@
 			margin: 0;
 		}
 	</style>
+	<script>
+		function isUrlValid(url) {
+			var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+			return regexp.test(url);
+		}
+
+		function modifyUrl(url) {
+			if (url.slice(url.length - 1) == '/') {
+				var newUrl = url.substring(0, url.length - 1);
+				return newUrl;
+			} else {
+				return url;
+			}
+		}
+		$(document).ready(function () {
+			const vscode = acquireVsCodeApi();
+			var url = `wso2isurl`;
+			var clientID = `wso2ISClientID`;
+			var clientSecret = `wso2ISClientSecret`;
+			$('#url').val(url);
+			$('#clientID').val(clientID);
+			$('#clientSecret').val(clientSecret);
+			$('#login').click(function () {
+				var clientID = $('#clientID').val();
+				var clientSecret = $('#clientSecret').val();
+				var isURL = $('#url').val();
+				var url = modifyUrl(isURL);
+				if (isUrlValid(isURL) && clientSecret.length>0 && clientID.length>0) {
+					vscode.postMessage({
+						command: 'login',
+						url: url,
+						clientID:clientID,
+						clientSecret:clientSecret
+					});
+				}
+			});
+
+			$('#acess').click(function () {
+				var acessToken = $('#acesstoken').val();
+				if (acessToken.length > 0) {
+					vscode.postMessage({
+						command: 'acess',
+						acessToken: acessToken,
+					});
+				}
+			});
+		});
+	</script>
 </body>
 
 </html>
