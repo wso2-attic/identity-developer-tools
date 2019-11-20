@@ -18,22 +18,21 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
-
-
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+
 
 /**
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
-    public static final String filename = "/home/piyumi/identity-developer-tools/modules/identity-java-agent/java-agent/src/main/resources/instrumentation-config.properties";
-    private String className;
-    private String methodName;
-    private String signature;
+
+    private static final String filename = "/home/piyumi/identity-developer-tools/modules/identity-java-agent/java-agent/src/main/resources/instrumentation-config.properties";
+
 
     /**
      * Reads the configs in the class resource
@@ -43,33 +42,53 @@ public class InterceptorConfigReader {
      */
     public List<InterceptorConfig> readConfig(){
 
+        List<String> classNumbers=new ArrayList<>();
+        List<String> classProperties=new ArrayList<>();
+        try {
 
-            Properties properties = new Properties();
-            try {
-                FileInputStream fileReader = new FileInputStream(filename);
-                properties.load(fileReader);
+            FileInputStream fileReader = new FileInputStream(filename);
+            BufferedReader readBuffered = new BufferedReader(new InputStreamReader(fileReader));
 
-                this.className = properties.getProperty("class.1.className");
-                this.methodName= properties.getProperty("class.1.methodName");
-                this.signature=properties.getProperty("class.1.signature");
+            String line = null;
+            while ((line = readBuffered.readLine()) != null) {
 
-            }catch (IOException e){
-                e.printStackTrace();
+                if (line.trim().length() == 0 || line.startsWith("#") || line.startsWith(" "))
+                    continue;
 
+                if (line.startsWith("class.")) {
+                    String delimiters = "\\.+|=\\s*";
+                    String[] tokensVal = line.split(delimiters);
+                    for (int i = 0; i < tokensVal.length; i++) {
+                        if (i == 1) {
+                            String classNumber = tokensVal[i];
+                            classNumbers.add(classNumber);
+                        }
+                        if (i == 3) {
+                            String classProperty = tokensVal[i];
+                            classProperties.add(classProperty);
+                        }
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        ArrayList<InterceptorConfig> result = new ArrayList<>();
+
+            for(int j=0;j< classProperties.size()-2;j+=3){
+                InterceptorConfig interceptorConfig = new InterceptorConfig();
+                interceptorConfig.setClassName(classProperties.get(j));
+                interceptorConfig.addMethodSignature(classProperties.get(j + 1),classProperties.get(j + 2));
+                result.add(interceptorConfig);
             }
 
 
-        ArrayList<InterceptorConfig> result = new ArrayList<>();
-            ClassLoader classLoader = getClass().getClassLoader();
-            //TODO: Read the instrumentation-config.properties
+        System.out.println(result.get(1).getClassName());
 
-            InterceptorConfig interceptorConfig = new InterceptorConfig();
-            interceptorConfig.setClassName(className);
-            interceptorConfig.addMethodSignature(methodName,signature);
-
-            result.add(interceptorConfig);
             return result;
 
     }
+
 
 }
