@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
-    private static final String filename = "/home/piyumi/Music/identity-developer-tools/modules/identity-java-agent/java-agent/src/main/resources/instrumentation-config.properties";
+    private static final String filename =  "instrumentation-config.properties";
 
 
     /**
@@ -43,9 +43,8 @@ public class InterceptorConfigReader {
         List<String> classNumbers=new ArrayList<>();
         List<String> classProperties=new ArrayList<>();
         try {
-
-            FileInputStream fileReader = new FileInputStream(filename);
-            BufferedReader readBuffered = new BufferedReader(new InputStreamReader(fileReader));
+            InputStream in = getClass().getResourceAsStream("/"+filename);
+            BufferedReader readBuffered = new BufferedReader(new InputStreamReader(in));
 
             String line = null;
             while ((line = readBuffered.readLine()) != null) {
