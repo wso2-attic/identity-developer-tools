@@ -21,8 +21,9 @@
 		"onLanguage:xml",
 		"onCommand:extension.diagram",
 		"onCommand:extension.script",
-		"onCommand:extension.auth",
-		"onCommand:extension.oAuth"
+		"onCommand:extension.serviceProviers",
+		"onCommand:extension.oAuth",
+		"onView:package-config"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
@@ -108,7 +109,47 @@
 				}
 			}
 		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "package-explorer",
+					"title": "WSO2 IAM Manger",
+					"icon": "resources/iss.ico"
+				}
+			]
+		},
+		"views": {
+			"package-explorer": [
+				{
+					"id": "package-config",
+					"name": "congifurations"
+				},
+				{
+					"id": "service-providers",
+					"name": "Service Providers"
+				},
+				{
+					"id": "adaptive-templates",
+					"name": "Adaptive Templates",
+					"when": "resourceExtname == .authjs"
+				}
+			]
+		},
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "extension.serviceProvierFromTreeView",
+					"when": "false"
+				},
+				{
+					"command": "extension.diagram",
+					"when": "false"
+				},
+				{
+					"command": "extension.script",
+					"when": "false"
+				}
+			],
 			"editor/title": [
 				{
 					"when": "resourceExtname == .authxml",
@@ -140,7 +181,7 @@
 		},
 		"commands": [
 			{
-				"command": "extension.auth",
+				"command": "extension.serviceProviers",
 				"title": "IAM Service Providers"
 			},
 			{
@@ -154,6 +195,10 @@
 			{
 				"command": "extension.oAuth",
 				"title": "Login With Wso2 IS"
+			},
+			{
+				"command": "extension.serviceProvierFromTreeView",
+				"title": "From Tree View"
 			}
 		],
 		"configuration": {

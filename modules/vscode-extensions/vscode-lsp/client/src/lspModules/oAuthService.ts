@@ -7,6 +7,8 @@ import * as express from "express";
 import { Server } from "http";
 import * as vscode from 'vscode';
 const keytar = require('keytar');
+const axios = require('axios');
+import {ServiceTree} from './serviceTree';
 export class Wso2OAuth {
 	public app: express.Express;
 	public server: Server;
@@ -20,9 +22,8 @@ export class Wso2OAuth {
 
 		this.server = this.app.listen(this.port);
 		this.app.get("/oauth", async (req, res) => {
-			const axios = require('axios');
+			
 			try {
-
 				// Get client ID from the extension configuartions.
 				var clientID = vscode.workspace.getConfiguration().get('IAM.ServiceClientID');
 				var clientSecret;
@@ -70,6 +71,9 @@ export class Wso2OAuth {
 					// Close the webview.
 					await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 
+					vscode.window.createTreeView('service-providers', {
+						treeDataProvider: new ServiceTree()
+					});
 					// Show the sucess message in the vscode.
 					vscode.window.showInformationMessage("Successfully Configued your Extension");
 

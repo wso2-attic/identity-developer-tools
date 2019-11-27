@@ -4,10 +4,11 @@ import * as url from 'url';
 import * as xmlQuery from 'xml-query';
 import * as XmlReader from 'xml-reader';
 import * as vscode from 'vscode';
+import { ExecuteCommandRequest } from 'vscode-languageclient';
 export class FileHandler {
 
 	/**
-	 *  readXML() used to read the XML files code from the given file path
+	 * readXML() used to read the XML files code from the given file path
 	 */
 	public readXML(filePath): String {
 		return String(fs.readFileSync(filePath, 'utf8'));
@@ -44,63 +45,116 @@ export class FileHandler {
 	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or 
 	 * create a new adaptive script file.
 	 */
-	public createOrOpenAdaptiveScript(message, xmlFilePath) {
-
-		//handle the button click in web view.
-		switch (message.command) {
-			case 'scriptFile':
-				var serviceName = this.extractFileName(xmlFilePath);
-				vscode.window.showInformationMessage("Servicename is " + serviceName);
+	public async handleButtonClick(message, xmlFilePath) {
+		// Get the name of the servce.
+		var serviceName = this.extractFileName(xmlFilePath).replace('%20', ' ');
+		// Handle the button click in web view.
+		switch (String(message.command)) {
+			case "scriptFile":
 				var adaptive = this.extractAdaptiveScript(xmlFilePath);
-
-				// Check whether the file already exsists.
-				if (fs.existsSync(path.join(vscode.workspace.rootPath, serviceName + '.authjs'))) {
-					var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
-					// Open the file.
-					vscode.workspace.openTextDocument(file).then(document => {
-						vscode.window.showTextDocument(document, 3, false);
-					});
-				} else {
-
-					// Uri of the untitled file.
-					var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
-					vscode.workspace.openTextDocument(newFile).then(document => {
-						const edit = new vscode.WorkspaceEdit();
-						// Insert text to the untitled file.
-						edit.insert(newFile, new vscode.Position(0, 0), adaptive);
-						return vscode.workspace.applyEdit(edit).then(async success => {
-							if (success) {
-								// save the untitled file.
-								await document.save();
-								const newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
-								vscode.workspace.openTextDocument(newFile).then(document => {
-									vscode.window.showTextDocument(document, 3, false);
-								});
-							} else {
-								vscode.window.showInformationMessage('Error!');
-							}
-						});
-					});
-					return;
-				}
+				this.createOrOpenAdaptiveScript(adaptive, serviceName);
+			case "defaultScriptFile":
+				var adaptiveScript = this.createDefaultAdaptiveScript(message.data);				
+				this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
 		}
 	}
 
+	/**
+	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or 
+	 * create a new adaptive script file.
+	 */
+	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {		
+		// Check whether the file already exsists.
+		if (fs.existsSync(path.join(vscode.workspace.rootPath, serviceName + '.authjs'))) {
+			vscode.window.showInformationMessage('oyee!');
+			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
+			// Open the file.
+			vscode.workspace.openTextDocument(file).then(document => {
+				vscode.window.showTextDocument(document, 2, false);
+			});
+		} else {
+			vscode.window.showInformationMessage('oyee! naa');			
+			// Uri of the untitled file.
+			var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
+			vscode.workspace.openTextDocument(newFile).then(document => {
+				const edit = new vscode.WorkspaceEdit();
+				// Insert text to the untitled file.
+				edit.insert(newFile, new vscode.Position(0, 0), adaptiveScript);
+				return vscode.workspace.applyEdit(edit).then(async success => {
+					if (success) {
+						// save the untitled file.
+						await document.save();
+						const newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
+						vscode.workspace.openTextDocument(newFile).then(document => {
+							vscode.window.showTextDocument(document, 3, false);
+						});
+					} else {
+						vscode.window.showInformationMessage('Error!');
+					}
+				});
+			});
+			return;
+		}
+	}
+
+	/**
+	 * createDefaultAdaptiveScript() to create adaptive script when no scripts found.
+	 */
+	public createDefaultAdaptiveScript(executeSteps) {
+		var script = `var onLoginRequest = function (context) {\n` +
+			this.bindExecuteSteps(executeSteps)
+			+ `\n};`;
+		console.log(script);
+		return script;
+	}
+
+	/**
+	 * bindExecuteSteps() to bind the executeStep method to the script.
+	 */
+	public bindExecuteSteps(executeSteps) {
+		var executeStep = ``;
+		for (let index = 1; index <= executeSteps; index++) {
+			if (index < executeSteps) {
+				executeStep = executeStep + `\texecuteStep(` + index + `);\n`;
+			} else {
+				executeStep = executeStep + `\texecuteStep(` + index + `);`;
+			}
+		}
+		return executeStep;
+
+	}
 
 	/**
 	 * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
 	 */
 	public syncServiceProviderWithAdaptiveScript(xmlFilePath) {
+
+		var fileNames = [];
+		var files;
+		if(fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))){
+			files=this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
+
+			files.forEach(file => {
+				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
+			});
+	
+		}
+
 		const { activeTextEditor } = vscode.window;
 		const { document } = activeTextEditor;
 
 		// Save the active adaptive script before sync.
-		document.save(); 
+		document.save();
 
 		// Get the adative Script code. 
-		const newAdaptiveScriptCode = document.getText(); 
-
-		var xml = this.readXML(xmlFilePath);
+		const newAdaptiveScriptCode = document.getText();
+		var serviceName = this.extractFileName(document.uri.fsPath).replace('%20', ' ');
+		console.log("servicename in sync--" + serviceName);
+		var xmlFile = path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]);
+		console.log("servicename in xmlFile--" + xmlFile);
+		console.log("servicename in xmlFilePath--" + xmlFilePath);
+		// return;
+		var xml = this.readXML(xmlFile);
 
 		// Get the line count of the xml file.
 		var linecount = xml.split(/\r\n|\r|\n/).length + 1;
@@ -111,7 +165,7 @@ export class FileHandler {
 		var newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode);
 		const newFile = vscode.Uri.parse('file:' + path.join(xmlFilePath));
 		vscode.workspace.openTextDocument(newFile).then(async document => {
-			const edit = new vscode.WorkspaceEdit();			
+			const edit = new vscode.WorkspaceEdit();
 			await edit.delete(newFile, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(linecount, 0)));
 			await edit.insert(newFile, new vscode.Position(0, 0), newXml);
 			return vscode.workspace.applyEdit(edit).then(async success => {
@@ -122,6 +176,82 @@ export class FileHandler {
 				}
 			});
 		});
+	}
+
+	/**
+	 * createXMLFile() to create the xml file with of the service.
+	 */
+	public async createXMLFile(xml, serviceName) {
+		var fileNames = [];
+		var files;
+		if(fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))){
+			files=this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
+
+			files.forEach(file => {
+				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""))
+			});
+	
+		}
+		
+		console.log();
+		console.log(files);
+		// Get the line count of the xml file.
+		var linecount = xml.split(/\r\n|\r|\n/).length + 1;
+		// Check whether the file already exsists.
+		if (fileNames.includes(serviceName)) {
+			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]));
+			// Open the file.
+			vscode.workspace.openTextDocument(file).then(async document => {
+				const edit = new vscode.WorkspaceEdit();
+				await edit.delete(file, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(linecount, 0)));
+				await edit.insert(file, new vscode.Position(0, 0), xml);
+				vscode.window.showTextDocument(document, 1, false);
+			});
+		} else {
+			// Uri of the untitled file.
+			var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
+			vscode.workspace.openTextDocument(newFile).then(async document => {
+				const edit = new vscode.WorkspaceEdit();
+				// Insert text to the untitled file.
+				await edit.insert(newFile, new vscode.Position(0, 0), xml);
+				return vscode.workspace.applyEdit(edit).then(async success => {
+					if (success) {
+						// save the untitled file.
+						await document.save();
+						await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+						const newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
+						vscode.workspace.openTextDocument(newFile).then(async document => {
+							vscode.window.showTextDocument(document, 1, false);
+						});
+					} else {
+						vscode.window.showInformationMessage('Error!');
+					}
+				});
+			});
+			return;
+		}
+	}
+
+	// Return a list of files of the specified fileTypes in the provided dir, 
+	// with the file path relative to the given dir
+	// dir: path of the directory you want to search the files for
+	// fileTypes: array of file types you are search files, ex: ['.txt', '.jpg']
+	public getFilesFromDir(dir, fileTypes) {
+		var filesToReturn = [];
+		function walkDir(currentPath) {
+			var files = fs.readdirSync(currentPath);
+			for (var i in files) {
+				var curFile = path.join(currentPath, files[i]);
+				if (fs.statSync(curFile).isFile() && fileTypes.indexOf(path.extname(curFile)) != -1) {
+					filesToReturn.push(curFile.replace(dir, ''));
+				} else if (fs.statSync(curFile).isDirectory()) {
+					walkDir(curFile);
+				}
+			}
+		}
+		walkDir(dir);
+		return filesToReturn;
+
 	}
 
 }

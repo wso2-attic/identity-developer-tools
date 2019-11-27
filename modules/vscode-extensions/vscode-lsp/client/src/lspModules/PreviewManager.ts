@@ -37,7 +37,7 @@ export class PreviewManager {
 			panel.webview.html = previewManager.getWebviewContent(code, pathUri, xmlFilePath);
 			panel.webview.onDidReceiveMessage(
 				message => {
-					fileHandler.createOrOpenAdaptiveScript(message, xmlFilePath);
+					fileHandler.handleButtonClick(message, xmlFilePath);
 				},
 				undefined,
 				context.subscriptions
@@ -113,8 +113,7 @@ export class PreviewManager {
 					vscode.commands.executeCommand(
 						"vscode.open",
 						vscode.Uri.parse(
-							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID
-						)
+							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID + "&scope=internal_identity_mgt_view internal_identity_mgt_delete internal_identity_mgt_create internal_identity_mgt_update")
 					);
 				} else if (message.command == 'acess') {
 					// Set Acess Token to system key chain.					
@@ -122,7 +121,7 @@ export class PreviewManager {
 					// Close the webview
 					await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 					// Show the sucess message
-					vscode.window.showInformationMessage("Successfully Configued your Extension");					
+					vscode.window.showInformationMessage("Successfully Configued your Extension");
 				}
 
 			},

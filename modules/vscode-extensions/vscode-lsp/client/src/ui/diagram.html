@@ -129,8 +129,9 @@
 
         });
 
+        var executeStep = 0;
         $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationSteps").find("AuthenticationStep").each(function () {
-
+            executeStep +=1;
             var $row = $(this),
                 name = $row.find("column1").text(),
                 job = $row.find("LocalAuthenticatorConfigs").find("Name").text();
@@ -141,11 +142,21 @@
         if (code.length > 0) {
             z = document.getElementById("item_input");
             z.innerHTML += ' <input type="button" value="script" id="openUndefine" >';
+        }else{
+            z = document.getElementById("item_input");
+            z.innerHTML += ' <input type="button" value="script" id="defaultScript" >';
         }
 
         $('#openUndefine').click(function () {
             vscode.postMessage({
                 command: 'scriptFile'
+            })
+        });
+
+        $('#defaultScript').click(function () {
+            vscode.postMessage({
+                command: 'defaultScriptFile',
+                data:executeStep
             })
         });
 
