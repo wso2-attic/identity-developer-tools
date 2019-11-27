@@ -21,6 +21,7 @@ import {
 } from 'vscode-languageserver';
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
+import * as path from 'path';
 const fs = require('fs');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -37,8 +38,8 @@ let hasDiagnosticRelatedInformationCapability: boolean = false;
 declare var text: String;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
 connection.onInitialize((params: InitializeParams) => {	
-	const templates = params.rootPath + '/.conf/templates/';
-	console.log(connection);
+	const templates =  path.join(__dirname,'..','src','adaptiveTemplates/');
+	console.log(templates);
 	try {
 		fs.readdirSync(templates).forEach((file: any) => {
 			var filepath = templates + file;
