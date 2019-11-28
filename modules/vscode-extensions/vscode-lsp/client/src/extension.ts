@@ -14,9 +14,7 @@ import {
 	TransportKind
 } from 'vscode-languageclient';
 let client: LanguageClient;
-import * as fs from 'fs';
 import * as Net from 'net';
-const keytar = require('keytar');
 import { FileHandler } from './lspModules/fileHandler';
 import { ServiceManger } from './lspModules/serviceManger';
 import { PreviewManager } from './lspModules/PreviewManager';
@@ -81,11 +79,12 @@ export function activate(context: ExtensionContext) {
 
 		// File open event hadler
 		vscode.workspace.onDidOpenTextDocument(async (file) => {
+			// Get the Extesnion of the file.
 			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
-			console.log(extensionOfOpenedFile);
+			// Check the extension of the opened file.
 			if (extensionOfOpenedFile == ".authxml") {
 				await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-				xmlFilePath = file.uri.fsPath.split(".git")[0];
+				xmlFilePath = file.uri.fsPath.split(".git")[0];				
 				previewManager.generateWebViewPanel(xmlFilePath, context);
 			}
 		}),
@@ -101,7 +100,7 @@ export function activate(context: ExtensionContext) {
 
 		// Sync command registration.
 		vscode.commands.registerCommand('extension.script', async () => {
-			fileHandler.syncServiceProviderWithAdaptiveScript(xmlFilePath);
+			fileHandler.syncServiceProviderWithAdaptiveScript();
 		}),
 
 		// List the service providers in command plate.
