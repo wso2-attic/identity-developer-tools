@@ -189,7 +189,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		// if launch.json is missing or empty
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor;
-			if (editor && editor.document.languageId === 'markdown') {
+			if (editor && editor.document.languageId == 'javascript') {
 				config.type = 'mock';
 				config.name = 'Launch';
 				config.request = 'launch';
@@ -199,6 +199,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		}
 
 		if (!config.program) {
+			//return config;
 			return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
 				return undefined;	// abort launch
 			});
