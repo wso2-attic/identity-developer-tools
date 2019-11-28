@@ -28,9 +28,8 @@ import {ServiceTree} from './lspModules/serviceTree';
  * Please note: the test suite does not (yet) work in this mode.
  */
 const EMBED_DEBUG_ADAPTER = true;
-export function activate(context: ExtensionContext) {	
-	// keytar.deletePassword("acessToken", "acessToken");
-
+export function activate(context: ExtensionContext) {
+	
 	// To keep the file path of the xml of the service provider.
 	var xmlFilePath;
 	// The Object Of the FileHandler.

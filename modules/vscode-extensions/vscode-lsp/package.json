@@ -265,6 +265,7 @@
 		"vscode": "^1.1.36",
 		"vscode-languageclient": "^5.2.1",
 		"xml-query": "^1.5.0",
-		"xml-reader": "^2.4.3"
+		"xml-reader": "^2.4.3",
+		"xml2js": "^0.4.22"
 	}
 }

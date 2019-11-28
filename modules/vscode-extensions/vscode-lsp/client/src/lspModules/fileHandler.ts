@@ -4,13 +4,13 @@ import * as url from 'url';
 import * as xmlQuery from 'xml-query';
 import * as XmlReader from 'xml-reader';
 import * as vscode from 'vscode';
-import { ExecuteCommandRequest } from 'vscode-languageclient';
+const xml2js = require('xml2js');
 export class FileHandler {
 
 	/**
 	 * readXML() used to read the XML files code from the given file path
 	 */
-	public readXML(filePath): String {
+	public readXML(filePath: any): String {
 		return String(fs.readFileSync(filePath, 'utf8'));
 	}
 
@@ -54,7 +54,7 @@ export class FileHandler {
 				var adaptive = this.extractAdaptiveScript(xmlFilePath);
 				this.createOrOpenAdaptiveScript(adaptive, serviceName);
 			case "defaultScriptFile":
-				var adaptiveScript = this.createDefaultAdaptiveScript(message.data);				
+				var adaptiveScript = this.createDefaultAdaptiveScript(message.data);
 				this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
 		}
 	}
@@ -63,7 +63,7 @@ export class FileHandler {
 	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or 
 	 * create a new adaptive script file.
 	 */
-	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {		
+	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
 		// Check whether the file already exsists.
 		if (fs.existsSync(path.join(vscode.workspace.rootPath, serviceName + '.authjs'))) {
 			vscode.window.showInformationMessage('oyee!');
@@ -73,7 +73,7 @@ export class FileHandler {
 				vscode.window.showTextDocument(document, 2, false);
 			});
 		} else {
-			vscode.window.showInformationMessage('oyee! naa');			
+			vscode.window.showInformationMessage('oyee! naa');
 			// Uri of the untitled file.
 			var newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
 			vscode.workspace.openTextDocument(newFile).then(document => {
@@ -131,15 +131,14 @@ export class FileHandler {
 
 		var fileNames = [];
 		var files;
-		if(fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))){
-			files=this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
+		if (fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))) {
+			files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
 
 			files.forEach(file => {
 				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
 			});
-	
-		}
 
+		}
 		const { activeTextEditor } = vscode.window;
 		const { document } = activeTextEditor;
 
@@ -159,14 +158,29 @@ export class FileHandler {
 		// Get the line count of the xml file.
 		var linecount = xml.split(/\r\n|\r|\n/).length + 1;
 
-		var adaptiveScript = this.extractAdaptiveScript(xmlFilePath);
+		var adaptiveScript = this.extractAdaptiveScript(xmlFilePath);		
+		var newXml;
+		var parser = new xml2js.Parser({ explicitArray: false });
+		var xmlBuilder = new xml2js.Builder({ cdata: true });
+		parser.parseString(xml, function (err, result) {
+			// Check whether AuthenticationScript node is Available.		
+			if ('AuthenticationScript' in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
+				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode);
+			} else {	
+				// Add the AuthenticationScript node to the xmlfile.			
+				result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = { $: { enabled: "false", language: "application/javascript" }, _: "//<enable false>\n"+newAdaptiveScriptCode};
+				// change the xml to the new xml.
+				newXml = xmlBuilder.buildObject(result);		
+			}
+		});
 
-		// Sync two documents.
-		var newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode);
+		// Sync two documents.		
 		const newFile = vscode.Uri.parse('file:' + path.join(xmlFilePath));
 		vscode.workspace.openTextDocument(newFile).then(async document => {
 			const edit = new vscode.WorkspaceEdit();
+			// Delete the current xml code.
 			await edit.delete(newFile, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(linecount, 0)));
+			// Add new xml code.
 			await edit.insert(newFile, new vscode.Position(0, 0), newXml);
 			return vscode.workspace.applyEdit(edit).then(async success => {
 				if (success) {
@@ -184,15 +198,15 @@ export class FileHandler {
 	public async createXMLFile(xml, serviceName) {
 		var fileNames = [];
 		var files;
-		if(fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))){
-			files=this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
+		if (fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))) {
+			files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
 
 			files.forEach(file => {
-				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""))
+				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
 			});
-	
+
 		}
-		
+
 		console.log();
 		console.log(files);
 		// Get the line count of the xml file.
@@ -232,10 +246,9 @@ export class FileHandler {
 		}
 	}
 
-	// Return a list of files of the specified fileTypes in the provided dir, 
-	// with the file path relative to the given dir
-	// dir: path of the directory you want to search the files for
-	// fileTypes: array of file types you are search files, ex: ['.txt', '.jpg']
+	/**
+	 * getFilesFromDir() to return a list of files of the specified fileTypes in the provided dir.
+	*/	
 	public getFilesFromDir(dir, fileTypes) {
 		var filesToReturn = [];
 		function walkDir(currentPath) {
