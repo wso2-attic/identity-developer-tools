@@ -19,9 +19,9 @@ import {
 	VersionedTextDocumentIdentifier,
 	CompletionList
 } from 'vscode-languageserver';
-
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
+import * as path from 'path';
 const fs = require('fs');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -37,9 +37,9 @@ let hasDiagnosticRelatedInformationCapability: boolean = false;
 
 declare var text: String;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
-connection.onInitialize((params: InitializeParams) => {
-	const templates = params.rootPath + '/.conf/templates/';
-
+connection.onInitialize((params: InitializeParams) => {	
+	const templates =  path.join(__dirname,'..','src','adaptiveTemplates/');
+	console.log(templates);
 	try {
 		fs.readdirSync(templates).forEach((file: any) => {
 			var filepath = templates + file;
@@ -223,13 +223,8 @@ connection.onCompletion(
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.		
 		if (extension === "authjs") {
-
-
 			var WebSocket = require('ws');
 			var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
-
-
-
 			var obj: any = {
 				"text": text,
 				"line": _textDocumentPosition.position.line + 1,

@@ -11,7 +11,8 @@
 	"dependencies": {
 		"vscode-languageserver": "^5.2.1",
 		"vscode-ws-jsonrpc": "^0.1.1",
-		"ws": "^7.1.2"
+		"ws": "^7.1.2",
+		"vscode": "^1.1.36"
 	},
 	"scripts": {}
 }

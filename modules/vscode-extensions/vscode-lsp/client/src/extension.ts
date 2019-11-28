@@ -14,23 +14,28 @@ import {
 	TransportKind
 } from 'vscode-languageclient';
 let client: LanguageClient;
-import * as fs from 'fs';
 import * as Net from 'net';
 import { FileHandler } from './lspModules/fileHandler';
+import { ServiceManger } from './lspModules/serviceManger';
 import { PreviewManager } from './lspModules/PreviewManager';
-var xmlFilePath;
+import { ConfigProvider } from './lspModules/configTree';
+import {ServiceTree} from './lspModules/serviceTree';
 /*
  * Set the following compile time flag to true if the
  * debug adapter should run inside the extension host.
  * Please note: the test suite does not (yet) work in this mode.
  */
-
 const EMBED_DEBUG_ADAPTER = true;
 export function activate(context: ExtensionContext) {
-	// The Object Of the FileHandler
+	
+	// To keep the file path of the xml of the service provider.
+	var xmlFilePath;
+	// The Object Of the FileHandler.
 	const fileHandler = new FileHandler();
-	// The Object Of the previewManager
+	// The Object Of the previewManager.
 	const previewManager = new PreviewManager();
+	// The object of the ServiceManger.
+	const serviceManger = new ServiceManger(context);
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
@@ -58,26 +63,28 @@ export function activate(context: ExtensionContext) {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
-	};
-
-	var accessToken;
+	};	
+	vscode.window.createTreeView('package-config',{
+		treeDataProvider: new ConfigProvider()			
+	});
+	vscode.window.createTreeView('service-providers', {
+		treeDataProvider: new ServiceTree()
+	});
 	context.subscriptions.push(
 
 		// Show oAuth webview.
 		vscode.commands.registerCommand('extension.oAuth', () => {
-			previewManager.generateOAuthPreview(context);
+			previewManager.generateOAuthPreview(context);			
 		}),
 
 		// File open event hadler
 		vscode.workspace.onDidOpenTextDocument(async (file) => {
-
-			accessToken = vscode.workspace.getConfiguration().get('IAM.acessToken');
+			// Get the Extesnion of the file.
 			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
-			console.log(extensionOfOpenedFile);
+			// Check the extension of the opened file.
 			if (extensionOfOpenedFile == ".authxml") {
 				await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-				xmlFilePath = file.uri.fsPath.split(".git")[0];
-				vscode.window.showInformationMessage(String(accessToken));
+				xmlFilePath = file.uri.fsPath.split(".git")[0];				
 				previewManager.generateWebViewPanel(xmlFilePath, context);
 			}
 		}),
@@ -93,32 +100,22 @@ export function activate(context: ExtensionContext) {
 
 		// Sync command registration.
 		vscode.commands.registerCommand('extension.script', async () => {
-			fileHandler.syncServiceProviderWithAdaptiveScript(xmlFilePath);
+			fileHandler.syncServiceProviderWithAdaptiveScript();
 		}),
 
-		// List the service providers in command plate
-		vscode.commands.registerCommand('extension.auth', async () => {
-			// Path of the service providers directory.
-			const serviceProvidersDirectory = vscode.workspace.rootPath + '/.conf/sp/';
-			var services = [];
-			try {
-				// Add the service names to the services array.
-				fs.readdirSync(serviceProvidersDirectory).forEach((file: any) => {
-					var serviceName = String(file).replace(/\.[^/.]+$/, "");
-					services.push(serviceName);
-				});
-			} catch (e) {
-				console.log(e);
-			}
+		// List the service providers in command plate.
+		vscode.commands.registerCommand('extension.serviceProviers', async () => {
+			//get the service providers list in command pallete.			
+			serviceManger.getServicesList();
+			// xmlFilePath = serviceProvidersDirectory + result + '.authxml';
+			// previewManager.generateWebViewPanel(xmlFilePath, context);
 
-			// Show thelist of services in command pallet.
-			var result = await vscode.window.showQuickPick(
-				services,
-				{ placeHolder: 'Select Service' }
-			);
-			xmlFilePath = serviceProvidersDirectory + result + '.authxml';
-			previewManager.generateWebViewPanel(xmlFilePath, context);
+		}),
 
+		// List the service providers in command plate.
+		vscode.commands.registerCommand('extension.serviceProvierFromTreeView', async (servicesArray,serviceName) => {
+			//get the service providers list in command pallete.					
+			serviceManger.getIDOfService(servicesArray,serviceName);
 		})
 	);
 	// register a configuration provider for 'mock' debug type
