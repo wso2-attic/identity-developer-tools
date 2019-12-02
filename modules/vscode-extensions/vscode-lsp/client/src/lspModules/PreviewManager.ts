@@ -107,7 +107,7 @@ export class PreviewManager {
 					vscode.workspace.getConfiguration().update("IAM.ServiceClientID", message.clientID);
 
 					// Set Client Secret to system key chain.
-					keytar.setPassword("clientSecret", "clientSecret", message.clientSecret);
+					await keytar.setPassword("clientSecret", "clientSecret", message.clientSecret);
 
 					// Open the login page.
 					vscode.commands.executeCommand(

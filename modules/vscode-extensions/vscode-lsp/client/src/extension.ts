@@ -76,7 +76,7 @@ export function activate(context: ExtensionContext) {
 		vscode.commands.registerCommand('extension.oAuth', () => {
 			previewManager.generateOAuthPreview(context);			
 		}),
-
+		
 		// File open event hadler
 		vscode.workspace.onDidOpenTextDocument(async (file) => {
 			// Get the Extesnion of the file.

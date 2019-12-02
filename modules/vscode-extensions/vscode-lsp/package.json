@@ -14,7 +14,6 @@
 		"vscode": "^1.39.0"
 	},
 	"activationEvents": [
-		"onWebviewEditor:qqq",
 		"onDebug",
 		"onCommand:extension.mock-debug.getProgramName",
 		"onLanguage:javascript",
@@ -262,6 +261,8 @@
 		"oauth": "^0.9.15",
 		"openurl": "^1.1.1",
 		"passport-oauth2": "^1.5.0",
+		"temp": "^0.9.1",
+		"tmp": "^0.1.0",
 		"vscode": "^1.1.36",
 		"vscode-languageclient": "^5.2.1",
 		"xml-query": "^1.5.0",

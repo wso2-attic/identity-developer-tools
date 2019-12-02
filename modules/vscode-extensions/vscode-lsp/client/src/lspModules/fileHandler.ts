@@ -5,6 +5,7 @@ import * as xmlQuery from 'xml-query';
 import * as XmlReader from 'xml-reader';
 import * as vscode from 'vscode';
 const xml2js = require('xml2js');
+const temp = require('temp');	
 export class FileHandler {
 
 	/**
@@ -49,13 +50,13 @@ export class FileHandler {
 		// Get the name of the servce.
 		var serviceName = this.extractFileName(xmlFilePath).replace('%20', ' ');
 		// Handle the button click in web view.
-		switch (String(message.command)) {
-			case "scriptFile":
-				var adaptive = this.extractAdaptiveScript(xmlFilePath);
-				this.createOrOpenAdaptiveScript(adaptive, serviceName);
-			case "defaultScriptFile":
-				var adaptiveScript = this.createDefaultAdaptiveScript(message.data);
-				this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
+		vscode.window.showInformationMessage(String(message.command));
+		if(String(message.command) == "scriptFile"){
+			var adaptive = this.extractAdaptiveScript(xmlFilePath);
+			this.createOrOpenAdaptiveScript(adaptive, serviceName);
+		}else if(String(message.command) == "defaultScriptFile"){
+			var adaptiveScript = this.createDefaultAdaptiveScript(message.data);
+			this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
 		}
 	}
 
@@ -65,30 +66,23 @@ export class FileHandler {
 	 */
 	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
 		// Check whether the file already exsists.
-		if (fs.existsSync(path.join(vscode.workspace.rootPath, serviceName + '.authjs'))) {
-			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
-			// Open the file.
-			vscode.workspace.openTextDocument(file).then(document => {
-				vscode.window.showTextDocument(document, 2, false);
-			});
-		} else {
-			// Uri of the file will be created file.
-			var newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, serviceName + '.authjs'));
-			
-			//Uri of the adaptive script file.
-			var adaptiveScriptFile = path.join(vscode.workspace.rootPath, serviceName + '.authjs');
-			
-			// Create and add adaptive script to the file.
-			fs.writeFile(adaptiveScriptFile, adaptiveScript, (err) => {
-				if (err) throw err;
-				vscode.window.showInformationMessage('The file has been saved!');
-			});
 
-			// Open the new adaptive script in colum two editor.
-			vscode.workspace.openTextDocument(newFile).then(document => {
-				vscode.window.showTextDocument(document, 2, false);
+		// Automatically track and cleanup files at exit
+		temp.track();		
+
+		// Create a temp file.
+		temp.mkdir('adaptiveScript', function (err, dirPath) {
+			if (err) throw err;
+			var inputPath = path.join(dirPath, serviceName+'.authjs');
+			fs.writeFile(inputPath, adaptiveScript, function (err) {
+				if (err) throw err;
+				process.chdir(dirPath);
+				vscode.workspace.openTextDocument(inputPath).then(document => {
+					vscode.window.showTextDocument(document, 2, false);
+				});				
 			});
-		}
+		});
+		
 	}
 
 	/**
@@ -97,7 +91,7 @@ export class FileHandler {
 	public createDefaultAdaptiveScript(executeSteps) {
 		var script = `var onLoginRequest = function (context) {\n` +
 			this.bindExecuteSteps(executeSteps)
-			+ `\n};`;		
+			+ `\n};`;
 		return script;
 	}
 
@@ -119,7 +113,7 @@ export class FileHandler {
 	/**
 	 * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
 	 */
-	public syncServiceProviderWithAdaptiveScript() {
+	public async syncServiceProviderWithAdaptiveScript() {
 		var parser = new xml2js.Parser({ explicitArray: false });
 		var xmlBuilder = new xml2js.Builder({ cdata: true });
 		const { activeTextEditor } = vscode.window;
@@ -134,21 +128,21 @@ export class FileHandler {
 			});
 		}
 		// Variable to assign the new xml.
-		var newXml; 
+		var newXml;
 		// Get the adative Script code. 
 		var newAdaptiveScriptCode = document.getText();
 		// Get the service name.
-		var serviceName = this.extractFileName(document.uri.fsPath).replace('%20', ' ');	
+		var serviceName = this.extractFileName(document.uri.fsPath).replace('%20', ' ');
 		// Path of the xml file of the service.	
-		var xmlFile = path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]);	
+		var xmlFile = path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]);
 		// Current code of the xml file.
 		var xml = this.readXML(xmlFile);
 		// Get the old adaptive script.	
-		var adaptiveScript = this.extractAdaptiveScript(xmlFile);	
+		var adaptiveScript = this.extractAdaptiveScript(xmlFile);
 		// Save the active adaptive script before sync.
 		document.save();
-		
-		parser.parseString(xml, function (err, result) {			
+
+		parser.parseString(xml, function (err, result) {
 			// Check whether AuthenticationScript node is Available.		
 			if ('AuthenticationScript' in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
 				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode);
@@ -164,6 +158,7 @@ export class FileHandler {
 			console.log(err)
 			vscode.window.showInformationMessage('The file has been saved!');
 		});
+		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 	}
 
 	/**
@@ -177,24 +172,27 @@ export class FileHandler {
 			files.forEach(file => {
 				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
 			});
+		}else{
+			fs.mkdirSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), { recursive: true });			
 		}
 		// Check whether the file already exsists.
 		if (fileNames.includes(serviceName)) {
 			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]));
-			
+
 			// Open the file.
-			vscode.workspace.openTextDocument(file).then(async document => {				
+			vscode.workspace.openTextDocument(file).then(async document => {
 				vscode.window.showTextDocument(document, 1, false);
 			});
 		} else {
 			// Uri of the untitled file.
+
 			var newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
 			fs.writeFile(path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'), xml, (err) => {
 				if (err) throw err;
 				vscode.window.showInformationMessage('The file has been saved!');
 			});
 			// Open the file.
-			vscode.workspace.openTextDocument(newFile).then(async document => {				
+			vscode.workspace.openTextDocument(newFile).then(async document => {
 				vscode.window.showTextDocument(document, 1, false);
 			});
 			return;
