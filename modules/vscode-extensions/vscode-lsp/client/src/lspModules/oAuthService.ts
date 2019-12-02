@@ -63,7 +63,6 @@ export class Wso2OAuth {
 				}).then(async (response) => {
 					// Once we get the response, extract the access token from
 					// the response body
-					console.log("access token is" + response.data.access_token);
 
 					// Add the Password to the keychain
 					keytar.setPassword("acessToken", "acessToken", String(response.data.access_token));

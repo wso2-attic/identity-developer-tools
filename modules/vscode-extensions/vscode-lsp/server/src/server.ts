@@ -13,11 +13,7 @@ import {
 	InitializeParams,
 	DidChangeConfigurationNotification,
 	CompletionItem,
-	CompletionItemKind,
-	TextDocumentPositionParams,
-	Position,
-	VersionedTextDocumentIdentifier,
-	CompletionList
+	TextDocumentPositionParams
 } from 'vscode-languageserver';
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
@@ -34,25 +30,25 @@ let documents: TextDocuments = new TextDocuments();
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
-
+declare var webSocket: any;
 declare var text: String;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
-connection.onInitialize((params: InitializeParams) => {	
-	const templates =  path.join(__dirname,'..','src','adaptiveTemplates/');
+connection.onInitialize((params: InitializeParams) => {
+	const templates = path.join(__dirname, '..', 'src', 'adaptiveTemplates/');
 	console.log(templates);
 	try {
 		fs.readdirSync(templates).forEach((file: any) => {
 			var filepath = templates + file;
-			fs.readFile(filepath, 'utf8', function 	(err: any, data: any) {
-				if (err) throw err;	
-				console.log(file);			
+			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
+				if (err) throw err;
+				console.log(file);
 				var obj = JSON.parse(String(data));
 				var codeArray = obj.code;
 				var description = obj.summary;
 				var name = obj.name;
 				var code: String = "";
 				for (var i in codeArray) {
-					code += codeArray[i] + "\n";					
+					code += codeArray[i] + "\n";
 				}
 				var snippentObj = {
 					label: name,
@@ -161,6 +157,7 @@ documents.onDidChangeContent(change => {
 	file = change.document.uri;
 	var xtension = file.split('.').pop();
 	extension = String(xtension);
+	console.log(extension);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
@@ -221,10 +218,11 @@ connection.onCompletion(
 	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.		
+		// info and always provide the same completion items.	
+		const WebSocket = require('ws');
+		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
+		console.log("extesnion is" + extension);
 		if (extension === "authjs") {
-			var WebSocket = require('ws');
-			var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
 			var obj: any = {
 				"text": text,
 				"line": _textDocumentPosition.position.line + 1,
@@ -241,7 +239,7 @@ connection.onCompletion(
 					console.log("yawwa spaams+ " + output);
 				},
 			});
-			
+
 			await webSocket.on('message', function incoming(data: any) {
 				console.log("Recieved " + data);
 				console.log("Recieved data type " + typeof data);
@@ -250,8 +248,8 @@ connection.onCompletion(
 				recieveData = obj.result;
 				var jsonData = JSON.parse(JSON.stringify(obj.result.re));
 				completionList = [];
-				for (var j in completionTemplates) {				
-					completionList.push(completionTemplates[j]);					
+				for (var j in completionTemplates) {
+					completionList.push(completionTemplates[j]);
 				}
 				for (var i = 0; i < jsonData.length; i++) {
 					var counter = jsonData[i];
@@ -263,12 +261,9 @@ connection.onCompletion(
 					completionList.push(jsonob);
 					console.log(counter.id);
 				}
-			});
-			
-			
-
-			var initialize = "null";
+			});			
 			return completionList;
+			
 		} else {
 			completionList = [
 				{
@@ -277,7 +272,7 @@ connection.onCompletion(
 			];
 			return completionList;
 		}
-
+		
 	}
 );
 

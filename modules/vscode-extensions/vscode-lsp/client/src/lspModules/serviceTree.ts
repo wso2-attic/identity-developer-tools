@@ -13,7 +13,6 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
-		console.log("called me")
 	}
 
 	getTreeItem(element: Dependency): vscode.TreeItem {
@@ -53,8 +52,7 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 			}
 		}).then((response) => {
 			// Once we get the response, extract the access token from
-			// the response body
-			console.log(response.data.applications);
+			// the response body			
 			// Show the sucess message in the vscode.
 			vscode.window.showInformationMessage("Successfully retrieve the services");
 
@@ -67,7 +65,6 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 						arguments:[response.data.applications,response.data.applications[index].name]
 					}
 				));
-				console.log(response.data.applications[index].name);
 			}
 
 		}).catch((err) => {
