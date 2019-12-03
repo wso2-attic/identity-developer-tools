@@ -18,10 +18,6 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,58 +25,25 @@ import java.util.List;
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
-    private static final String filename =  "instrumentation-config.properties";
-
 
     /**
      * Reads the configs in the class resource
-     * "instrumentation-config.properties".
+     * "instrumentation-config.json".
      *
      * @return
      */
     public List<InterceptorConfig> readConfig() {
 
-        List<String> classNumbers=new ArrayList<>();
-        List<String> classProperties=new ArrayList<>();
-        try {
-            InputStream in = getClass().getResourceAsStream("/"+filename);
-            BufferedReader readBuffered = new BufferedReader(new InputStreamReader(in));
-
-            String line = null;
-            while ((line = readBuffered.readLine()) != null) {
-
-                if (line.trim().length() == 0 || line.startsWith("#") || line.startsWith(" "))
-                    continue;
-
-                if (line.startsWith("class.")) {
-                    String delimiters = "\\.+|=\\s*";
-                    String[] tokensVal = line.split(delimiters);
-                    for (int i = 0; i < tokensVal.length; i++) {
-                        if (i == 1) {
-                            String classNumber = tokensVal[i];
-                            classNumbers.add(classNumber);
-                        }
-                        if (i == 3) {
-                            String classProperty = tokensVal[i];
-                            classProperties.add(classProperty);
-                        }
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
         ArrayList<InterceptorConfig> result = new ArrayList<>();
 
-        for(int j=0;j< classProperties.size()-2;j+=3){
-            InterceptorConfig interceptorConfig = new InterceptorConfig();
-            interceptorConfig.setClassName(classProperties.get(j));
-            interceptorConfig.addMethodSignature(classProperties.get(j + 1),classProperties.get(j + 2));
-            result.add(interceptorConfig);
-        }
+        //TODO: Read the instrumentation-config.json
+        InterceptorConfig interceptorConfig = new InterceptorConfig();
+        interceptorConfig.setClassName(
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator");
+        interceptorConfig.addMethodSignature("handle",
+                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 
+        result.add(interceptorConfig);
         return result;
-
     }
 }
