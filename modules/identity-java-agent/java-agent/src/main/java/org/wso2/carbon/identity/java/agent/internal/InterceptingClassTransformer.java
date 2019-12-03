@@ -31,18 +31,26 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class transformer which intercepts the method call, used to emit the debug information.
  */
 public class InterceptingClassTransformer implements ClassFileTransformer {
 
+    /**
+     * We use JUL as this is an java agent which should not depend on any other framework than java.
+     */
+    private final static Logger log = Logger.getLogger(InterceptingClassTransformer.class.getName());
+
     private final Map<String, InterceptorConfig> interceptorMap = new HashMap<>();
     private ScopedClassPoolFactoryImpl scopedClassPoolFactory = new ScopedClassPoolFactoryImpl();
     private MethodEntryListener methodEntryListener = new MethodEntryListener();
-    private  ClassPool rootPool;
+    private ClassPool rootPool;
 
     public void init() {
+
         rootPool = ClassPool.getDefault();
     }
 
@@ -54,7 +62,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         byte[] byteCode = classfileBuffer;
 
         if (shouldIntercept(loader, className)) {
-            System.out.println("Instrumenting......");
+            log.fine("Transforming the class " + className);
             boolean isTransformed = false;
             InterceptorConfig config = getInterceptorConfig(loader, className);
             try {
@@ -64,25 +72,22 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
                 CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(
                         classfileBuffer));
                 CtMethod[] methods = ctClass.getDeclaredMethods();
+
                 for (CtMethod method : methods) {
                     if (config.hasMethodSignature(method.getName(), method.getSignature())) {
+                        log.info(
+                                "Intercepted method " + className + "." + method.getName() + " " + method.getSignature());
                         isTransformed = true;
-                        method.addLocalVariable("startTime", CtClass.longType);
-//                        method.addLocalVariable("methodEntryListener", CtClass methodEntryListener);
-                        method.insertBefore("startTime = System.nanoTime(); org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\""+method.getName()+"\", \""+method.getSignature()+"\", null);");
-                        method.insertAfter("System.out.println(\"Execution Duration "
-                                + "(nano sec): \"+ (System.nanoTime() - startTime) );");
-
+                        method.insertBefore(
+                                "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\"" + method.getName() + "\", \"" + method.getSignature() + "\", $args);");
                     }
                 }
                 if (isTransformed) {
                     byteCode = ctClass.toBytecode();
                 }
                 ctClass.detach();
-                System.out.println("Instrumentation complete.");
             } catch (Throwable ex) {
-                System.out.println("Exception: " + ex);
-                ex.printStackTrace();
+                log.log(Level.SEVERE, "Error in transforming the class: " + className, ex);
             }
         }
         return byteCode;
@@ -92,7 +97,6 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     private boolean shouldIntercept(ClassLoader loader, String className) {
 
         if (interceptorMap.keySet().contains(className)) {
-            System.out.println("[InterceptingClassTransformer] intercepting " + className);
             return true;
         }
         return false;

@@ -184,10 +184,11 @@ export class FileHandler {
 				vscode.window.showTextDocument(document, 1, false);
 			});
 		} else {
+			console.log("came here")
 			// Uri of the untitled file.
 
 			var newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
-			fs.writeFile(path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'), xml, (err) => {
+			await fs.writeFile(path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'), xml, (err) => {
 				if (err) throw err;
 				vscode.window.showInformationMessage('The file has been saved!');
 			});

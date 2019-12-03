@@ -35,6 +35,7 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 		await secret.then((result) => {
 			acessToken = result; // Assign the value to acess toke.					
 		});
+		console.log("acess "+ acessToken);
 
 		// To bypass the self signed server error.
 		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";

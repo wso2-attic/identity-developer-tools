@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
-import java.util.List;
-
 public class EventRequest extends ProtocolMessage {
 
     public EventRequest(String type, String command) {

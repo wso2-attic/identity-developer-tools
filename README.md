@@ -15,7 +15,7 @@ cp modules/identity-java-agent/java-agent/target/org.wso2.carbon.identity.develo
 ``` 
 * Modify the startup script to enable agent "wso2server.sh"
 ```
--javaagent:$CARBON_HOME/lib/org.wso2.carbon.identity.developer.java-agent-1.0.0-SNAPSHOT-jar-with-dependencies.jar=org.wso2.carbon.identity.java.agent.LoggingInterceptor\;$CARBON_HOME/repository/logs/intercept.log \
+-javaagent:$CARBON_HOME/lib/org.wso2.carbon.identity.developer.java-agent-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
 ```
 * Copy the lsp endpoint war
 ```
