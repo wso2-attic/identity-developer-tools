@@ -24,25 +24,26 @@ import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 /**
- * Listens the method entry on a class, captures inbound parameters
+ * Listens the method entry on a class, captures inbound parameters.
  */
 public class MethodEntryListener {
 
-    private InterceptionEngine interceptionEngine;
+    /**
+     * This method will be injected by {@link InterceptingClassTransformer} upon matching the method name and signature.
+     *
+     * @param methodName The method name which was called.
+     * @param signature  The signature of the method being called
+     * @param args       The arguments (values) of the method.
+     */
+    public static void methodEntered(String methodName, String signature, Object[] args) {
 
-    public MethodEntryListener() {
-
-        this.interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
-    }
-
-    public static void methodEntered(String methodName, String signature, Object... args) {
-
-        System.out.println("MethodEntryListener entred " + methodName);
         InterceptionEngine engine = AgentHelper.getInstance().getInterceptionEngine();
         if (engine instanceof EventPublisher) {
             Thread thread = Thread.currentThread();
             MethodContext methodContext = new MethodContext(thread, methodName, signature);
+            methodContext.setArguments(args);
             ((EventPublisher) engine).fireEvent(InterceptionEventType.METHOD_ENTRY, methodContext);
         }
     }
+
 }

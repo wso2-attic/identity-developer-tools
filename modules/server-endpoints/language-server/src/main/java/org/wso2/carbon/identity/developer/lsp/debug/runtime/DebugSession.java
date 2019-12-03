@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
+import org.wso2.carbon.identity.java.agent.host.MethodContext;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ public class DebugSession {
 
     private Session session;
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
+    private MethodContext currentMethodContext;
 
     public Session getSession() {
 
@@ -74,5 +77,15 @@ public class DebugSession {
             i++;
         }
         return result;
+    }
+
+    public MethodContext getCurrentMethodContext() {
+
+        return currentMethodContext;
+    }
+
+    public void setCurrentMethodContext(MethodContext currentMethodContext) {
+
+        this.currentMethodContext = currentMethodContext;
     }
 }

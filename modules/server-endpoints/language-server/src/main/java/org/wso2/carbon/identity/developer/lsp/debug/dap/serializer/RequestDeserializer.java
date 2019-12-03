@@ -24,11 +24,15 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.EventRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.UnknownRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -40,7 +44,10 @@ import java.util.List;
  */
 public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
+    private static final Log log = LogFactory.getLog(RequestDeserializer.class);
+
     private static final String LOCAL_NAME_SEQ = "seq";
+    private static final String LOCAL_NAME_ID= "id";
     private static final String LOCAL_NAME_TYPE = "type";
     private static final String LOCAL_NAME_COMMAND = "command";
     private static final String LOCAL_NAME_ARGUMENTS = "arguments";
@@ -49,6 +56,7 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
     private static final String LOCAL_NAME_PARAMS = "params";
     private static final String LOCAL_NAME_METHOD = "method";
     private static final String LOCAL_NAME_SETBREAKPOINT = "setBreakpoint";
+    private static final String LOCAL_NAME_VARIABLES = "variables";
     private static final String LOCAL_NAME_LINES = "lines";
     private static final String LOCAL_NAME_SOURCE = "source";
     private static final String LOCAL_NAME_NAME = "name";
@@ -60,7 +68,8 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
     private static final String LOCAL_NAME_UNKNOWN = "unknown";
 
     public ProtocolMessage deserialize(JsonElement jsonElement, Type type,
-                               JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                                       JsonDeserializationContext jsonDeserializationContext)
+            throws JsonParseException {
 
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
@@ -75,18 +84,36 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private Request createMessageRequest(JsonObject jsonObject) {
 
-        JsonObject paramsObject = jsonObject.get(LOCAL_NAME_PARAMS).getAsJsonObject();
         String method = getAsString(jsonObject, LOCAL_NAME_METHOD);
+
+        JsonElement idElement = jsonObject.get(LOCAL_NAME_ID);
+        long id = idElement != null ? idElement.getAsLong() : 0;
 
         switch (method) {
             case LOCAL_NAME_SETBREAKPOINT:
-                return constructSetBreakpointRequest(LOCAL_NAME_SETBREAKPOINT, paramsObject);
+                return constructSetBreakpointRequest(LOCAL_NAME_SETBREAKPOINT, jsonObject);
+            case LOCAL_NAME_VARIABLES:
+                return constructVariablesRequest(LOCAL_NAME_SETBREAKPOINT, id, jsonObject);
         }
 
-        return new Request( LOCAL_NAME_UNKNOWN, 0, LOCAL_NAME_UNKNOWN, null);
+        return new UnknownRequest(LOCAL_NAME_UNKNOWN, id, method, null);
     }
 
-    private Request constructSetBreakpointRequest(String method, JsonObject paramsObject) {
+    private VariablesRequest constructVariablesRequest(String method, long id, JsonObject jsonObject) {
+
+
+        VariablesRequest request = new VariablesRequest(LOCAL_NAME_MESSAGE, id, LOCAL_NAME_VARIABLES, null);
+        return request;
+    }
+
+    private Request constructSetBreakpointRequest(String method, JsonObject jsonObject) {
+
+        JsonElement paramElement = jsonObject.get(LOCAL_NAME_PARAMS);
+        if (paramElement == null) {
+            log.error("Set breakpoint request received without params");
+            return new UnknownRequest(LOCAL_NAME_UNKNOWN, 0, method, null);
+        }
+        JsonObject paramsObject = paramElement.getAsJsonObject();
 
         JsonElement linesElement = paramsObject.get(LOCAL_NAME_LINES);
         JsonObject sourceElement = (JsonObject) paramsObject.get(LOCAL_NAME_SOURCE);
@@ -99,7 +126,7 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
         JsonArray linesArray = linesElement.getAsJsonArray();
         int[] lines = new int[linesArray.size()];
-        for (int i=0; i< lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             lines[i] = linesArray.get(i).getAsInt();
         }
         request.setLines(lines);

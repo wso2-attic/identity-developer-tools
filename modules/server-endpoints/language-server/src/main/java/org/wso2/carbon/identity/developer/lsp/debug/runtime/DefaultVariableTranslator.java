@@ -16,28 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
+package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
 /**
- * Represents an argument of a Debug protocol message
- *
- * @param <T>
+ * Default variable translator, uses reflection to get the variables and values.
  */
-public class Argument<T extends Object> {
-    private Object value;
+public class DefaultVariableTranslator implements VariableTranslator {
 
-    public Argument(Object value) {
+    @Override
+    public Object translate(Object in) {
 
-        this.value = value;
-    }
-
-    public T getValue() {
-
-        return (T) value;
-    }
-
-    public void setValue(T value) {
-
-        this.value = value;
+        return in;
     }
 }

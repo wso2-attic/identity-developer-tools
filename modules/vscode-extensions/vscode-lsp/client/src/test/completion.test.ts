@@ -13,7 +13,7 @@ describe('Should do completion', () => {
 	it('Completes JS/TS in txt file', async () => {
 		await testCompletion(docUri, new vscode.Position(0, 0), {
 			items: [
-				{ label: 'JavaScript', kind: vscode.CompletionItemKind.Text },
+				{ label: 'authjs', kind: vscode.CompletionItemKind.Text },
 				{ label: 'TypeScript', kind: vscode.CompletionItemKind.Text }
 			]
 		});
