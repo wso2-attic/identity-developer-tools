@@ -19,25 +19,13 @@
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
- * Represents an argument of a Debug protocol message
- *
- * @param <T>
+ * Response for the variables request.
  */
-public class Argument<T extends Object> {
-    private Object value;
+public class VariablesResponse extends Response {
 
-    public Argument(Object value) {
+    public VariablesResponse(String type, long seq, long requestSeq, boolean success, String command,
+                             String message, Argument body) {
 
-        this.value = value;
-    }
-
-    public T getValue() {
-
-        return (T) value;
-    }
-
-    public void setValue(T value) {
-
-        this.value = value;
+        super(type, seq, requestSeq, success, command, message, body);
     }
 }

@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -55,6 +56,7 @@ public class JsonDap {
                 .registerTypeAdapter(Request.class, new RequestDeserializer())
                 .registerTypeAdapter(Response.class, new ResponseSerializer())
                 .registerTypeAdapter(StoppedEvent.class, new StoppedEventSerializer())
+                .registerTypeAdapter(VariablesResponse.class, new VariablesResponseSerializer())
                 .create();
     }
 

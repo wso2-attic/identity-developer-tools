@@ -26,6 +26,8 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.config.DebugListenerConfigurator;
 import org.wso2.carbon.identity.java.agent.AgentHelper;
@@ -53,9 +55,12 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
     private InterceptionEngine interceptionEngine;
 
+    private VariableTranslator variableTranslator;
+
     public void init() {
 
         interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
+        variableTranslator = new DefaultVariableTranslator();
         if (interceptionEngine == null) {
             log.error(
                     "Java Instrumentation needed for debug is not initialized. Debugging will not function correctly");
@@ -86,9 +91,38 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         switch (request.getCommand()) {
             case "setBreakpoint":
                 return setBreakpoints(debugSession, (BreakpointRequest) request);
+            case "variables":
+                return readVariables(debugSession, (VariablesRequest) request);
         }
-        Response response = new Response(request.getType(), request.getSeq(), request.getSeq(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "", "", null);
         return response;
+    }
+
+    private Response readVariables(DebugSession debugSession, VariablesRequest request) {
+
+        System.out.println("Read Variables id : "+request.getId());
+        MethodContext methodContext = debugSession.getCurrentMethodContext();
+        if (methodContext == null) {
+            HashMap<String, Object> variables = new HashMap<>();
+            Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
+            VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),true, request.getCommand(),
+                    request.getCommand(), variablesArgument);
+            return variablesResponse;
+        }
+
+        HashMap<String, Object> variables = new HashMap<>();
+
+        Object[] arguments = methodContext.getArguments();
+        if(arguments != null) {
+            for(int i = 0; i< arguments.length; i++) {
+                variables.put("var_"+i, variableTranslator.translate(arguments[i]));
+            }
+        }
+        Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
+
+        VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),true, request.getCommand(),
+                request.getCommand(), variablesArgument);
+        return variablesResponse;
     }
 
     @Override
@@ -126,6 +160,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         //This is just simple implementation.
         BreakpointInfo[] breakpointInfos = debugSession.getBreakpointInfos();
+
+        debugSession.setCurrentMethodContext(methodContext);
         if (breakpointInfos.length > 0) {
             BreakpointInfo breakpointInfo = breakpointInfos[0];
             StoppedEvent stoppedEvent = new StoppedEvent("breakpoint", "breakpoint",
@@ -181,7 +217,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
     private Response setBreakpoints(DebugSession debugSession, BreakpointRequest request) {
 
-        Response response = new Response(request.getType(), request.getSeq(), request.getSeq(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "", "", null);
 
         debugSession.setBreakpoints(request.getSourceName(), request.getBreakpoints());
         return response;

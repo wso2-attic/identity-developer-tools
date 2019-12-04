@@ -18,26 +18,17 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
+import java.util.List;
+
 /**
- * Represents an argument of a Debug protocol message
- *
- * @param <T>
+ * An unknown request for the debug protocol.
+ * This is the case where any unknownm message arrives.
  */
-public class Argument<T extends Object> {
-    private Object value;
+public class UnknownRequest extends Request{
 
-    public Argument(Object value) {
+    public UnknownRequest(String type, long seq, String command,
+                          List<Argument> arguments) {
 
-        this.value = value;
-    }
-
-    public T getValue() {
-
-        return (T) value;
-    }
-
-    public void setValue(T value) {
-
-        this.value = value;
+        super(type, seq, command, arguments);
     }
 }

@@ -25,6 +25,7 @@ public class MethodContext {
     private Thread instrumentedThread;
     private Object instrumentedObject;
     private Object methodStack;
+    private Object[] arguments;
     private String methodName;
     private String methodSignature;
 
@@ -58,5 +59,15 @@ public class MethodContext {
     public String getMethodSignature() {
 
         return methodSignature;
+    }
+
+    public Object[] getArguments() {
+
+        return arguments;
+    }
+
+    public void setArguments(Object[] arguments) {
+
+        this.arguments = arguments;
     }
 }

@@ -48,7 +48,7 @@
 		],
 		"breakpoints": [
 			{
-				"language": "markdown"
+				"language": "javascript"
 			}
 		],
 		"debuggers": [
@@ -57,6 +57,7 @@
 				"label": "WSO2 IAM Debug",
 				"program": "./out/debugAdapter.js",
 				"runtime": "node",
+				"languages": ["javascript"],
 				"configurationAttributes": {
 					"launch": {
 						"required": [

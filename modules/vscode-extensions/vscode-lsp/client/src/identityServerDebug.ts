@@ -252,34 +252,18 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
 		const variables: DebugProtocol.Variable[] = [];
-
-
-		if (this._isLongrunning.get(args.variablesReference)) {
-			// long running
-
-			if (request) {
-				this._cancelationTokens.set(request.seq, false);
-			}
-
-			for (let i = 0; i < 100; i++) {
-				await timeout(1000);
-				variables.push({
-					name: `i_${i}`,
-					type: "integer",
-					value: `${i}`,
-					variablesReference: 0
-				});
-				if (request && this._cancelationTokens.get(request.seq)) {
-					break;
-				}
-			}
-
-			if (request) {
-				this._cancelationTokens.delete(request.seq);
-			}
-
+		if(this.messageConnection != null) {
+			// Create the remote variable request and await the response
+			var varaiablesRequest = new rpc.RequestType0<DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
+			var answer = this.messageConnection.sendRequest(varaiablesRequest);
+			console.log("Variables "+answer);
+			answer.then((remoteResponse) => {
+				console.log("Remote variable Values "+remoteResponse.body);
+				response.body = remoteResponse.body;
+				this.sendResponse(response);
+			});
 		} else {
-
+			//No remote connetion exists. Create dummy variables.
 			const id = this._variableHandles.get(args.variablesReference);
 
 			if (id) {
@@ -289,42 +273,14 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 					value: "123",
 					variablesReference: 0
 				});
-				variables.push({
-					name: id + "_f",
-					type: "float",
-					value: "3.14",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_s",
-					type: "string",
-					value: "hello world",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_o",
-					type: "object",
-					value: "Object",
-					variablesReference: this._variableHandles.create(id + "_o")
-				});
-
-				// cancelation support for long running requests
-				const nm = id + "_long_running";
-				const ref = this._variableHandles.create(id + "_lr");
-				variables.push({
-					name: nm,
-					type: "object",
-					value: "Object",
-					variablesReference: ref
-				});
-				this._isLongrunning.set(ref, true);
 			}
-		}
 
-		response.body = {
-			variables: variables
-		};
-		this.sendResponse(response);
+			response.body = {
+				variables: variables
+			};
+			
+			this.sendResponse(response);
+		}
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {

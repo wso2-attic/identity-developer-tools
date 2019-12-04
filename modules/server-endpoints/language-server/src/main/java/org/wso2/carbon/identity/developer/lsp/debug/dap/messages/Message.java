@@ -23,21 +23,21 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
  */
 public class Message extends ProtocolMessage {
 
-    private long seq;
+    private long id;
 
-    public Message(String type, long seq) {
+    public Message(String type, long id) {
 
         super(type);
-        this.seq = seq;
+        this.id = id;
     }
 
-    public long getSeq() {
+    public long getId() {
 
-        return seq;
+        return id;
     }
 
-    public void setSeq(long seq) {
+    public void setId(long seq) {
 
-        this.seq = seq;
+        this.id = seq;
     }
 }
