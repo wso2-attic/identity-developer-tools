@@ -4,8 +4,8 @@ import * as url from 'url';
 import * as xmlQuery from 'xml-query';
 import * as XmlReader from 'xml-reader';
 import * as vscode from 'vscode';
-const xml2js = require('xml2js');
-const temp = require('temp');	
+import * as xml2js from 'xml2js';
+import * as temp from 'temp';
 export class FileHandler {
 
 	/**
@@ -159,6 +159,10 @@ export class FileHandler {
 			vscode.window.showInformationMessage('The file has been saved!');
 		});
 		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+		vscode.workspace.openTextDocument(xmlFile).then(document => {
+			vscode.window.showTextDocument(document, 1, false);
+		});
 	}
 
 	/**
