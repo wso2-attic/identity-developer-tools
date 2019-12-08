@@ -12,6 +12,10 @@
 		"vscode-languageserver": "^5.2.1",
 		"vscode-ws-jsonrpc": "^0.1.1",
 		"ws": "^7.1.2",
+		"xml2js": "^0.4.22"
+	},
+	"devDependencies": {
+		"@types/xml2js": "^0.4.5",
 		"vscode": "^1.1.36"
 	},
 	"scripts": {}

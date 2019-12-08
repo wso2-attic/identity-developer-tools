@@ -57,7 +57,9 @@
 				"label": "WSO2 IAM Debug",
 				"program": "./out/debugAdapter.js",
 				"runtime": "node",
-				"languages": ["javascript"],
+				"languages": [
+					"javascript"
+				],
 				"configurationAttributes": {
 					"launch": {
 						"required": [
@@ -265,7 +267,7 @@
 		"openurl": "^1.1.1",
 		"passport-oauth2": "^1.5.0",
 		"temp": "^0.9.1",
-		"tmp": "^0.1.0",		
+		"tmp": "^0.1.0",
 		"vscode-languageclient": "^5.2.1",
 		"xml-query": "^1.5.0",
 		"xml-reader": "^2.4.3",
