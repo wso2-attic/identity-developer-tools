@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"version": "1.0.0",
 	"repository": {},
-	"publisher": "wso2.com",
+	"publisher": "wso2",
 	"categories": [],
 	"keywords": [
 		"multi-root ready"
@@ -57,7 +57,9 @@
 				"label": "WSO2 IAM Debug",
 				"program": "./out/debugAdapter.js",
 				"runtime": "node",
-				"languages": ["javascript"],
+				"languages": [
+					"javascript"
+				],
 				"configurationAttributes": {
 					"launch": {
 						"required": [
@@ -240,7 +242,8 @@
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"test": "sh ./scripts/e2e.sh"
+		"test": "sh ./scripts/e2e.sh",
+		"package": "npm run compile && vsce package"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.7",
@@ -249,7 +252,8 @@
 		"vscode-debugadapter-testsupport": "1.37.0",
 		"typescript": "^3.5.1",
 		"mocha": "6.2.0",
-		"vsce": "1.66.0"
+		"vsce": "1.66.0",
+		"vscode": "^1.1.36"
 	},
 	"dependencies": {
 		"axios": "^0.19.0",
@@ -264,7 +268,6 @@
 		"passport-oauth2": "^1.5.0",
 		"temp": "^0.9.1",
 		"tmp": "^0.1.0",
-		"vscode": "^1.1.36",
 		"vscode-languageclient": "^5.2.1",
 		"xml-query": "^1.5.0",
 		"xml-reader": "^2.4.3",
