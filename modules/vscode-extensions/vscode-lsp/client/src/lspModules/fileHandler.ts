@@ -146,10 +146,11 @@ export class FileHandler {
 		parser.parseString(xml, function (err, result) {
 			// Check whether AuthenticationScript node is Available.		
 			if ('AuthenticationScript' in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
-				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode);
+				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode).
+					replace('AuthenticationScript enabled="true"', 'AuthenticationScript enabled="false"');
 			} else {
 				// Add the AuthenticationScript node to the xmlfile.			
-				result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = { $: { enabled: "false", language: "application/javascript" }, _: "//<enable false>\n" + newAdaptiveScriptCode };
+				result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = { $: { enabled: "false", language: "application/javascript" }, _: "//<enabled false>\n" + newAdaptiveScriptCode };
 				// change the xml to the new xml.
 				newXml = xmlBuilder.buildObject(result);
 			}
@@ -182,7 +183,8 @@ export class FileHandler {
 		}
 		// Check whether the file already exsists.
 		if (fileNames.includes(serviceName)) {
-			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]));
+			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps',
+				files[fileNames.indexOf(serviceName)]));
 
 			// Open the file.
 			vscode.workspace.openTextDocument(file).then(async document => {
