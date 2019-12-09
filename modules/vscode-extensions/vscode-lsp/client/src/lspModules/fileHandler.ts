@@ -6,7 +6,8 @@ import * as XmlReader from 'xml-reader';
 import * as vscode from 'vscode';
 import * as xml2js from 'xml2js';
 import * as temp from 'temp';
-
+const axios = require('axios');
+const keytar = require('keytar');
 export class FileHandler {
 
 	/**
@@ -50,8 +51,7 @@ export class FileHandler {
 	public async handleButtonClick(message, xmlFilePath) {
 		// Get the name of the servce.
 		var serviceName = this.extractFileName(xmlFilePath).replace('%20', ' ');
-		// Handle the button click in web view.
-		vscode.window.showInformationMessage(String(message.command));
+		// Handle the button click in web view.		
 		if (String(message.command) == "scriptFile") {
 			var adaptive = this.extractAdaptiveScript(xmlFilePath);
 			this.createOrOpenAdaptiveScript(adaptive, serviceName);
@@ -165,6 +165,9 @@ export class FileHandler {
 		vscode.workspace.openTextDocument(xmlFile).then(document => {
 			vscode.window.showTextDocument(document, 1, false);
 		});
+		
+		// To update the service.
+		this.updateService(fs.readFileSync(xmlFile));
 	}
 
 	/**
@@ -195,7 +198,6 @@ export class FileHandler {
 			var newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
 			await fs.writeFile(path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'), xml, (err) => {
 				if (err) throw err;
-				vscode.window.showInformationMessage('The file has been saved!');
 			});
 			// Open the file.
 			vscode.workspace.openTextDocument(newFile).then(async document => {
@@ -223,5 +225,46 @@ export class FileHandler {
 		}
 		walkDir(dir);
 		return filesToReturn;
+	}
+
+	/**
+	 * updateSerive() to update the service in the productIS.
+	 */
+	public async updateService(file) {
+		var url = vscode.workspace.getConfiguration().get('IAM.URL');
+		var acessToken;
+		// Get the acess token from the system key chain.
+		var secret = keytar.getPassword("acessToken", "acessToken");
+		await secret.then((result) => {
+			acessToken = result; // Assign the value to acess toke.					
+		});
+
+		// To bypass the self signed server error.
+		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+		var FormData = require('form-data');
+		var bodyFormData = new FormData();
+		bodyFormData.append('file', file); 
+		axios({
+
+			method: 'put',
+			url: url + `/t/carbon.super/api/server/v1/applications/import`,
+			data: bodyFormData,
+			// Set the content type header, so that we get the response in JSOn
+			headers: {
+				Authorization: 'Bearer ' + acessToken,
+				'Content-Type': 'multipart/form-data'
+
+			}
+		}).then(async (response) => {
+			vscode.window.showInformationMessage("Sucessfully Imported");
+
+		}).catch((err) => {
+			// Do somthing
+			console.log(err);
+
+			// Show the sucess message in the vscode.
+			vscode.window.showErrorMessage("Error..");
+
+		});
 	}
 }
