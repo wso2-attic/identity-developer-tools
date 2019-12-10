@@ -48,8 +48,7 @@ public class InterceptorConfigReader {
         }
     }
 
-
-    private Properties loadProperties() throws Exception {
+    private Properties loadProperties()throws Exception{
         Properties properties = new Properties();
         InputStream inStream = null;
         File InterceptorPropertyFile = new File("instrumentation-config.properties");
@@ -93,6 +92,7 @@ public class InterceptorConfigReader {
         }
         return result;
     }
+
     public static Properties getSubProperties(String prefix, Properties properties) {
 
         if (StringUtils.isEmpty(prefix) || properties == null) {

@@ -74,13 +74,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sinnerschrader.aem.react</groupId>
-            <artifactId>jdk-nashorn-fragment</artifactId>
-            <version>0.24.2.12</version>
-        </dependency>
-
-
-        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
             <version>${org.powermock.version}</version>
@@ -103,8 +96,6 @@
             <version>3.9</version>
             <scope>compile</scope>
         </dependency>
-
-
     </dependencies>
     <build>
         <plugins>
