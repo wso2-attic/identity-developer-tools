@@ -3,8 +3,8 @@
 This will use to get debugger support for Identity Server Authentication Flow.
 
 It has three components
-1. VS-Code Plugin to connect Debug Server wia websocket
-2. Debug Server analayse debug requests and responses
+1. VS-Code Plugin to connect Debug Server via websocket
+2. Debug Server analyse debug requests and responses
 3. Java agent to intercept IS
 
 ### Pre-Requisites
@@ -13,7 +13,7 @@ It has three components
 
 ### How to build
 1. Checkout the java-agent module.
-2. Bbuild with maven.
+2. Build with maven.
     ```
     mvn clean install
     ```
