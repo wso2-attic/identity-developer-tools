@@ -75,6 +75,14 @@
             <version>5.14.35</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.functions.library.mgt</artifactId>
+            <version>5.14.35</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.identity.developer</groupId>
             <artifactId>org.wso2.carbon.identity.developer.java-agent</artifactId>
