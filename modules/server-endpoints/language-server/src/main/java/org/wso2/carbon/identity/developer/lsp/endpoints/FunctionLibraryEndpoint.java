@@ -17,6 +17,7 @@
  */
 
 package org.wso2.carbon.identity.developer.lsp.endpoints;
+
 import com.google.gson.*;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
@@ -26,7 +27,9 @@ import org.wso2.carbon.identity.jsonrpc.JsonRPC;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
 import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
+
 import java.io.IOException;
+
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -51,9 +54,11 @@ public class FunctionLibraryEndpoint {
     private LanguageProcessorFactory languageProcessorFactory;
 
     public FunctionLibraryEndpoint() {
+
         this.jsonRPC = new JsonRPC();
         jsonRPC.init();
     }
+
     /**
      * Method is called when a connection is established.
      *
@@ -61,6 +66,7 @@ public class FunctionLibraryEndpoint {
      */
     @OnOpen
     public void onOpen(Session session) {
+
         System.out.println(session.getId() + " has opened a connection");
         try {
             Gson gson = new Gson();
@@ -68,7 +74,7 @@ public class FunctionLibraryEndpoint {
         } catch (IOException ex) {
             log.error("onOpen functionLibrary exception ", ex);
         } catch (EncodeException e) {
-            log.debug("onOpen functionLibrary encode error  ",e);
+            log.debug("onOpen functionLibrary encode error  ", e);
         }
     }
 
@@ -79,6 +85,7 @@ public class FunctionLibraryEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
+
         System.out.println("Session " + session.getId() + " has ended");
     }
 
@@ -93,13 +100,13 @@ public class FunctionLibraryEndpoint {
             Request request = jsonRPC.decode(message);
             LanguageProcessor languageProcessor = languageProcessorFactory.getProcessor(request);
             Response response = new SuccessResponse();
-            if(languageProcessor == null) {
+            if (languageProcessor == null) {
                 //TODO: Descriptive error, no processor found
                 response = new SuccessResponse();
             } else {
                 response = languageProcessor.process(request);
             }
-            if(response == null) {
+            if (response == null) {
                 //TODO: Descriptive error
                 response = new SuccessResponse();
             }
@@ -111,10 +118,12 @@ public class FunctionLibraryEndpoint {
 
     /**
      * Method is called when an error occurs.
+     *
      * @param e
      */
     @OnError
     public void onError(Throwable e) {
+
         e.printStackTrace();
     }
 
