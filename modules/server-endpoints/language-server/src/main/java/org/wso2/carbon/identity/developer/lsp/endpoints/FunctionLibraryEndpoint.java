@@ -67,7 +67,6 @@ public class FunctionLibraryEndpoint {
     @OnOpen
     public void onOpen(Session session) {
 
-        System.out.println(session.getId() + " has opened a connection");
         try {
             Gson gson = new Gson();
             session.getBasicRemote().sendObject(gson.toJson("Hello"));
@@ -86,7 +85,7 @@ public class FunctionLibraryEndpoint {
     @OnClose
     public void onClose(Session session) {
 
-        System.out.println("Session " + session.getId() + " has ended");
+        log.info("Closed the connection ");
     }
 
     /**
@@ -112,7 +111,7 @@ public class FunctionLibraryEndpoint {
             }
             session.getBasicRemote().sendText(jsonRPC.encode(response));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("on Message error", e);
         }
     }
 
@@ -124,7 +123,7 @@ public class FunctionLibraryEndpoint {
     @OnError
     public void onError(Throwable e) {
 
-        e.printStackTrace();
+        log.error("connection error  ", e);
     }
 
 }
