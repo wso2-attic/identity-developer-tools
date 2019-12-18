@@ -19,11 +19,13 @@
 package org.wso2.carbon.identity.developer.lsp.language.sp;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
 import org.wso2.carbon.identity.developer.lsp.LanguageException;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.completion.CompletionListGenerator;
+import org.wso2.carbon.identity.developer.lsp.completion.FunctionLibraryManager;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
 import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
@@ -58,6 +60,12 @@ public class AuthenticationScriptProcessor implements LanguageProcessor {
             } catch (ScriptException e) {
                 throw new LanguageException("Unable to parse the scope :" + text, e);
             }
+        }else if(request.getMethod().equals("onInitialize")){
+            FunctionLibraryManager functionLibraryManager = new FunctionLibraryManager();
+            JsonObject mainObj = new JsonObject();
+            mainObj.add("re",
+                    functionLibraryManager.getFuntionLibraryDetails());
+            successResponse.setResult(mainObj);
         }
         return successResponse;
     }

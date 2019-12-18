@@ -20,6 +20,7 @@ import * as xml2js from 'xml2js';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as path from 'path';
 const fs = require('fs');
+const WebSocket = require('ws');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -36,34 +37,10 @@ declare var text: String;
 var rootpath: any;
 var executeStepCount: any = 0;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
-connection.onInitialize((params: InitializeParams) => {
+connection.onInitialize(async (params: InitializeParams) => {
 	rootpath = params.rootPath;
-	const templates = path.join(__dirname, '..', 'src', 'adaptiveTemplates/');
-	try {
-		fs.readdirSync(templates).forEach((file: any) => {
-			var filepath = templates + file;
-			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
-				if (err) throw err;
-				var obj = JSON.parse(String(data));
-				var codeArray = obj.code;
-				var description = obj.summary;
-				var name = obj.name;
-				var code: String = "";
-				for (var i in codeArray) {
-					code += codeArray[i] + "\n";
-				}
-				var snippentObj = {
-					label: name,
-					detail: description,
-					insertText: code
-				};
-				completionTemplates.push(snippentObj);
-			});
-		});
-	} catch (err) {
-		console.log(err);
-	}
-
+	generateFUnctionLibraries();
+	getTemplates();
 
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
@@ -156,8 +133,10 @@ documents.onDidChangeContent(change => {
 	text = change.document.getText();
 	file = change.document.uri;
 	var xtension = file.split('.').pop();
-	var fileName = path.basename(String(file)).replace(/\.[^/.]+$/, "");
-	setExecuteStep(String(fileName));
+	if (xtension == "authjs") {
+		var fileName = path.basename(String(file)).replace(/\.[^/.]+$/, "");
+		setExecuteStep(String(fileName));
+	}
 	extension = String(xtension);
 });
 
@@ -217,8 +196,7 @@ connection.onCompletion(
 	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.	
-		const WebSocket = require('ws');
+		// info and always provide the same completion items.		
 		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
 		if (extension === "authjs") {
 			var obj: any = {
@@ -324,4 +302,78 @@ function getFilesFromDir(dir: string, fileTypes: string[]): any[] {
 	}
 	walkDir(dir);
 	return filesToReturn;
+}
+
+
+// To read and create the directory with files in temp directory.
+async function generateFUnctionLibraries() {
+	var webSocket = new WebSocket('wss://localhost:9443/lsp/functionLibrary', { rejectUnauthorized: false });
+	rpc.listen({
+		webSocket,
+		onConnection: (rpcConnection: rpc.MessageConnection) => {
+			const notification = new rpc.NotificationType<void, void>('onInitialize');
+			rpcConnection.listen();
+			rpcConnection.sendNotification(notification);
+		},
+	});
+
+	await webSocket.on('message', function incoming(data: any) {
+		let obj = JSON.parse(data);
+		recieveData = obj.result;
+		var jsonData = JSON.parse(JSON.stringify(obj.result.re));
+		var tempPath = require('os').tmpdir();
+
+		// Create a node_modules folder in the temp directory.
+		if (!fs.existsSync(path.join(tempPath, 'node_modules'))) {
+			fs.mkdir(path.join(require('os').tmpdir(), 'node_modules/'), (err: any, folder: any) => {
+				if (err) throw err;
+			});
+		}
+		// Loop over the function libraries and create them inside the node modules.		
+		jsonData.forEach(function (arrayItem: any) {
+			if (fs.existsSync(path.join(tempPath, 'node_modules', arrayItem.name))) {
+				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
+				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
+					if (err) throw err;
+				});
+
+			} else {
+				fs.mkdirSync(path.join(tempPath, 'node_modules', arrayItem.name), { recursive: true });
+				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
+				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
+					if (err) throw err;
+				});
+			}
+		});
+	});
+}
+
+// To get the adaptive script templates.
+async function getTemplates() {
+	const templates = path.join(__dirname, '..', 'src', 'adaptiveTemplates/');
+	try {
+		fs.readdirSync(templates).forEach((file: any) => {
+			var filepath = templates + file;
+			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
+				if (err) throw err;
+				var obj = JSON.parse(String(data));
+				var codeArray = obj.code;
+				var description = obj.summary;
+				var name = obj.name;
+				var code: String = "";
+				for (var i in codeArray) {
+					code += codeArray[i] + "\n";
+				}
+				var snippentObj = {
+					label: name,
+					detail: description,
+					insertText: code
+				};
+				completionTemplates.push(snippentObj);
+			});
+		});
+	} catch (err) {
+		console.log(err);
+	}
+
 }
