@@ -16,8 +16,11 @@ package org.wso2.carbon.identity.developer.lsp.completion;
  * specific language governing permissions and limitations
  * under the License.
  */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.wso2.carbon.identity.developer.lsp.endpoints.OSGIBindingConfigurator;
 import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementService;
 import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementServiceImpl;
 import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryManagementException;
@@ -25,8 +28,13 @@ import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * The function libraries management class.
+ * Use to get the details of the function libraries.
+ */
 public class FunctionLibraryManager {
 
+    private static Log log = LogFactory.getLog(OSGIBindingConfigurator.class);
     /**
      * Get functionlibraries.
      * @return
@@ -38,7 +46,7 @@ public class FunctionLibraryManager {
         try {
             functionLibraries = functionLibMgtService.listFunctionLibraries("carbon.super");
         } catch (FunctionLibraryManagementException e) {
-            e.printStackTrace();
+            log.error("Error in get function libraries from framework ",e);
         }
         return functionLibraries;
     }
@@ -60,20 +68,22 @@ public class FunctionLibraryManager {
                 functionLibraryScript = functionLibrary.getFunctionLibraryScript();
                 functionLibraryDetails.put(functionLibrary.getFunctionLibraryName(),functionLibraryScript);
             } catch (Exception error) {
-                error.printStackTrace();
+                log.error("Error in get function libraries details ",error);
             }
         }
         return  generateArray(functionLibraryDetails);
     }
 
     private JsonArray generateArray(HashMap<String, String> keywords) {
+        final String functionLibraryName = "name";
+        final String functionLibraryCode = "code";
         JsonArray arr = new JsonArray();
         HashMap<String, JsonObject> map = new HashMap<String, JsonObject>();
         int i = 0;
         for (String key : keywords.keySet()) {
             JsonObject json = new JsonObject();
-            json.addProperty("name", key);
-            json.addProperty("code", keywords.get(key));
+            json.addProperty(functionLibraryName, key);
+            json.addProperty(functionLibraryCode, keywords.get(key));
             map.put("json", json);
             i += 1;
             arr.add(map.get("json"));

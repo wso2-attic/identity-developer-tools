@@ -20,7 +20,8 @@ package org.wso2.carbon.identity.developer.lsp.endpoints;
 import com.google.gson.*;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
-import org.wso2.carbon.identity.developer.lsp.completion.FunctionLibraryManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.jsonrpc.JsonRPC;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
@@ -44,6 +45,7 @@ import javax.websocket.server.ServerEndpoint;
 public class FunctionLibraryEndpoint {
 
     private final JsonRPC jsonRPC;
+    private static Log log = LogFactory.getLog(OSGIBindingConfigurator.class);
 
     @Inject
     private LanguageProcessorFactory languageProcessorFactory;
@@ -64,9 +66,9 @@ public class FunctionLibraryEndpoint {
             Gson gson = new Gson();
             session.getBasicRemote().sendObject(gson.toJson("Hello"));
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("onOpen functionLibrary exception ", ex);
         } catch (EncodeException e) {
-            e.printStackTrace();
+            log.debug("onOpen functionLibrary encode error  ",e);
         }
     }
 

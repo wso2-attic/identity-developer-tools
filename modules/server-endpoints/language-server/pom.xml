@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.functions.library.mgt</artifactId>
-            <version>5.14.35</version>
+            <version>${org.wso2.carbon.identity.framework}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -122,5 +122,6 @@
         <jmockit.version>1.44</jmockit.version>
         <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
         <org.powermock.version>1.7.4</org.powermock.version>
+        <org.wso2.carbon.identity.framework>5.14.35</org.wso2.carbon.identity.framework>
     </properties>
 </project>

@@ -19,8 +19,8 @@ import * as xml2js from 'xml2js';
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as path from 'path';
-import * as temp from 'temp';
 const fs = require('fs');
+const WebSocket = require('ws');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -196,8 +196,7 @@ connection.onCompletion(
 	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.	
-		var WebSocket = require('ws');
+		// info and always provide the same completion items.		
 		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
 		if (extension === "authjs") {
 			var obj: any = {
@@ -308,7 +307,6 @@ function getFilesFromDir(dir: string, fileTypes: string[]): any[] {
 
 // To read and create the directory with files in temp directory.
 async function generateFUnctionLibraries() {
-	var WebSocket = require('ws');
 	var webSocket = new WebSocket('wss://localhost:9443/lsp/functionLibrary', { rejectUnauthorized: false });
 	rpc.listen({
 		webSocket,
