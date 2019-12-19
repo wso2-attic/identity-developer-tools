@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class DebugSession {
     private Session session;
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
     private MethodContext currentMethodContext;
+    private List<Object> calledObjectStack = new ArrayList<>();
 
     public Session getSession() {
 
@@ -64,8 +66,8 @@ public class DebugSession {
 
     /**
      * This is temporary method, needs to be removed once created correct breakpoint identification logic.
-     * @return
      *
+     * @return
      */
     @Deprecated
     public BreakpointInfo[] getBreakpointInfos() {
@@ -87,5 +89,75 @@ public class DebugSession {
     public void setCurrentMethodContext(MethodContext currentMethodContext) {
 
         this.currentMethodContext = currentMethodContext;
+    }
+
+    /**
+     * Processes the method entry event.
+     *
+     * @param methodContext
+     */
+    public DebugProcessingResult processMethodEntry(MethodContext methodContext) {
+
+//        if (isHttpRequestEntry(methodContext)) {
+//            calledObjectStack.add(createHttpRequestDataObject(methodContext));
+//
+//        } else if (isJavascriptFunctionCall(methodContext)) {
+//            calledObjectStack.add(createJsFunctionCallObject(methodContext));
+//        } else if (isJavascriptFunctionExit(methodContext)) {
+//            calledObjectStack.remove(getCurrentJavascriptFunctionObject(calledObjectStack));
+//        }
+
+        BreakpointInfo breakpointInfo = findAnyStoppableBreakpoint(methodContext);
+        if (breakpointInfo != null) {
+            if(breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length >0) {
+                DebugProcessingResult result = new DebugProcessingResult(DebugProcessingResult.InstructionType.STOP);
+                result.setBreakpointInfo(breakpointInfo);
+                return result;
+            }
+        }
+        return null;
+    }
+
+    private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
+        if(breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
+            return null;
+        }
+        return breakpointInfoMap.values().stream().findFirst().get();
+    }
+
+    private int getCurrentJavascriptFunctionObject(List<Object> calledObjectStack) {
+
+        return 0;
+    }
+
+    private boolean isJavascriptFunctionExit(MethodContext methodContext) {
+
+        return false;
+
+    }
+
+    private Object createJsFunctionCallObject(MethodContext methodContext) {
+
+        return null;
+    }
+
+    private boolean isJavascriptFunctionCall(MethodContext methodContext) {
+
+        return false;
+    }
+
+    private Object createHttpRequestDataObject(MethodContext methodContext) {
+
+        return null;
+    }
+
+    private boolean isHttpRequestEntry(MethodContext methodContext) {
+
+        if ("org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator".equals(
+                methodContext.getClassName())) {
+            return "handle".equals(
+                    methodContext.getMethodName());
+        }
+        return false;
     }
 }

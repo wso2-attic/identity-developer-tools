@@ -26,24 +26,28 @@ import org.wso2.carbon.identity.java.agent.host.MethodContext;
  */
 public class MethodEntryInterceptionFilter implements InterceptionFilter {
 
+    private String className;
     private String methodName;
     private String signature;
 
-    public MethodEntryInterceptionFilter(String methodName, String signature) {
+    public MethodEntryInterceptionFilter(String className, String methodName, String signature) {
 
+        this.className = className;
         this.methodName = methodName;
         this.signature = signature;
     }
 
     @Override
     public boolean shouldIntercept(InterceptionEventType type, MethodContext methodContext) {
+
         if (methodContext == null) {
             return false;
         }
-        if(InterceptionEventType.METHOD_ENTRY != type) {
+        if (InterceptionEventType.METHOD_ENTRY != type) {
             return false;
         }
 
-        return methodContext.getMethodName().equals(methodName) && methodContext.getMethodSignature().equals(signature);
+        return methodContext.getClassName().equals(className) && methodContext.getMethodName().equals(
+                methodName) && methodContext.getMethodSignature().equals(signature);
     }
 }

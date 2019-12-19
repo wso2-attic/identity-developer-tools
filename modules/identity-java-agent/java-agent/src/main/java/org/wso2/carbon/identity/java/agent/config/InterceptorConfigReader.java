@@ -44,6 +44,13 @@ public class InterceptorConfigReader {
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 
         result.add(interceptorConfig);
+
+        interceptorConfig = new InterceptorConfig();
+        interceptorConfig.setClassName(
+                "jdk/nashorn/internal/runtime/DebuggerSupport");
+        interceptorConfig.addMethodSignature("notifyInvoke",
+                "(Ljava/lang/invoke/MethodHandle;)V");
+        result.add(interceptorConfig);
         return result;
     }
 }
