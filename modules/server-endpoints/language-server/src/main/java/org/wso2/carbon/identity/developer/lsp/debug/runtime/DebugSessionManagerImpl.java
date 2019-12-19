@@ -37,11 +37,8 @@ import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
 /**
@@ -100,29 +97,48 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
     private Response readVariables(DebugSession debugSession, VariablesRequest request) {
 
-        System.out.println("Read Variables id : "+request.getId());
         MethodContext methodContext = debugSession.getCurrentMethodContext();
         if (methodContext == null) {
             HashMap<String, Object> variables = new HashMap<>();
             Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
-            VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),true, request.getCommand(),
+            VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(),
+                    request.getId(), true, request.getCommand(),
                     request.getCommand(), variablesArgument);
             return variablesResponse;
         }
 
         HashMap<String, Object> variables = new HashMap<>();
 
-        Object[] arguments = methodContext.getArguments();
-        if(arguments != null) {
-            for(int i = 0; i< arguments.length; i++) {
-                variables.put("var_"+i, variableTranslator.translate(arguments[i]));
+        Object[] arguments = methodContext.getArgumentValues();
+        if (arguments != null) {
+            for (int i = 0; i < arguments.length; i++) {
+                String variableName = deriveVariableName(methodContext.getArgumentTypes(), i);
+                variables.put(variableName, variableTranslator.translate(arguments[i]));
             }
         }
         Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
 
-        VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),true, request.getCommand(),
+        VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),
+                true, request.getCommand(),
                 request.getCommand(), variablesArgument);
         return variablesResponse;
+    }
+
+    /**
+     * Creates an appropriate variable name for the given argument type.
+     *
+     * @param argumentTypes
+     * @param i
+     * @return
+     */
+    private String deriveVariableName(Class[] argumentTypes, int i) {
+
+        if (argumentTypes == null || argumentTypes.length < i) {
+            return "arg_" + i;
+        }
+        Class type = argumentTypes[i];
+        String simpleName = type.getSimpleName();
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1, simpleName.length());
     }
 
     @Override
@@ -147,7 +163,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         ProtocolMessage messageToClient = null;
         switch (type) {
             case METHOD_ENTRY:
-                messageToClient = processBreakpoint(type, methodContext, debugSession);
+                messageToClient = handleMethodEntry(methodContext, debugSession);
         }
 
         if (messageToClient != null) {
@@ -155,22 +171,30 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         }
     }
 
-    private StoppedEvent processBreakpoint(InterceptionEventType type, MethodContext methodContext,
+    private StoppedEvent handleMethodEntry(MethodContext methodContext,
                                            DebugSession debugSession) {
 
-        //This is just simple implementation.
-        BreakpointInfo[] breakpointInfos = debugSession.getBreakpointInfos();
-
-        debugSession.setCurrentMethodContext(methodContext);
-        if (breakpointInfos.length > 0) {
-            BreakpointInfo breakpointInfo = breakpointInfos[0];
-            StoppedEvent stoppedEvent = new StoppedEvent("breakpoint", "breakpoint",
-                    breakpointInfo.getBreakpointLocations()[0],
-                    breakpointInfo.getResourceName());
-            return stoppedEvent;
+        DebugProcessingResult result = debugSession.processMethodEntry(methodContext);
+        if (result == null) {
+            return null;
         }
+        debugSession.setCurrentMethodContext(methodContext);
+        switch (result.getInstructionType()) {
+            case STOP:
+                return createStoppedEvent(methodContext, debugSession, result);
 
+        }
         return null;
+
+    }
+
+    private StoppedEvent createStoppedEvent(MethodContext methodContext, DebugSession debugSession,
+                                            DebugProcessingResult result) {
+
+        StoppedEvent stoppedEvent = new StoppedEvent("breakpoint", "breakpoint",
+                result.getBreakpointInfo().getBreakpointLocations()[0],
+                result.getBreakpointInfo().getResourceName());
+        return stoppedEvent;
     }
 
     private void sendRequestToClient(Session websocketSession, ProtocolMessage message) {
@@ -188,6 +212,10 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Map.Entry<Session, DebugSession> findInterestedDebugSession(MethodContext methodContext) {
 
         //For not, just return the first entry. We need to have a better filter later.
+        if (!methodContext.getClassName().equals(
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator")) {
+            return null;
+        }
         if (!activeDebugSessions.isEmpty()) {
             for (Map.Entry<Session, DebugSession> entry : activeDebugSessions.entrySet()) {
                 return entry;
