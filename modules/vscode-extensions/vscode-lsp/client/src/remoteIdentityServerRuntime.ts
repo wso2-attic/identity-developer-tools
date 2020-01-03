@@ -1,10 +1,31 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ * ------------------------------------------------------------------------------------------ */
 
-import { readFileSync } from 'fs';
 import { EventEmitter } from 'events';
+import { DebugProtocol } from 'vscode-debugprotocol';
+import { readFileSync } from 'fs';
+import * as rpc from 'vscode-ws-jsonrpc';
 
+var WebSocket = require('ws');
+
+/**
+ * Remote Breakpoint, communicated over Websocket and DAP.
+ */
 export interface RemoteBreakpoint {
 	id: number;
 	line: number;
@@ -12,24 +33,26 @@ export interface RemoteBreakpoint {
 }
 
 /**
- * A Mock runtime with minimal debugger functionality.
+ * Runtime implementation for debuging remote Identity Server via WebSocket connections.
+ * Websocket can be made to local or remote server.
+ * There will be only one debug connection need to be maintained per server.
  */
 export class RemoteIdentityServerRuntime extends EventEmitter {
 
-	// the initial (and one and only) file we are 'debugging'
+	
+	private  webSocket: WebSocket;
+	private messageConnection: rpc.MessageConnection;
+
+	// Source file.Currently only one file. TODO: make debug available for multiple files
 	private _sourceFile: string;
-	public get sourceFile() {
-		return this._sourceFile;
-	}
-
-	// the contents (= lines) of the one and only file
+	// the contents (= lines) of the one and only file. TODO: Have a map of source file to lines
 	private _sourceLines: string[];
-
-	// This is the next line that will be 'executed'
+	// This is the next line that will be 'executed' .TODO: Have a map of source file to lines
 	private _currentLine = 0;
 
-	// maps from sourceFile to array of Mock breakpoints
+	// maps from sourceFile to array of  breakpoints
 	private _breakPoints = new Map<string, RemoteBreakpoint[]>();
+
 
 	// since we want to send breakpoint events, we will assign an id to every event
 	// so that the frontend can match events with breakpoints.
@@ -37,16 +60,14 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 
 	private _breakAddresses = new Set<string>();
 
+
 	constructor() {
 		super();
 	}
 
-	/**
-	 * Start executing the given program.
-	 */
 	public start(program: string, stopOnEntry: boolean) {
+		this.connectWebsocket();
 
-		this.loadSource(program);
 		this._currentLine = -1;
 
 		this.verifyBreakpoints(this._sourceFile);
@@ -58,20 +79,69 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			// we just start to run until we hit a breakpoint or an exception
 			this.continue();
 		}
-	}x
+	}
 
-	/**
-	 * Continue execution to the end/beginning.
+	public setBreakPoint(path: string, line: number, args: DebugProtocol.SetBreakpointsArguments) : RemoteBreakpoint {
+		const bp = <RemoteBreakpoint> { verified: false, line, id: this._breakpointId++ };
+		let bps = this._breakPoints.get(path);
+		if (!bps) {
+			bps = new Array<RemoteBreakpoint>();
+			this._breakPoints.set(path, bps);
+		}
+		bps.push(bp);
+
+		this.verifyBreakpoints(path);
+
+		if(this.messageConnection != null) {
+			var notification = new rpc.NotificationType("setBreakpoint")
+			this.messageConnection.sendNotification(notification, args);;
+		}
+
+
+		return bp;
+	}
+
+	/*
+	 * Clear all breakpoints for file.
 	 */
-	public continue(reverse = false) {
-		this.run(reverse, undefined);
+	public clearBreakpoints(path: string): void {
+		if(this.messageConnection != null) {
+			var notification = new rpc.NotificationType("clearBreakpoints")
+			this.messageConnection.sendNotification(notification);
+		}
+		this._breakPoints.delete(path);
+	}
+
+	public getBreakpoints(path: string, line: number): number[] {
+
+		const l = this._sourceLines[line];
+
+		let sawSpace = true;
+		const bps: number[] = [];
+		for (let i = 0; i < l.length; i++) {
+			if (l[i] !== ' ') {
+				if (sawSpace) {
+					bps.push(i);
+					sawSpace = false;
+				}
+			} else {
+				sawSpace = true;
+			}
+		}
+
+		return bps;
 	}
 
 	/**
-	 * Step to the next/previous non empty line.
+	 * Creates the variable request and returns the promise which can be used to perform the results on the request
+	 * @param response 
+	 * @param args 
+	 * @param request 
 	 */
-	public step(reverse = false, event = 'stopOnStep') {
-		this.run(reverse, event);
+	public fetchVariables(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) :Thenable<DebugProtocol.VariablesResponse> {
+		var varaiablesRequest = new rpc.RequestType0<DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
+		var answer = this.messageConnection.sendRequest(varaiablesRequest);
+		return answer;
 	}
 
 	/**
@@ -98,92 +168,30 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 		};
 	}
 
-	public getBreakpoints(path: string, line: number): number[] {
-
-		const l = this._sourceLines[line];
-
-		let sawSpace = true;
-		const bps: number[] = [];
-		for (let i = 0; i < l.length; i++) {
-			if (l[i] !== ' ') {
-				if (sawSpace) {
-					bps.push(i);
-					sawSpace = false;
-				}
-			} else {
-				sawSpace = true;
-			}
-		}
-
-		return bps;
-	}
-
-	/*
-	 * Set breakpoint in file with given line.
+	/**
+	 * Continue execution to the end/beginning.
 	 */
-	public setBreakPoint(path: string, line: number) : RemoteBreakpoint {
-
-		const bp = <RemoteBreakpoint> { verified: false, line, id: this._breakpointId++ };
-		let bps = this._breakPoints.get(path);
-		if (!bps) {
-			bps = new Array<RemoteBreakpoint>();
-			this._breakPoints.set(path, bps);
-		}
-		bps.push(bp);
-
-		this.verifyBreakpoints(path);
-
-		return bp;
+	public continue(reverse = false) {
+		this.run(reverse, undefined);
 	}
 
-	/*
-	 * Clear breakpoint in file with given line.
+	/**
+	 * Step to the next/previous non empty line.
 	 */
-	public clearBreakPoint(path: string, line: number) : RemoteBreakpoint | undefined {
-		let bps = this._breakPoints.get(path);
-		if (bps) {
-			const index = bps.findIndex(bp => bp.line === line);
-			if (index >= 0) {
-				const bp = bps[index];
-				bps.splice(index, 1);
-				return bp;
-			}
-		}
-		return undefined;
+	public step(reverse = false, event = 'stopOnStep') {
+		this.run(reverse, event);
 	}
 
-	/*
-	 * Clear all breakpoints for file.
-	 */
-	public clearBreakpoints(path: string): void {
-		this._breakPoints.delete(path);
+	private sendEvent(event: string, ... args: any[]) {
+		setImmediate(_ => {
+			this.emit(event, ...args);
+		});
 	}
 
-	/*
-	 * Set data breakpoint.
-	 */
-	public setDataBreakpoint(address: string): boolean {
-		if (address) {
-			this._breakAddresses.add(address);
-			return true;
-		}
-		return false;
-	}
-
-	/*
-	 * Clear all data breakpoints.
-	 */
-	public clearAllDataBreakpoints(): void {
-		this._breakAddresses.clear();
-	}
-
-	// private methods
-
-	private loadSource(file: string) {
-		if (this._sourceFile !== file) {
-			this._sourceFile = file;
-			this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
-		}
+	private fireBreakpoint(ln: number) {
+		// send 'stopped' event
+		this._currentLine = ln;
+		this.sendEvent('stopOnBreakpoint');
 	}
 
 	/**
@@ -298,15 +306,55 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 		return false;
 	}
 
-	private sendEvent(event: string, ... args: any[]) {
-		setImmediate(_ => {
-			this.emit(event, ...args);
-		});
+	/*
+	 * Set data breakpoint.
+	 */
+	public setDataBreakpoint(address: string): boolean {
+		if (address) {
+			this._breakAddresses.add(address);
+			return true;
+		}
+		return false;
 	}
 
-	public fireBreakpoint(ln: number) {
-		// send 'stopped' event
-		this._currentLine = ln;
-		this.sendEvent('stopOnBreakpoint');
+	/*
+	 * Clear all data breakpoints.
+	 */
+	public clearAllDataBreakpoints(): void {
+		this._breakAddresses.clear();
+	}
+
+	private loadSource(file: string) {
+		if (this._sourceFile !== file) {
+			this._sourceFile = file;
+			this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
+		}
+	}
+
+	private connectWebsocket() :void {
+		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',{ rejectUnauthorized: false });
+		this.webSocket = webSocket;
+		console.log("Listening.. " );
+		rpc.listen({
+			webSocket,
+			onConnection: (rpcConnection: rpc.MessageConnection) => {
+				console.log("connected+ " );
+				this.messageConnection = rpcConnection;
+				let notification = new rpc.NotificationType<string, void>('breakpoint');
+
+				rpcConnection.onNotification(notification, (param: any) => {
+					console.log("got notificaiton breakpoint.. "+param );
+					this.fireBreakpoint(param.line);
+				});
+				rpcConnection.onNotification( (param: any) => {
+					console.log("got notificaiton any .. "+param );;
+				});
+				rpcConnection.onRequest((param: any) => {
+					console.log("got Request.. "+param );
+				});
+				rpcConnection.listen();
+			}
+		});
+
 	}
 }
