@@ -13,7 +13,6 @@ export class ServiceManger {
 	constructor(context) {
 		var context = context;
 	}
-
 	/**
 	 * getServicesList() to get the services using the apis.
 	 */
@@ -144,5 +143,5 @@ export class ServiceManger {
 			vscode.window.showErrorMessage("Error..");
 
 		});
-	}
+	}	
 }

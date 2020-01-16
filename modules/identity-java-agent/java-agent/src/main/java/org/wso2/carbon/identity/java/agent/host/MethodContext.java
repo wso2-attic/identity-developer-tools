@@ -18,14 +18,21 @@
 
 package org.wso2.carbon.identity.java.agent.host;
 
+import java.util.LinkedList;
+import java.util.Map;
+
 /**
  * Instrumentation comntext for a method.
  */
 public class MethodContext {
+
     private Thread instrumentedThread;
     private Object instrumentedObject;
     private Object methodStack;
-    private Object[] arguments;
+    private Object[] argumentValues;
+    private Class[] argumentTypes;
+    private LinkedList<Map<String, Object>> dataStack = new LinkedList<>();
+    private String className;
     private String methodName;
     private String methodSignature;
 
@@ -61,13 +68,46 @@ public class MethodContext {
         return methodSignature;
     }
 
-    public Object[] getArguments() {
+    public Object[] getArgumentValues() {
 
-        return arguments;
+        return argumentValues;
     }
 
-    public void setArguments(Object[] arguments) {
+    public void setArgumentValues(Object[] argumentValues) {
 
-        this.arguments = arguments;
+        this.argumentValues = argumentValues;
+    }
+
+    public Class[] getArgumentTypes() {
+
+        return argumentTypes;
+    }
+
+    public void setArgumentTypes(Class[] argumentTypes) {
+
+        this.argumentTypes = argumentTypes;
+    }
+
+    public void pushData(Map<String, Object> dataFrame) {
+
+        dataStack.addFirst(dataFrame);
+    }
+
+    public Map<String, Object> popData() {
+
+        if (dataStack.isEmpty()) {
+            return null;
+        }
+        return dataStack.removeFirst();
+    }
+
+    public void setClassName(String className) {
+
+        this.className = className;
+    }
+
+    public String getClassName() {
+
+        return className;
     }
 }

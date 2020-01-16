@@ -38,14 +38,15 @@ public class InterceptorConfigReader {
    public List<InterceptorConfig> readConfig() {
         ArrayList<InterceptorConfig> result = new ArrayList<>();
 
-        //TODO: Read the instrumentation-config.json
-        InterceptorConfig interceptorConfig = new InterceptorConfig();
+        result.add(interceptorConfig);
+
+        interceptorConfig = new InterceptorConfig();
         interceptorConfig.setClassName(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator");
-        interceptorConfig.addMethodSignature("handle",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
-        
-	result.add(interceptorConfig);
+                "jdk/nashorn/internal/runtime/DebuggerSupport");
+        interceptorConfig.addMethodSignature("notifyInvoke",
+                "(Ljava/lang/invoke/MethodHandle;)V");
+        result.add(interceptorConfig);
+
         return result;
     }
 }

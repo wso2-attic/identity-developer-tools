@@ -21,6 +21,12 @@ package org.wso2.carbon.identity.java.agent.internal;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.LocalVariableAttribute;
+import javassist.bytecode.MethodInfo;
+import javassist.runtime.Desc;
 import javassist.scopedpool.ScopedClassPoolFactoryImpl;
 import javassist.scopedpool.ScopedClassPoolRepositoryImpl;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
@@ -51,6 +57,8 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
 
     public void init() {
 
+        //Sets the useContextClassLoader =true to get any class type to be correctly resolved with correct OSGI module
+        Desc.useContextClassLoader = true;
         rootPool = ClassPool.getDefault();
     }
 
@@ -66,7 +74,6 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
             boolean isTransformed = false;
             InterceptorConfig config = getInterceptorConfig(loader, className);
             try {
-
                 ClassPool classPool = scopedClassPoolFactory.create(loader, rootPool,
                         ScopedClassPoolRepositoryImpl.getInstance());
                 CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(
@@ -75,11 +82,16 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
 
                 for (CtMethod method : methods) {
                     if (config.hasMethodSignature(method.getName(), method.getSignature())) {
+//                        String[] variableNames = getVariableNames(method);
                         log.info(
                                 "Intercepted method " + className + "." + method.getName() + " " + method.getSignature());
+//                        System.out.println("Var names "+variableNames);
                         isTransformed = true;
                         method.insertBefore(
-                                "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\"" + method.getName() + "\", \"" + method.getSignature() + "\", $args);");
+                                "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\""
+                                        + className + "\", \"" + method.getName() + "\", \"" + method.getSignature()
+                                        + "\", $sig, $args );");
+//                                        + "\","+$sig+", $args);");
                     }
                 }
                 if (isTransformed) {
@@ -92,6 +104,21 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         }
         return byteCode;
 
+    }
+
+    private String[] getVariableNames(CtMethod method) throws NotFoundException {
+        MethodInfo methodInfo = method.getMethodInfo();
+        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
+        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+        if (attr == null) {
+            return new String[0];
+        }
+        CtClass[] paramTypes = method.getParameterTypes();
+        String[] paramNames = new String[method.getParameterTypes().length];
+        for (int i = 0; i < paramNames.length; i++) {
+            paramNames[i] = paramTypes[i].getSimpleName()+(i);
+        }
+        return paramNames;
     }
 
     private boolean shouldIntercept(ClassLoader loader, String className) {

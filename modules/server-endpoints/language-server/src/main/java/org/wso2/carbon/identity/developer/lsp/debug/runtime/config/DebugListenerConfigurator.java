@@ -37,9 +37,18 @@ public class DebugListenerConfigurator {
 
     public void configure(InterceptionEngine interceptionEngine) {
 
-        MethodEntryInterceptionFilter frameworkEntryFilter = new MethodEntryInterceptionFilter("handle",
+        MethodEntryInterceptionFilter frameworkEntryFilter = new MethodEntryInterceptionFilter(
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator",
+                "handle",
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 
         interceptionEngine.addListener(frameworkEntryFilter, sessionManager);
+
+        MethodEntryInterceptionFilter nashornListener = new MethodEntryInterceptionFilter(
+                "jdk/nashorn/internal/runtime/DebuggerSupport",
+                "notifyInvoke",
+                "(Ljava/lang/invoke/MethodHandle;)V");
+
+        interceptionEngine.addListener(nashornListener, sessionManager);
     }
 }
