@@ -1,4 +1,4 @@
-# IAM-CTL
+﻿# IAM-CTL
 
 This will use to get support for create service providers inside the Identity Server.
 Here you can create service providers by entering inputs as a command  and flags or entering inputs in an interactive way.
@@ -169,28 +169,3 @@ $ iamctl application
 ? Select the option to move on: Get List
 ```
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
- 
