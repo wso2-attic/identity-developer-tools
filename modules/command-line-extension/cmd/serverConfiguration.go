@@ -1,3 +1,18 @@
+/*
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package cmd
 
 import (
@@ -9,26 +24,23 @@ import (
 	"net/url"
 )
 
-
 var configCmd = &cobra.Command{
 	Use:  "serverConfiguration" ,
 	Short: "you can set your server domain",
 	Long: `You can set your server domain`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server1, _ := cmd.Flags().GetString("server")
+		server, _ := cmd.Flags().GetString("server")
 
-		if server1 =="" {
+		if server =="" {
 			setServer()
 		}else {
-			_, err := url.ParseRequestURI(server1)
+			_, err := url.ParseRequestURI(server)
 			if err != nil {
-				fmt.Println(err)
+				log.Fatalln(err)
 			}
-
-
 			userName, _ := cmd.Flags().GetString("username")
 			password, _ := cmd.Flags().GetString("password")
-			start(server1,userName,password)
+			start(server,userName,password)
 		}
 	},
 }
@@ -52,12 +64,19 @@ var userNamePassword = []*survey.Question{
 		Validate: survey.Required,
 	},
 }
+//var (
+//	passwordInteractive bool
+//	passwordFromFlag    string
+//)
+
 func init(){
 	rootCmd.AddCommand(configCmd)
 	configCmd.Flags().StringP("server", "s", "", "set server domain")
 	configCmd.Flags().StringP("username", "u", "", "enter your username")
 	configCmd.Flags().StringP("password", "p", "", "enter your password")
 
+	//configCmd.Flags().BoolVar(&passwordInteractive, "interactive", true, "Read password from stdin instead of interactive terminal")
+	//configCmd.Flags().StringVar(&passwordFromFlag, "password", "", "Supply password from the command line flag")
 }
 
 func setServer(){
@@ -68,6 +87,11 @@ func setServer(){
 	serverAnswer := struct{
 		Server string `survey:"server"`
 	}{}
+	userNamePasswordAnswer:= struct {
+		UserName  string `survey:"username"`
+		Password   string `survey:"password"`
+	}{}
+
 	err1 := survey.Ask(server, &serverAnswer)
 	if err1 != nil {
 		log.Fatal(err1)
@@ -75,19 +99,14 @@ func setServer(){
 	}
 	_, err := url.ParseRequestURI(serverAnswer.Server)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
-	userNamePasswordAnswer:= struct {
-		UserName  string `survey:"username"`
-		Password   string `survey:"password"`
-	}{}
 	err1 = survey.Ask(userNamePassword, &userNamePasswordAnswer)
 	if err1 != nil {
 		log.Fatal(err1)
 		return
 	}
+
 	start(serverAnswer.Server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
-
-
 }

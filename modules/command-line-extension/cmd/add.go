@@ -1,3 +1,18 @@
+/*
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package cmd
 
 import (
@@ -24,10 +39,10 @@ var createUsingCommand = &cobra.Command{
 		if typeOfAPP=="basic" {
 			if  description==""{
 				createSPBasicApplication(domain, name, name)
-			}else {
+			}else{
 				createSPBasicApplication(domain, name, description)
 			}
-		}else {
+		}else{
 				callbackURl, _ :=cmd.Flags().GetString("callbackURl")
 
 				if callbackURl == "" {
@@ -50,31 +65,29 @@ var createUsingCommand = &cobra.Command{
 						}
 					}
 				}
-			}
+		}
 	},
 }
 
 var serverDomain string
-var name1 string
+var applicationName string
 
 func init(){
 	createSPCmd.AddCommand(createUsingCommand)
+
 	createUsingCommand.Flags().StringP("type", "t", "oauth", "Enter application type")
 	name:=createUsingCommand.Flags()
-	name.StringVarP(&name1,"name", "n", "", "name of service provider - **compulsory")
+	name.StringVarP(&applicationName,"name", "n", "", "name of service provider - **compulsory")
 	err := cobra.MarkFlagRequired(name, "name")
 	if err!= nil{
 		fmt.Println(err)
 	}
-
 	createUsingCommand.Flags().StringP("description", "d", "", "description of SP - **for basic application")
 	createUsingCommand.Flags().StringP("callbackURl", "c", "", "callbackURL  of SP - **for oauth application")
-
-	serverdomain:=createUsingCommand.Flags()
-	serverdomain.StringVarP(&serverDomain,"serverDomain", "s", "", "server Domain - **compulsory")
-	err2 := cobra.MarkFlagRequired(serverdomain, "serverDomain")
-	if err2 != nil{
-		fmt.Println(err2)
+	server:=createUsingCommand.Flags()
+	server.StringVarP(&serverDomain,"serverDomain", "s", "", "server Domain - **compulsory")
+	err = cobra.MarkFlagRequired(server, "serverDomain")
+	if err != nil{
+		log.Fatalln(err)
 	}
 }
-

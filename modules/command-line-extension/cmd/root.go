@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,22 +17,19 @@ package cmd
 
 import (
   "fmt"
-  "github.com/spf13/cobra"
-  "os"
-
   "github.com/mitchellh/go-homedir"
+  "github.com/spf13/cobra"
   "github.com/spf13/viper"
+  "os"
 )
 
 const (
   appName="IAM-CTL"
   shortAppDesc="SP config"
   longAPPConfig="Service provider configuration"
-
 )
 
 var cfgFile string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
   Use:   appName,
@@ -47,7 +44,6 @@ func Execute() {
     fmt.Println(err)
     os.Exit(1)
   }
-
 }
 
 func init() {
@@ -82,4 +78,3 @@ func initConfig() {
     fmt.Println("Using config file:", viper.ConfigFileUsed())
   }
 }
-

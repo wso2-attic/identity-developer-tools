@@ -1,3 +1,18 @@
+/*
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package cmd
 
 import (
@@ -19,6 +34,7 @@ type ServerDetails struct {
 type myJSON struct {
 	Array []ServerDetails
 }
+
 func createFile() {
 	// detect if file exists
 	var _, err = os.Stat(path)
@@ -32,7 +48,7 @@ func createFile() {
 		encjson, _ := json.Marshal(jsondat)
 
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		err = ioutil.WriteFile(path, encjson, 0644)
 		if err!=nil{
@@ -68,22 +84,21 @@ func writeFiles(server string,token string,refreshToken string) {
 				data.Array[i].AccessToken = token
 				data.Array[i].RefreshToken = refreshToken
 			} else {
-
 				data.Array = append(data.Array, *msg)
 			}
 		}
 	}
 
 	jsonData, err := json.Marshal(data)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		err = ioutil.WriteFile(path, jsonData, 0644)
-		if err!=nil{
-			log.Fatalln(err)
-		} else{
-			fmt.Println("Authorization is done for : "+server)
-		}
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = ioutil.WriteFile(path, jsonData, 0644)
+	if err!=nil{
+		log.Fatalln(err)
+	}else{
+		fmt.Println("Authorization is done for : "+server)
+	}
 
 	checkError(err)
 }
@@ -111,12 +126,6 @@ func readFile(domain string) string {
 	return a.AccessToken
 }
 
-//func deleteFile() bool{
-//	// delete file
-//	var err = os.Remove(path)
-//	return (err != nil)
-//
-//}
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err.Error())
