@@ -9,7 +9,7 @@ Here you can create service providers by entering inputs as a command  and flags
 
 ### How to run
 1. first clone or download IAM-CTL from ```command-line-extension``` module
-2. copy the path of ```<command-line-extension_PATH>/iamcli```
+2. copy the path of ```<command-line-extension_PATH>/iamctl```
 3. Then you select your directory to work and open a terminal
 4. You can choose any name as keyword of IAM-CTL and set that using following command.
 Here I chosen 'iamctl' as keyword.
@@ -22,11 +22,11 @@ Here I chosen 'iamctl' as keyword.
 7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be complete as follows.
 Run :-
 ```
-iamctl existApp
+iamctl init
 ```
 Now give answers for questions asked bu CTL.
 ```
-:~$ iamcli existApp
+:~$ iamcli init
   ___      _      __  __            ____   _____   _     
  |_ _|    / \    |  \/  |          / ___| |_   _| | |    
   | |    / _ \   | |\/| |  _____  | |       | |   | |    
