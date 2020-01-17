@@ -9,13 +9,13 @@ Here you can create service providers by entering inputs as a command  and flags
 
 ### How to run
 1. first clone or download ```commannd-line-extension``` module
-2. copy the path of ```<commannd-line-extension/IAM-CTL_PATH>/iamcli```
+2. copy the path of ```<commannd-line-extension_PATH>/iamctl```
 3. Then you select your directory to work and open a terminal
 4. You can choose any name as keyword of IAM-CTL and set that using following command.
 Here I have chosen 'iamctl' as keyword.
 
     ```
-    alias iamctl="<commannd-line-extension/IAM-CTL_PATH>/iamctl" 
+    alias iamctl="<commannd-line-extension_PATH>/iamctl" 
     ```
 5. Now you can run IAM-CTL using your keyword.
 6. First you need to configure service provider to get access from identity server. For that this [link](https://docs.wso2.com/display/IS570/Configuring+OAuth2-OpenID+Connect+Single-Sign-On) will help to you..
@@ -135,7 +135,7 @@ $ iamctl application
                                                          
 ? Enter IS URL: https://localhost:9443
 ? Select the option to move on:  [Use arrows to move, type to filter]
-> Create Service Provider
+> Add application
   Get List
   Exit
 ```
@@ -150,10 +150,11 @@ example:-
  |___| /_/   \_\ |_|  |_|          \____|   |_|   |_____|
                                                          
 ? Enter IS URL: https://localhost:9443
-? Select the option to move on: Create Service App
-? Select the configuration type: Basic application
-? Enter service provider name: BasicApp
-? Enter service provider description: this is description
+? Select the option to move on: Add application
+? Select the configuration type:  [Use arrows to move, type to filter]
+> Basic application
+  oauth
+
 ```
 To view list of applications you should select ```list``` from selections.
 example:-
@@ -168,29 +169,3 @@ $ iamctl application
 ? Enter IS URL: https://localhost:9443
 ? Select the option to move on: Get List
 ```
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
- 
