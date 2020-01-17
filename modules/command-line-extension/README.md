@@ -8,23 +8,23 @@ Here you can create service providers by entering inputs as a command  and flags
 * WSO2IS 5.10.0 alpha2 
 
 ### How to run
-1. first clone or download IAM-CTL from ```command-line-extension``` module
-2. copy the path of ```<command-line-extension_PATH>/iamctl```
-3. Then you select your directory to work and open a terminal
+1. first clone or download  ```command-line-extension``` module.
+2. copy the path of ```<command-line-extension_PATH>/iamctl```.
+3. Then you select your directory to work and open a terminal.
 4. You can choose any name as keyword of IAM-CTL and set that using following command.
-Here I chosen 'iamctl' as keyword.
+Here I have chosen 'iamctl' as keyword.
 
     ```
     alias iamctl="<command-line-extension_PATH>/iamctl" 
     ```
 5. Now you can run IAM-CTL using your keyword.
 6. First you need to configure service provider to get access from identity server. For that this [link](https://docs.wso2.com/display/IS570/Configuring+OAuth2-OpenID+Connect+Single-Sign-On) will help to you..
-7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be complete as follows.
-Run :-
+7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be completed as follows.
+
 ```
 iamctl init
 ```
-Now give answers for questions asked bu CTL.
+Now you should gives answers for questions asked by CTL.
 ```
 :~$ iamcli init
   ___      _      __  __            ____   _____   _     
