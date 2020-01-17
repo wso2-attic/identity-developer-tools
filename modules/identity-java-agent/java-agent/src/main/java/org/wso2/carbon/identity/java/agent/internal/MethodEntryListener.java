@@ -35,13 +35,15 @@ public class MethodEntryListener {
      * @param signature  The signature of the method being called
      * @param args       The arguments (values) of the method.
      */
-    public static void methodEntered(String methodName, String signature, Object[] args) {
+    public static void methodEntered(String className, String methodName, String signature, Class[] sig, Object[] args) {
 
         InterceptionEngine engine = AgentHelper.getInstance().getInterceptionEngine();
         if (engine instanceof EventPublisher) {
             Thread thread = Thread.currentThread();
             MethodContext methodContext = new MethodContext(thread, methodName, signature);
-            methodContext.setArguments(args);
+            methodContext.setArgumentValues(args);
+            methodContext.setArgumentTypes(sig);
+            methodContext.setClassName(className);
             ((EventPublisher) engine).fireEvent(InterceptionEventType.METHOD_ENTRY, methodContext);
         }
     }

@@ -27,5 +27,5 @@
 		"vscode-debugadapter-testsupport": "1.37.0",
 		"tslint": "5.18.0",
 		"vsce": "1.66.0"
-    	}
+	}
 }

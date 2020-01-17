@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.java.agent;
 
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfigReader;
-import org.wso2.carbon.identity.java.agent.host.DefaultInterceptionEngine;
 import org.wso2.carbon.identity.java.agent.internal.InterceptingClassTransformer;
 
 import java.lang.instrument.Instrumentation;

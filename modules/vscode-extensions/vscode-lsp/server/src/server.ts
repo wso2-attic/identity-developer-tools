@@ -15,10 +15,12 @@ import {
 	CompletionItem,
 	TextDocumentPositionParams
 } from 'vscode-languageserver';
+import * as xml2js from 'xml2js';
 // import {SnippetString} from 'vscode';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as path from 'path';
 const fs = require('fs');
+const WebSocket = require('ws');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -32,38 +34,13 @@ let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 declare var webSocket: any;
 declare var text: String;
+var rootpath: any;
+var executeStepCount: any = 0;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
-connection.onInitialize((params: InitializeParams) => {
-	const templates = path.join(__dirname, '..', 'src', 'adaptiveTemplates/');
-	console.log(templates);
-	try {
-		fs.readdirSync(templates).forEach((file: any) => {
-			var filepath = templates + file;
-			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
-				if (err) throw err;
-				console.log(file);
-				var obj = JSON.parse(String(data));
-				var codeArray = obj.code;
-				var description = obj.summary;
-				var name = obj.name;
-				var code: String = "";
-				for (var i in codeArray) {
-					code += codeArray[i] + "\n";
-				}
-				var snippentObj = {
-					label: name,
-					detail: description,
-					insertText: code
-				};
-				completionTemplates.push(snippentObj);
-
-				console.log('OK: ' + completionTemplates[0].label);
-			});
-		});
-	} catch (e) {
-		console.log(e);
-	}
-
+connection.onInitialize(async (params: InitializeParams) => {
+	rootpath = params.rootPath;
+	generateFUnctionLibraries();
+	getTemplates();
 
 	let capabilities = params.capabilities;
 	// Does the client support the `workspace/configuration` request?
@@ -156,51 +133,52 @@ documents.onDidChangeContent(change => {
 	text = change.document.getText();
 	file = change.document.uri;
 	var xtension = file.split('.').pop();
+	if (xtension == "authjs") {
+		var fileName = path.basename(String(file)).replace(/\.[^/.]+$/, "");
+		setExecuteStep(String(fileName));
+	}
 	extension = String(xtension);
-	console.log(extension);
+});
+
+documents.onDidOpen(params => {
+	file = params.document.uri;
+	var fileName = path.basename(String(file)).replace(/\.[^/.]+$/, "");
+	setExecuteStep(String(fileName));
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
-	// In this simple example we get the settings for every validate run.
-	let settings = await getDocumentSettings(textDocument.uri);
-
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	let text = textDocument.getText();
-	let pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
-
-	let problems = 0;
 	let diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-		problems++;
+	let pattern = new RegExp(`executeStep\\([${executeStepCount + 1}-9]*\\)`, "g");
+	let m: RegExpExecArray | null;
+	while ((m = pattern.exec(text))) {
 		let diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
+			severity: DiagnosticSeverity.Error,
 			range: {
 				start: textDocument.positionAt(m.index),
 				end: textDocument.positionAt(m.index + m[0].length)
 			},
-			message: `${m[0]} is all Uppercase.`,
-			source: 'ex'
+			message: `Could not find matching Authentication Step for script executeStep`,
+			source: 'wso2 IAM'
 		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
+		diagnostics.push(diagnostic);
+	}
+	var functionRegex = new RegExp("onLoginRequest\\([a-zA-Z_0-9_$][^)]*\\)", "g");
+	var functionRegexForNewJDK = new RegExp("varonLoginRequest=function\\([a-zA-Z_0-9_$][^)]*\\)", "g");
+
+	// To check whether onLoginRequest is there.
+	if (!text.trim().replace(/(?:\r\n|\r|\n)/g, '').replace(/\s/g, '').match(functionRegex) && !text.trim().replace(/(?:\r\n|\r|\n)/g, '').replace(/\s/g, '').match(functionRegexForNewJDK)) {
+		let diagnostic: any = {
+			severity: DiagnosticSeverity.Error,
+			range: {
+				start: textDocument.positionAt(0),
+				end: textDocument.positionAt(0)
+			},
+			message: `Missing required function: onLoginRequest(parameter)`,
+			source: 'wso2 IAM'
+		};
 		diagnostics.push(diagnostic);
 	}
 	// Send the computed diagnostics to VSCode.
@@ -211,17 +189,15 @@ connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
 	connection.console.log('We received an file change event');
 });
-var recieveData: any = "hi";
+var recieveData: any = "";
 // This handler provides the initial list of the completion items.
 let completionList: CompletionItem[] = [];
 connection.onCompletion(
 	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.	
-		const WebSocket = require('ws');
+		// info and always provide the same completion items.		
 		var webSocket = new WebSocket('wss://localhost:9443/lsp/lsp', { rejectUnauthorized: false });
-		console.log("extesnion is" + extension);
 		if (extension === "authjs") {
 			var obj: any = {
 				"text": text,
@@ -236,15 +212,11 @@ connection.onCompletion(
 					const notification = new rpc.NotificationType<any, void>('onCompletion');
 					rpcConnection.listen();
 					rpcConnection.sendNotification(notification, JSON.stringify(output));
-					console.log("yawwa spaams+ " + output);
 				},
 			});
 
 			await webSocket.on('message', function incoming(data: any) {
-				console.log("Recieved " + data);
-				console.log("Recieved data type " + typeof data);
 				let obj = JSON.parse(data);
-				console.log("Recieved id type " + JSON.stringify(obj.result.re));
 				recieveData = obj.result;
 				var jsonData = JSON.parse(JSON.stringify(obj.result.re));
 				completionList = [];
@@ -259,20 +231,15 @@ connection.onCompletion(
 						insertText: counter.insertText,
 					};
 					completionList.push(jsonob);
-					console.log(counter.id);
 				}
-			});			
+			});
 			return completionList;
-			
+
 		} else {
-			completionList = [
-				{
-					label: "extension"
-				}
-			];
+			completionList = [];
 			return completionList;
 		}
-		
+
 	}
 );
 
@@ -291,30 +258,122 @@ connection.onCompletionResolve(
 	}
 );
 
-/*
-connection.onDidOpenTextDocument((params) => {
-	// A text document got opened in VSCode.
-	// params.uri uniquely identifies the document. For documents store on disk this is a file URI.
-	// params.text the initial full content of the document.
-	connection.console.log(`${params.textDocument.uri} opened.`);
-});
-connection.onDidChangeTextDocument(onInitialize(params) => {
-	// The content of a text documeonInitializent did change in VSCode.
-	// params.uri uniquely identifionInitializees the document.
-	// params.contentChanges descrionInitializebe the content changes to the document.
-	connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-});
-
-connection.onDidCloseTextDocument((params) => {
-	// A text document got closed in VSCode.
-	// params.uri uniquely identifies the document.
-	connection.console.log(`${params.textDocument.uri} closed.`);
-});
-*/
-
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
 
 // Listen on the connection
 connection.listen();
+
+// To set the stepCount.
+function setExecuteStep(fileName: string): void {
+
+	var fileNames: any[] = []; // To keep the names of the file.
+	var files; // Array of available files in the directory
+	files = getFilesFromDir(path.join(rootpath, 'IAM', 'Apps'), [".authxml"]);
+	files.forEach(file => {
+		fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
+	});
+	var xmlFile = path.join(rootpath, 'IAM', 'Apps', files[fileNames.indexOf(fileName)]);
+	var xml = String(fs.readFileSync(xmlFile, 'utf8'));
+	var parser = new xml2js.Parser({ explicitArray: false });
+	parser.parseString(xml, function (err: any, result: any) {
+		// Check whether AuthenticationScripts node is Available.
+		if (Array.isArray(result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationSteps.AuthenticationStep)) {
+			executeStepCount = Object.keys(result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationSteps.AuthenticationStep).length;
+		} else {
+			executeStepCount = Object.keys(result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationSteps).length;
+		}
+	});
+}
+// To get the list of files in the Directory.
+function getFilesFromDir(dir: string, fileTypes: string[]): any[] {
+	var filesToReturn: any[] = [];
+	function walkDir(currentPath: any) {
+		var files = fs.readdirSync(currentPath);
+		for (var i in files) {
+			var curFile = path.join(currentPath, files[i]);
+			if (fs.statSync(curFile).isFile() && fileTypes.indexOf(path.extname(curFile)) != -1) {
+				filesToReturn.push(curFile.replace(dir, ''));
+			} else if (fs.statSync(curFile).isDirectory()) {
+				walkDir(curFile);
+			}
+		}
+	}
+	walkDir(dir);
+	return filesToReturn;
+}
+
+
+// To read and create the directory with files in temp directory.
+async function generateFUnctionLibraries() {
+	var webSocket = new WebSocket('wss://localhost:9443/lsp/functionLibrary', { rejectUnauthorized: false });
+	rpc.listen({
+		webSocket,
+		onConnection: (rpcConnection: rpc.MessageConnection) => {
+			const notification = new rpc.NotificationType<void, void>('onInitialize');
+			rpcConnection.listen();
+			rpcConnection.sendNotification(notification);
+		},
+	});
+
+	await webSocket.on('message', function incoming(data: any) {
+		let obj = JSON.parse(data);
+		recieveData = obj.result;
+		var jsonData = JSON.parse(JSON.stringify(obj.result.re));
+		var tempPath = require('os').tmpdir();
+
+		// Create a node_modules folder in the temp directory.
+		if (!fs.existsSync(path.join(tempPath, 'node_modules'))) {
+			fs.mkdir(path.join(require('os').tmpdir(), 'node_modules/'), (err: any, folder: any) => {
+				if (err) throw err;
+			});
+		}
+		// Loop over the function libraries and create them inside the node modules.		
+		jsonData.forEach(function (arrayItem: any) {
+			if (fs.existsSync(path.join(tempPath, 'node_modules', arrayItem.name))) {
+				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
+				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
+					if (err) throw err;
+				});
+
+			} else {
+				fs.mkdirSync(path.join(tempPath, 'node_modules', arrayItem.name), { recursive: true });
+				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
+				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
+					if (err) throw err;
+				});
+			}
+		});
+	});
+}
+
+// To get the adaptive script templates.
+async function getTemplates() {
+	const templates = path.join(__dirname, '..', 'src', 'adaptiveTemplates/');
+	try {
+		fs.readdirSync(templates).forEach((file: any) => {
+			var filepath = templates + file;
+			fs.readFile(filepath, 'utf8', function (err: any, data: any) {
+				if (err) throw err;
+				var obj = JSON.parse(String(data));
+				var codeArray = obj.code;
+				var description = obj.summary;
+				var name = obj.name;
+				var code: String = "";
+				for (var i in codeArray) {
+					code += codeArray[i] + "\n";
+				}
+				var snippentObj = {
+					label: name,
+					detail: description,
+					insertText: code
+				};
+				completionTemplates.push(snippentObj);
+			});
+		});
+	} catch (err) {
+		console.log(err);
+	}
+
+}

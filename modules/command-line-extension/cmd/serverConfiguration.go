@@ -64,19 +64,12 @@ var userNamePassword = []*survey.Question{
 		Validate: survey.Required,
 	},
 }
-//var (
-//	passwordInteractive bool
-//	passwordFromFlag    string
-//)
 
 func init(){
 	rootCmd.AddCommand(configCmd)
 	configCmd.Flags().StringP("server", "s", "", "set server domain")
 	configCmd.Flags().StringP("username", "u", "", "enter your username")
 	configCmd.Flags().StringP("password", "p", "", "enter your password")
-
-	//configCmd.Flags().BoolVar(&passwordInteractive, "interactive", true, "Read password from stdin instead of interactive terminal")
-	//configCmd.Flags().StringVar(&passwordFromFlag, "password", "", "Supply password from the command line flag")
 }
 
 func setServer(){
