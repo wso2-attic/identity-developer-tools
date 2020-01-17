@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/mbndr/figlet4go"
 	"github.com/spf13/cobra"
 	"log"
@@ -136,15 +135,17 @@ func create(){
 					log.Fatalln(err)
 					return
 				}
-				_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
-				if err != nil && answersOauth.CallbackURLs == ""  {
+				if  answersOauth.CallbackURLs == ""  {
 					grantTypes := []string{"password", "client_credentials", "refresh_token"}
-					createSPOauthApplication(domain.Name, domain.Name, answers.Name, answersOauth.CallbackURLs, grantTypes)
-				}else if err != nil{
-					log.Fatalln(err)
-				}else{
-					grantTypes := []string{"authorization_code", "implicit", "password", "client_credentials", "refresh_token"}
-					createSPOauthApplication(domain.Name, domain.Name, answers.Name, answersOauth.CallbackURLs, grantTypes)
+					createSPOauthApplication(domain.Name,answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+				}else  {
+					_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
+					if err!=nil{
+						log.Fatalln(err)
+					}else {
+						grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token"}
+						createSPOauthApplication(domain.Name, answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+					}
 				}
 			}
 		}
