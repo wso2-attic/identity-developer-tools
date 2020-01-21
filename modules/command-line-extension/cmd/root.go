@@ -52,7 +52,6 @@ func init() {
 
   cobra.OnInitialize(initConfig)
   rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file ")
-  //rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func initConfig() {
