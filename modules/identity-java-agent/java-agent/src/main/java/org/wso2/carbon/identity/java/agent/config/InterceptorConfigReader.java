@@ -18,30 +18,25 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
+
 import java.util.ArrayList;
+
 import java.util.List;
 
 /**
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
-
+   
+    }
     /**
      * Reads the configs in the class resource
      * "instrumentation-config.json".
      *
      * @return
      */
-    public List<InterceptorConfig> readConfig() {
-
+   public List<InterceptorConfig> readConfig() {
         ArrayList<InterceptorConfig> result = new ArrayList<>();
-
-        //TODO: Read the instrumentation-config.json
-        InterceptorConfig interceptorConfig = new InterceptorConfig();
-        interceptorConfig.setClassName(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator");
-        interceptorConfig.addMethodSignature("handle",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 
         result.add(interceptorConfig);
 
@@ -51,6 +46,7 @@ public class InterceptorConfigReader {
         interceptorConfig.addMethodSignature("notifyInvoke",
                 "(Ljava/lang/invoke/MethodHandle;)V");
         result.add(interceptorConfig);
+
         return result;
     }
 }
