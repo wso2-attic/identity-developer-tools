@@ -9,7 +9,7 @@ Here you can create service providers by entering inputs as a command  and flags
 
 **If you are having an executable file called "iamctl" you can skip this building process**.
 
-## How to build the executable file 
+### How to build the executable file 
 To build the IAMCTL in your computer, you should have the go in your computer. If you  have not go in your computer you can install go using this [link](https://golang.org/doc/install).
 
 Now you can build the IAMCTL in your computer.
