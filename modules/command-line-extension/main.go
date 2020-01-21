@@ -16,11 +16,17 @@ limitations under the License.
 
  package main
 
- import "iamctl/cmd"
+ import (
+  "fmt"
+  "iamctl/cmd"
+  "os"
+ )
 
  func main() {
 
-
-  cmd.Execute()
-
+   if len(os.Args)>1{
+      cmd.Execute()
+   }else{
+      fmt.Println("Use \" IAM-CTL [command] --help\" or \" IAM-CTL [command] -h\" for more information about a command.")
+   }
  }
