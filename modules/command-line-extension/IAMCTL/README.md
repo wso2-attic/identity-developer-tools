@@ -7,10 +7,25 @@ Here you can create service providers by entering inputs as a command  and flags
 ### Pre-Requisites
 * WSO2IS 5.10.0 alpha2 
 
-### How to run
-1. first clone or download ```commannd-line-extension``` module
-2. copy the path of ```<command-line-extension_PATH>/iamcli```
-3. Then you select your directory to work and open a terminal
+**If you are having an executable file called "iamctl" you can skip this building process**.
+
+## How to build the executable file 
+To build the IAMCTL in your computer, you should have the go in your computer. If you  have not go in your computer you can install go using this [link](https://golang.org/doc/install).
+
+Now you can build the IAMCTL in your computer.
+1. Open a terminal and set directory to ```<command-line-extension_ PATH>/IAMCTL```
+
+2. Then build the IAMCTL.
+```
+go build
+```
+ As the result created the executable file named ```iamctl```
+
+
+### How to run the executable file 
+1. First clone or download  ```command-line-extension``` module.
+2. Copy the path of ```<command-line-extension_PATH>/IAMCTL>/iamctl```.
+3. Then you select your directory to work and open a terminal.
 4. You can choose any name as keyword of IAM-CTL and set that using following command.
 Here I have chosen 'iamctl' as keyword.
 
@@ -22,11 +37,11 @@ Here I have chosen 'iamctl' as keyword.
 7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be completed as follows.
 
 ```
-iamctl existApp
+iamctl init
 ```
 Now you should gives answers for questions asked by CTL.
 ```
-:~$ iamcli existApp
+:~$ iamcli init
   ___      _      __  __            ____   _____   _     
  |_ _|    / \    |  \/  |          / ___| |_   _| | |    
   | |    / _ \   | |\/| |  _____  | |       | |   | |    
