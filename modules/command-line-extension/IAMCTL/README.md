@@ -7,8 +7,6 @@ Here you can create service providers by entering inputs as a command  and flags
 ### Pre-Requisites
 * WSO2IS 5.10.0 alpha2 
 
-**If you are having an executable file called "iamctl" you can skip this building process**.
-
 ### How to build the executable file 
 To build the IAMCTL in your computer, you should have the go in your computer. If you  have not go in your computer you can install go using this [link](https://golang.org/doc/install).
 
@@ -24,14 +22,43 @@ go build
 
 ### How to run the executable file 
 1. First clone or download  ```command-line-extension``` module.
-2. Copy the path of ```<command-line-extension_PATH>/IAMCTL>/iamctl```.
+2. Copy the path of executable file according to your platform.
+* Linux:
+
+```<command-line-extension_PATH>/IAMCTL>/iamctl```
+
+* IOS:
+
+```<command-line-extension_PATH>/IAMCTL>/iamctl-IOS```
+
+* Windows
+
+```<command-line-extension_PATH>/IAMCTL>/iamctl.exe```
+
+
 3. Then you select your directory to work and open a terminal.
-4. You can choose any name as keyword of IAM-CTL and set that using following command.
+4. You can choose any name as keyword of IAM-CTL and set that using following command according to your platform.
 Here I have chosen 'iamctl' as keyword.
 
+* Linux:
+ 
     ```
     alias iamctl="<command-line-extension_PATH>/iamctl" 
     ```
+  
+ *IOS:
+ 
+    ```
+   alias iamctl="<command-line-extension_PATH>/iamctl-IOS" 
+    ```
+
+* Windows
+
+    ```
+    doskey iamctl=<command-line-extension_PATH>\iamctl.exe $*
+    ```
+ 
+ 
 5. Now you can run IAM-CTL using your keyword.
 6. First you need to configure service provider to get access from identity server. For that this [link](https://docs.wso2.com/display/IS570/Configuring+OAuth2-OpenID+Connect+Single-Sign-On) will help to you..
 7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be completed as follows.
