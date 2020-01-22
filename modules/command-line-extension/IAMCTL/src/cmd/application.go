@@ -79,7 +79,7 @@ var oauthDetails = []*survey.Question{
 	},
 	{
 		Name:      "callbackURls",
-		Prompt:    &survey.Input{Message: "Enter callbackURLs:"},
+		Prompt:    &survey.Input{Message: "Enter callbackURLs(not mandatory):"},
 	},
 }
 

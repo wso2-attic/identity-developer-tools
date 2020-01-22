@@ -24,7 +24,7 @@ import (
 )
 
 var dir, _ = os.Getwd()
-var path = dir+"/iamctl-IOS.json"
+var path = dir+"/iamctl.json"
 
 type ServerDetails struct {
 	Server  string `json:"server"`

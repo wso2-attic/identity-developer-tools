@@ -5,22 +5,10 @@ Here you can create service providers by entering inputs as a command  and flags
 
 
 ### Pre-Requisites
-* WSO2IS 5.10.0 alpha2 
-
-### How to build the executable file 
-To build the IAMCTL in your computer, you should have the go in your computer. If you  have not go in your computer you can install go using this [link](https://golang.org/doc/install).
-
-Now you can build the IAMCTL in your computer.
-1. Open a terminal and set directory to ```<command-line-extension_ PATH>/IAMCTL```
-
-2. Then build the IAMCTL.
-```
-go build
-```
- As the result created the executable file named ```iamctl```
-
+* WSO2IS 5.10.0 alpha2 and start the server.
 
 ### How to run the executable file 
+
 1. First clone or download  ```command-line-extension``` module.
 2. Copy the path of executable file according to your platform.
 * Linux:

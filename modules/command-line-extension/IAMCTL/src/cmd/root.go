@@ -66,9 +66,9 @@ func initConfig() {
       fmt.Println(err)
       os.Exit(1)
     }
-    // Search config in home directory with name ".iamctl-IOS" (without extension).
+    // Search config in home directory with name ".iamctl" (without extension).
     viper.AddConfigPath(home)
-    viper.SetConfigName(".iamctl-IOS")
+    viper.SetConfigName(".iamctl")
   }
   viper.AutomaticEnv() // read in environment variables that match
 
