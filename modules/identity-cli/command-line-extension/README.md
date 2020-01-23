@@ -9,45 +9,45 @@ Here you can create service providers by entering inputs as a command  and flags
 
 ### How to run the executable file 
 
-1. First clone or download  ```command-line-extension``` module.
+1. First clone or download  ```identity-cli``` module.
 2. Copy the path of executable file according to your platform.
-* Linux:
+* linux:
 
-```<command-line-extension_PATH>/IAMCTL>/iamctl```
+```<identity-cli_PATH>/command-line-extension/bin/linux/iamctl```
 
-* IOS:
+* mac:
 
-```<command-line-extension_PATH>/IAMCTL>/iamctl-IOS```
+```<identity-cli_PATH>/command-line-extension/bin/mac/iamctl```
 
-* Windows
+* windows
 
-```<command-line-extension_PATH>/IAMCTL>/iamctl.exe```
+```<identity-cli_PATH>/command-line-extension/bin/windows/iamctl.exe```
 
 
 3. Then you select your directory to work and open a terminal.
 4. You can choose any name as keyword of IAM-CTL and set that using following command according to your platform.
 Here I have chosen 'iamctl' as keyword.
 
-* Linux:
+* linux:
  
     ```
-    alias iamctl="<command-line-extension_PATH>/iamctl" 
+    alias iamctl="<identity-cli_PATH>/command-line-extension/bin/linux/iamctl" 
     ```
   
- *IOS:
+* mac:
  
-    ```
-   alias iamctl="<command-line-extension_PATH>/iamctl-IOS" 
-    ```
+  ```
+   alias iamctl="<identity-cli_PATH>/command-line-extension/bin/mac/iamctl" 
+  ```
 
-* Windows
+* windows
 
     ```
-    doskey iamctl=<command-line-extension_PATH>\iamctl.exe $*
+    doskey iamctl=<identity-cli_PATH>/command-line-extension/bin/windows/iamctl.exe $*
     ```
  
  
-5. Now you can run IAM-CTL using your keyword.
+5. Now you can run IAM-ctl using your keyword.
 6. First you need to configure service provider to get access from identity server. For that this [link](https://docs.wso2.com/display/IS570/Configuring+OAuth2-OpenID+Connect+Single-Sign-On) will help to you..
 7. Then use  client_key, client_secret of created service provider to do the authorization relevant to server domain. It should be completed as follows.
 

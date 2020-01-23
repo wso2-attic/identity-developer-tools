@@ -65,15 +65,12 @@ func sendOAuthRequest(userName string, password string) (string,string, error) {
 	var refreshToken string
 	var list oAuthResponse
 
-	data := CLIENTID+":"+CLIENTSECRET
-
 	// Build response body to POST :=
 	body :=url.Values{}
 	body.Set("grant_type","password")
 	body.Set("username",userName)
 	body.Set("password", password)
 	body.Set("scope", SCOPE)
-	body.Set("user", data)
 
 	req, err := http.NewRequest("POST", AUTHURL,strings.NewReader(body.Encode()))
 	req.SetBasicAuth(CLIENTID,CLIENTSECRET)
