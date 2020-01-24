@@ -39,7 +39,7 @@ var executeStepCount: any = 0;
 const completionTemplates: { label: string; detail: any; insertText: any; }[] = [];
 connection.onInitialize(async (params: InitializeParams) => {
 	rootpath = params.rootPath;
-	generateFUnctionLibraries();
+	//generateFUnctionLibraries();
 	getTemplates();
 
 	let capabilities = params.capabilities;
@@ -220,8 +220,8 @@ connection.onCompletion(
 				recieveData = obj.result;
 				var jsonData = JSON.parse(JSON.stringify(obj.result.re));
 				completionList = [];
-				for (var j in completionTemplates) {
-					completionList.push(completionTemplates[j]);
+				for (var completionTemplate in completionTemplates) {
+					completionList.push(completionTemplates[completionTemplate]);
 				}
 				for (var i = 0; i < jsonData.length; i++) {
 					var counter = jsonData[i];
@@ -302,50 +302,6 @@ function getFilesFromDir(dir: string, fileTypes: string[]): any[] {
 	}
 	walkDir(dir);
 	return filesToReturn;
-}
-
-
-// To read and create the directory with files in temp directory.
-async function generateFUnctionLibraries() {
-	var webSocket = new WebSocket('wss://localhost:9443/lsp/functionLibrary', { rejectUnauthorized: false });
-	rpc.listen({
-		webSocket,
-		onConnection: (rpcConnection: rpc.MessageConnection) => {
-			const notification = new rpc.NotificationType<void, void>('onInitialize');
-			rpcConnection.listen();
-			rpcConnection.sendNotification(notification);
-		},
-	});
-
-	await webSocket.on('message', function incoming(data: any) {
-		let obj = JSON.parse(data);
-		recieveData = obj.result;
-		var jsonData = JSON.parse(JSON.stringify(obj.result.re));
-		var tempPath = require('os').tmpdir();
-
-		// Create a node_modules folder in the temp directory.
-		if (!fs.existsSync(path.join(tempPath, 'node_modules'))) {
-			fs.mkdir(path.join(require('os').tmpdir(), 'node_modules/'), (err: any, folder: any) => {
-				if (err) throw err;
-			});
-		}
-		// Loop over the function libraries and create them inside the node modules.		
-		jsonData.forEach(function (arrayItem: any) {
-			if (fs.existsSync(path.join(tempPath, 'node_modules', arrayItem.name))) {
-				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
-				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
-					if (err) throw err;
-				});
-
-			} else {
-				fs.mkdirSync(path.join(tempPath, 'node_modules', arrayItem.name), { recursive: true });
-				var inputPath = path.join(tempPath, 'node_modules', arrayItem.name, 'index.js');
-				fs.writeFile(inputPath, arrayItem.code, function (err: any) {
-					if (err) throw err;
-				});
-			}
-		});
-	});
 }
 
 // To get the adaptive script templates.

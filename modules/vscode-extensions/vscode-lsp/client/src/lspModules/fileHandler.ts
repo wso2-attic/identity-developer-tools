@@ -66,8 +66,6 @@ export class FileHandler {
 	 * create a new adaptive script file.
 	 */
 	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
-		// Check whether the file already exsists.
-
 		// Automatically track and cleanup files at exit
 		temp.track();
 
@@ -160,14 +158,10 @@ export class FileHandler {
 			if (err) throw err;
 			vscode.window.showInformationMessage('The file has been saved!');
 		});
-		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-		vscode.workspace.openTextDocument(xmlFile).then(document => {
-			vscode.window.showTextDocument(document, 1, false);
-		});
-		
 		// To update the service.
-		this.updateService(fs.readFileSync(xmlFile));
+		this.updateService(newXml);
+		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+			
 	}
 
 	/**
@@ -232,6 +226,7 @@ export class FileHandler {
 	 */
 	public async updateService(file) {
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
+		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
 		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
@@ -247,7 +242,7 @@ export class FileHandler {
 		axios({
 
 			method: 'put',
-			url: url + `/t/carbon.super/api/server/v1/applications/import`,
+			url: url + `/t/${tenant}/api/server/v1/applications/import`,
 			data: bodyFormData,
 			// Set the content type header, so that we get the response in JSOn
 			headers: {

@@ -29,6 +29,7 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 	private async getListOfItems(): Promise<Dependency[]> {
 		let services = [];
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
+		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
 		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
@@ -43,7 +44,7 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 		await axios({
 
 			method: 'get',
-			url: url + `/t/carbon.super/api/server/v1/applications`,
+			url: url + `/t/${tenant}/api/server/v1/applications`,
 
 			// Set the content type header, so that we get the response in JSOn
 			headers: {

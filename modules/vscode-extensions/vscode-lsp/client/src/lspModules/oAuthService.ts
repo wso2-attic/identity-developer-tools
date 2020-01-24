@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 const keytar = require('keytar');
 const axios = require('axios');
 import {ServiceTree} from './serviceTree';
+import {ScriptLibraryTree} from './scriptLibraryTree';
 export class Wso2OAuth {
 	public app: express.Express;
 	public server: Server;
@@ -58,7 +59,6 @@ export class Wso2OAuth {
 					headers: {
 						Authorization: 'Basic ' + base64data,
 						accept: 'application/json'
-
 					}
 				}).then(async (response) => {
 					// Once we get the response, extract the access token from
@@ -70,9 +70,16 @@ export class Wso2OAuth {
 					// Close the webview.
 					await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 
+					// To create the service providers tree view.
 					vscode.window.createTreeView('service-providers', {
 						treeDataProvider: new ServiceTree()
 					});
+
+					// To create the script libraries tree view.
+					vscode.window.createTreeView('script-libraries',{
+						treeDataProvider: new ScriptLibraryTree()			
+					});
+					
 					// Show the sucess message in the vscode.
 					vscode.window.showInformationMessage("Successfully Configued your Extension");
 

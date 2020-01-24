@@ -28,6 +28,10 @@
 								placeholder="Enter your IS url" required>
 						</div><br />
 						<div class="col-md-12">
+							<input id="tenant" input type="text" class="form-control form-control-lg"
+								placeholder="Enter your tenant domain" required>
+						</div><br />
+						<div class="col-md-12">
 							<input id="clientID" type="text" class="form-control form-control-lg"
 								placeholder="Client ID" required>
 						</div><br />
@@ -91,20 +95,24 @@
 		$(document).ready(function () {
 			const vscode = acquireVsCodeApi();
 			var url = `wso2isurl`;
+			var tenant = `wso2isTenant`;
 			var clientID = `wso2ISClientID`;
 			var clientSecret = `wso2ISClientSecret`;
 			$('#url').val(url);
+			$('#tenant').val(tenant);
 			$('#clientID').val(clientID);
 			$('#clientSecret').val(clientSecret);
 			$('#login').click(function () {
 				var clientID = $('#clientID').val();
 				var clientSecret = $('#clientSecret').val();
+				var tenant = $('#tenant').val();
 				var isURL = $('#url').val();
 				var url = modifyUrl(isURL);
 				if (isUrlValid(isURL) && clientSecret.length>0 && clientID.length>0) {
 					vscode.postMessage({
 						command: 'login',
 						url: url,
+						tenant: tenant,
 						clientID:clientID,
 						clientSecret:clientSecret
 					});

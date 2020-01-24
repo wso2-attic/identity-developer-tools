@@ -22,7 +22,8 @@
 		"onCommand:extension.script",
 		"onCommand:extension.serviceProviers",
 		"onCommand:extension.oAuth",
-		"onView:package-config"
+		"onView:service-providers",
+		"onView:script-libraries"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
@@ -123,17 +124,12 @@
 		"views": {
 			"package-explorer": [
 				{
-					"id": "package-config",
-					"name": "congifurations"
-				},
-				{
 					"id": "service-providers",
 					"name": "Service Providers"
 				},
 				{
-					"id": "adaptive-templates",
-					"name": "Adaptive Templates",
-					"when": "resourceExtname == .authjs"
+					"id": "script-libraries",
+					"name": "Script Libraries"
 				}
 			]
 		},
@@ -179,6 +175,18 @@
 					"alt": "markdown.showPreviewToSide",
 					"group": "navigation"
 				}
+			],
+			"view/title": [
+				{
+					"when": "view == service-providers",
+					"command": "extension.refreshServices",
+					"group": "navigation"
+				},
+				{
+					"when": "view == script-libraries",
+					"command": "extension.refreshScripts",
+					"group": "navigation"				
+				}
 			]
 		},
 		"commands": [
@@ -200,7 +208,21 @@
 			},
 			{
 				"command": "extension.serviceProvierFromTreeView",
-				"title": "From Tree View"
+				"title": "Service providers from Tree View"
+			},
+			{
+				"command": "extension.scriptLibrariesFromTreeView",
+				"title": "Script libraries from Tree View"
+			},
+			{
+				"command": "extension.refreshServices",
+				"title": "Refresh",
+				"icon": "resources/refresh.png"
+			},
+			{
+				"command": "extension.refreshScripts",
+				"title": "Refresh",
+				"icon": "resources/refresh.png"
 			}
 		],
 		"configuration": {
@@ -233,6 +255,11 @@
 					"type": "string",
 					"default": "https://localhost:9443",
 					"description": "URL of the WSO2 Identity Server"
+				},
+				"IAM.Tenant": {
+					"type": "string",
+					"default": "carbon.super",
+					"description": "WSO2 Identity Server tenat domain"
 				}
 			}
 		}

@@ -18,8 +18,8 @@ import * as Net from 'net';
 import { FileHandler } from './lspModules/fileHandler';
 import { ServiceManger } from './lspModules/serviceManger';
 import { PreviewManager } from './lspModules/PreviewManager';
-import { ConfigProvider } from './lspModules/configTree';
-import {ServiceTree} from './lspModules/serviceTree';
+import { ScriptLibraryTree } from './lspModules/scriptLibraryTree';
+import { ServiceTree } from './lspModules/serviceTree';
 /*
  * Set the following compile time flag to true if the
  * debug adapter should run inside the extension host.
@@ -27,7 +27,7 @@ import {ServiceTree} from './lspModules/serviceTree';
  */
 const EMBED_DEBUG_ADAPTER = true;
 export function activate(context: ExtensionContext) {
-	
+
 	// To keep the file path of the xml of the service provider.
 	var xmlFilePath;
 	// The Object Of the FileHandler.
@@ -63,28 +63,31 @@ export function activate(context: ExtensionContext) {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
-	};	
-	vscode.window.createTreeView('package-config',{
-		treeDataProvider: new ConfigProvider()			
-	});
+	};
+
 	vscode.window.createTreeView('service-providers', {
 		treeDataProvider: new ServiceTree()
+	});
+
+	vscode.window.createTreeView('script-libraries', {
+		treeDataProvider: new ScriptLibraryTree()
 	});
 	context.subscriptions.push(
 
 		// Show oAuth webview.
 		vscode.commands.registerCommand('extension.oAuth', () => {
-			previewManager.generateOAuthPreview(context);			
+			previewManager.generateOAuthPreview(context);
 		}),
-		
+
 		// File open event hadler
 		vscode.workspace.onDidOpenTextDocument(async (file) => {
 			// Get the Extesnion of the file.
 			var extensionOfOpenedFile = path.extname(file.uri.fsPath.split(".git")[0]);
 			// Check the extension of the opened file.
+			console.log(extensionOfOpenedFile);
 			if (extensionOfOpenedFile == ".authxml") {
 				await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-				xmlFilePath = file.uri.fsPath.split(".git")[0];				
+				xmlFilePath = file.uri.fsPath.split(".git")[0];
 				previewManager.generateWebViewPanel(xmlFilePath, context);
 			}
 		}),
@@ -113,9 +116,29 @@ export function activate(context: ExtensionContext) {
 		}),
 
 		// List the service providers in command plate.
-		vscode.commands.registerCommand('extension.serviceProvierFromTreeView', async (servicesArray,serviceName) => {
+		vscode.commands.registerCommand('extension.serviceProvierFromTreeView', async (servicesArray, serviceName) => {
 			//get the service providers list in command pallete.					
-			serviceManger.getIDOfService(servicesArray,serviceName);
+			serviceManger.getIDOfService(servicesArray, serviceName);
+		}),
+
+		// List the script libraries in command plate.
+		vscode.commands.registerCommand('extension.scriptLibrariesFromTreeView', async (scriptLibraryName) => {
+			//get the script libraries list in command pallete.					
+			console.log(scriptLibraryName);
+		}),
+
+		// Show oAuth webview.
+		vscode.commands.registerCommand('extension.refreshScripts', () => {
+			vscode.window.createTreeView('script-libraries', {
+				treeDataProvider: new ScriptLibraryTree()
+			});
+		}),
+
+		// Show oAuth webview.
+		vscode.commands.registerCommand('extension.refreshServices', () => {
+			vscode.window.createTreeView('service-providers', {
+				treeDataProvider: new ServiceTree()
+			});
 		})
 	);
 	// register a configuration provider for 'mock' debug type
