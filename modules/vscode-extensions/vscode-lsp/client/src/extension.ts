@@ -127,14 +127,14 @@ export function activate(context: ExtensionContext) {
 			console.log(scriptLibraryName);
 		}),
 
-		// Show oAuth webview.
+		// Refresh the script libraries list.
 		vscode.commands.registerCommand('extension.refreshScripts', () => {
 			vscode.window.createTreeView('script-libraries', {
 				treeDataProvider: new ScriptLibraryTree()
 			});
 		}),
 
-		// Show oAuth webview.
+		// Refresh the service providers list.
 		vscode.commands.registerCommand('extension.refreshServices', () => {
 			vscode.window.createTreeView('service-providers', {
 				treeDataProvider: new ServiceTree()

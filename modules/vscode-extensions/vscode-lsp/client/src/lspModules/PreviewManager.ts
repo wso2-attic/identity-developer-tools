@@ -106,7 +106,7 @@ export class PreviewManager {
 					// Set the url to extension configuration.
 					vscode.workspace.getConfiguration().update("IAM.URL", message.url);
 
-					// Set the url to extension configuration.
+					// Set the tenant domain to extension configuration.
 					vscode.workspace.getConfiguration().update("IAM.Tenant", message.tenant);
 
 					// Set the client id to extension configurations.
