@@ -18,6 +18,7 @@ export class ServiceManger {
 	 */
 	public async getServicesList() {
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
+		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
 		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
@@ -31,7 +32,7 @@ export class ServiceManger {
 		axios({
 
 			method: 'get',
-			url: url + `/t/carbon.super/api/server/v1/applications`,
+			url: url + `/t/${tenant}/api/server/v1/applications`,
 
 			// Set the content type header, so that we get the response in JSOn
 			headers: {
@@ -42,9 +43,6 @@ export class ServiceManger {
 		}).then(async (response) => {
 			// Once we get the response, extract the access token from
 			// the response body
-			console.log(response.data.applications);
-			// Show the sucess message in the vscode.
-			vscode.window.showInformationMessage("Successfully retrieve the services");
 			this.createListOfServices(response.data.applications);
 			
 		}).catch((err) => {
@@ -65,10 +63,9 @@ export class ServiceManger {
 		try {
 			for (let index = 0; index < servicesArray.length; index++) {
 				services.push(servicesArray[index].name);	
-				console.log(servicesArray[index].name);		
 			}			
-		} catch (error) {
-			console.log(error);
+		} catch (err) {
+			console.log(err);
 		}
 		
 		// Show the list of services in command pallet.
@@ -102,6 +99,7 @@ export class ServiceManger {
 	 */
 	public async exportService(serviceID , service) {		
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
+		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
 		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
@@ -115,7 +113,7 @@ export class ServiceManger {
 		axios({
 
 			method: 'get',
-			url: url + `/t/carbon.super/api/server/v1/applications/${serviceID}/export`,
+			url: url + `/t/${tenant}/api/server/v1/applications/${serviceID}/export`,
 
 			// Set the content type header, so that we get the response in JSOn
 			headers: {
@@ -129,12 +127,8 @@ export class ServiceManger {
 		}).then(async (response) => {
 			// Once we get the response, extract the access token from
 			// the response body
-			console.log(response.data);
 			// Pass data to the method of the file handler.
 			fileHandler.createXMLFile(response.data,service);
-			// Show the sucess message in the vscode.
-			vscode.window.showInformationMessage("Successfully retrieve the services");
-
 		}).catch((err) => {
 			// Do somthing
 			console.log(err);
@@ -144,4 +138,5 @@ export class ServiceManger {
 
 		});
 	}	
+	
 }

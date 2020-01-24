@@ -6,7 +6,7 @@ import { Wso2OAuth } from './oAuthService';
 const keytar = require('keytar');
 // Object of the FileHandler.
 const fileHandler = new FileHandler();
-
+const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_identity_mgt_view internal_identity_mgt_create internal_identity_mgt_delete internal_identity_mgt_update";
 export class PreviewManager {
 
 	/**
@@ -78,9 +78,11 @@ export class PreviewManager {
 		);
 
 		var replaceURL = /wso2isurl/gi;
+		var replaceTenant = /wso2isTenant/gi;
 		var replaceID = /wso2ISClientID/gi;
 		var replaceSecret = /wso2ISClientSecret/gi;
 		var preClientId = vscode.workspace.getConfiguration().get('IAM.ServiceClientID');
+		var preTenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var preClientSecret;
 		var secret = keytar.getPassword("clientSecret", "clientSecret");
 		await secret.then((result) => {
@@ -90,7 +92,8 @@ export class PreviewManager {
 
 		// Get the new code.
 		var newHtml = html.replace(replaceURL, vscode.workspace.getConfiguration().get('IAM.URL'))
-			.replace(replaceID, String(preClientId)).replace(replaceSecret, String(preClientSecret));
+			.replace(replaceID, String(preClientId)).replace(replaceSecret, String(preClientSecret))
+			.replace(replaceTenant,String(preTenant));
 		panel.webview.html = newHtml;
 
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
@@ -103,6 +106,9 @@ export class PreviewManager {
 					// Set the url to extension configuration.
 					vscode.workspace.getConfiguration().update("IAM.URL", message.url);
 
+					// Set the tenant domain to extension configuration.
+					vscode.workspace.getConfiguration().update("IAM.Tenant", message.tenant);
+
 					// Set the client id to extension configurations.
 					vscode.workspace.getConfiguration().update("IAM.ServiceClientID", message.clientID);
 
@@ -113,7 +119,7 @@ export class PreviewManager {
 					vscode.commands.executeCommand(
 						"vscode.open",
 						vscode.Uri.parse(
-							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID + "&scope=internal_identity_mgt_view internal_identity_mgt_delete internal_identity_mgt_create internal_identity_mgt_update")
+							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID + "&scope=" + scope)
 					);
 				} else if (message.command == 'acess') {
 					// Set Acess Token to system key chain.					
