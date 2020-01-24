@@ -31,26 +31,79 @@ var createUsingCommand = &cobra.Command{
 		name, _ :=cmd.Flags().GetString("name")
 		description, _ :=cmd.Flags().GetString("description")
 		domain,_:=cmd.Flags().GetString("serverDomain")
+
 		_, err = url.ParseRequestURI(domain)
-		if err != nil {
+		if err != nil && err.Error()!="parse : empty url" {
 			log.Fatalln(err)
+		} else if err==nil {
+			userName,_:=cmd.Flags().GetString("userName")
+			password,_:=cmd.Flags().GetString("password")
+
+			if userName =="" && password==""{
+				token:=readFile()
+				if token==""{
+					fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
+					return
+				}else{}
+			}else{
+			 if password==""{
+					fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
+					return
+				}else if userName==""{
+					fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
+				 	return
+				}else {
+				 	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+				 	if CLIENTID =="" {
+						 setSampleSP()
+					 	start(domain, userName, password)
+						if readFile()==""{
+							return
+						}
+				 	}else{
+					 	start(domain, userName, password)
+						if readFile()==""{
+							return
+						}
+				 	}
+				}
+			}
+		}else{
+			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+			if CLIENTID =="" {
+				setSampleSP()
+				SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+				setServerWithInit(SERVER)
+				if readFile()==""{
+					return
+				}
+			}else{
+				token:=readFile()
+				if token==""{
+					setServer()
+					if readFile()==""{
+						return
+					}
+				}else{}
+			}
 		}
 
 		if typeOfAPP=="basic" {
 			if  description==""{
-				createSPBasicApplication(domain, name, name)
+				createSPBasicApplication(name, name)
 			}else{
-				createSPBasicApplication(domain, name, description)
+				createSPBasicApplication(name, description)
 			}
 		}else{
+
 				callbackURl, _ :=cmd.Flags().GetString("callbackURl")
 
 				if callbackURl == "" {
 					grantTypes:=[]string{"password","client_credentials","refresh_token"}
 					if description!=""{
-						createSPOauthApplication(domain, name,description,callbackURl, grantTypes)
+						createSPOauthApplication(name,description,callbackURl, grantTypes)
 					}else{
-						createSPOauthApplication(domain, name,description,callbackURl, grantTypes)
+						createSPOauthApplication(name,description,callbackURl, grantTypes)
 					}
 				} else {
 					grantTypes:=[]string{"authorization_code","implicit","password","client_credentials","refresh_token"}
@@ -59,9 +112,9 @@ var createUsingCommand = &cobra.Command{
 						log.Fatalln(err)
 					}else {
 						if description != "" {
-							createSPOauthApplication(domain, name, description, callbackURl, grantTypes)
+							createSPOauthApplication(name, description, callbackURl, grantTypes)
 						} else {
-							createSPOauthApplication(domain, name, description, callbackURl, grantTypes)
+							createSPOauthApplication(name, description, callbackURl, grantTypes)
 						}
 					}
 				}
@@ -80,14 +133,11 @@ func init(){
 	name.StringVarP(&applicationName,"name", "n", "", "name of service provider - **compulsory")
 	err := cobra.MarkFlagRequired(name, "name")
 	if err!= nil{
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 	createUsingCommand.Flags().StringP("description", "d", "", "description of SP - **for basic application")
 	createUsingCommand.Flags().StringP("callbackURl", "c", "", "callbackURL  of SP - **for oauth application")
-	server:=createUsingCommand.Flags()
-	server.StringVarP(&serverDomain,"serverDomain", "s", "", "server Domain - **compulsory")
-	err = cobra.MarkFlagRequired(server, "serverDomain")
-	if err != nil{
-		log.Fatalln(err)
-	}
+	createUsingCommand.Flags().StringVarP(&serverDomain,"serverDomain", "s", "", "server Domain")
+	createUsingCommand.Flags().StringP("userName", "u", "", "Username for Identity Server")
+	createUsingCommand.Flags().StringP("password", "p", "", "Password for Identity Server")
 }

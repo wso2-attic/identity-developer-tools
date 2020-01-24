@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 )
 
@@ -35,6 +36,13 @@ var sampleSPCmd = &cobra.Command{
 	},
 }
 
+var serverInit = []*survey.Question{
+	{
+		Name:     "server",
+		Prompt:   &survey.Input{Message: "Enter IAM URL [<schema>://<host>]:"},
+		Validate: survey.Required,
+	},
+}
 var sampleSP = []*survey.Question{
 	{
 		Name:     "clientID",
@@ -52,9 +60,10 @@ var sampleSP = []*survey.Question{
 		Validate: survey.Required,
 	},
 }
-var pathSampleSPDetails=dir+"/sampleSP.json"
+var pathSampleSPDetails=dir+"/init.json"
 
 type SampleSP struct {
+	Server string `json:"server"`
 	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
 	Tenant       string `json:"tenant"`
@@ -69,25 +78,38 @@ func setSampleSP() {
 	renderStr, _ := ascii.Render(appName)
 	fmt.Print(renderStr)
 
+	sampleServer:=struct{
+		Server string `survey:"server"`
+	}{}
 	sampleSPAnswer := struct {
 		ClientID     string `survey:"clientID"`
 		ClientSecret string `survey:"clientSecret"`
 		Tenant       string `survey:"tenantDomain"`
 	}{}
-
-	err1 := survey.Ask(sampleSP, &sampleSPAnswer)
-	if err1 != nil {
-		fmt.Println(err1.Error())
+	err := survey.Ask(serverInit,&sampleServer)
+	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
-	writeSampleAPPFile(sampleSPAnswer.ClientID,sampleSPAnswer.ClientSecret,sampleSPAnswer.Tenant)
+	_, err = url.ParseRequestURI(sampleServer.Server)
+	if err != nil {
+		log.Fatalln(err)
+	}else{
+		err1 := survey.Ask(sampleSP, &sampleSPAnswer)
+		if err1 != nil {
+			fmt.Println(err1.Error())
+			return
+		}
+		writeSampleAPPFile(sampleServer.Server,sampleSPAnswer.ClientID,sampleSPAnswer.ClientSecret,sampleSPAnswer.Tenant)
+	}
 }
-func writeSampleAPPFile(clientID string,clientSecret string,tenant string){
+
+func writeSampleAPPFile(server string,clientID string,clientSecret string,tenant string){
 	var data SampleSP
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
 
 	_ = json.Unmarshal(file, &data)
-
+	data.Server=server
 	data.ClientID=clientID
 	data.ClientSecret=clientSecret
 	data.Tenant=tenant
@@ -98,7 +120,7 @@ func writeSampleAPPFile(clientID string,clientSecret string,tenant string){
 	}
 
 	err = ioutil.WriteFile(pathSampleSPDetails, jsonData, 0644)
-	fmt.Println("successfully set service provider  ClientID "+clientID+" Client Secret "+clientSecret+" Tenant Domain "+tenant)
+	fmt.Println("successfully set service provider  Client_key: "+clientID+" Client_Secret: ****************************  Tenant Domain "+tenant+" in "+server)
 }
 func createSampleSPFile() {
 	// detect if file exists
@@ -111,17 +133,20 @@ func createSampleSPFile() {
 		jsondat := &SampleSP{}
 		encjson, _ := json.Marshal(jsondat)
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		err = ioutil.WriteFile(pathSampleSPDetails, encjson, 0644)
 	}
 }
 
-func readSPConfig() (string,string,string){
+func readSPConfig() (string,string,string,string){
 	var data SampleSP
 
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
-	_ = json.Unmarshal(file, &data)
+	err:= json.Unmarshal(file, &data)
+	if err!=nil{
+		log.Fatalln(err)
+	}
 
-	return data.ClientID,data.ClientSecret,data.Tenant
+	return data.Server,data.ClientID,data.ClientSecret,data.Tenant
 }

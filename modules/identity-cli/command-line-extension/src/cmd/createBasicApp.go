@@ -29,15 +29,15 @@ type ServiceProvider struct{
 	Description string `json:"description"`
 }
 
-func createSPBasicApplication(domainName string,spName string, spDescription string) {
+func createSPBasicApplication(spName string, spDescription string) {
 
-	CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
 
-	var ADDAPPURL =domainName+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var ADDAPPURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
 	var err error
 	var status int
 
-	token := readFile(domainName)
+	token := readFile()
 
 	toJson := ServiceProvider{spName, spDescription}
 	jsonData, err := json.Marshal(toJson)
@@ -68,6 +68,8 @@ func createSPBasicApplication(domainName string,spName string, spDescription str
 
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
+		setServerWithInit(SERVER)
+		createSPBasicApplication(spName,spDescription)
 	}
 	if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")

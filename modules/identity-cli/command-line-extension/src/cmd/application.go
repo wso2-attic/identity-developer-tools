@@ -51,23 +51,16 @@ var types = []*survey.Question{
 	},
 }
 var details = []*survey.Question{
-		{
-			Name:     "spName",
-			Prompt:   &survey.Input{Message: "Enter service provider name:"},
-			Validate: survey.Required,
-			Transform: survey.Title,
-		},
-		{
+	{
+		Name:     "spName",
+		Prompt:   &survey.Input{Message: "Enter service provider name:"},
+		Validate: survey.Required,
+		Transform: survey.Title,
+	},
+	{
 		Name:     "spDescription",
 		Prompt:   &survey.Input{Message: "Enter service provider description:"},
 		Validate: survey.Required,
-		},
-}
-var domainName=[]*survey.Question{
-	{
-		Name:      "domainName",
-		Prompt:    &survey.Input{Message: "Enter IS URL:"},
-		Validate:  survey.Required,
 	},
 }
 var oauthDetails = []*survey.Question{
@@ -90,10 +83,6 @@ func init() {
 
 func create(){
 
-	ascii := figlet4go.NewAsciiRender()
-	renderStr, _ := ascii.Render(appName)
-	fmt.Print(renderStr)
-
 	answers := struct{
 		Selected string `survey:"question"`
 		Name string  `survey:"spName"`
@@ -102,23 +91,28 @@ func create(){
 	answersOfType := struct{
 		Selected string `survey:"type"`
 	}{}
-	domain := struct{
-		Name string `survey:"domainName"`
-	}{}
 	answersOauth:= struct {
 		Name string `survey:"oauthName"`
 		CallbackURLs string `survey:"callbackURls"`
 	}{}
 
-	err := survey.Ask(domainName, &domain)
-	if err != nil {
-		log.Fatalln(err)
-		return
+	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+
+	if CLIENTID =="" {
+		setSampleSP()
+		SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+		setServerWithInit(SERVER)
+	}else if readFile()==""{
+		setServer()
+		if readFile()==""{
+			return
+		}
+
+	}else{
+		ascii := figlet4go.NewAsciiRender()
+		renderStr, _ := ascii.Render(appName)
+		fmt.Print(renderStr)
 	}
-	_, err2 := url.ParseRequestURI(domain.Name)
-	if err2 != nil {
-		log.Fatalln(err2)
-	}else {
 		err := survey.Ask(qs, &answers)
 		if err == nil && answers.Selected == "Add application" {
 			err := survey.Ask(types, &answersOfType)
@@ -128,7 +122,7 @@ func create(){
 					log.Fatalln(err1)
 					return
 				}
-				createSPBasicApplication(domain.Name, answers.Name, answers.Description)
+				createSPBasicApplication( answers.Name, answers.Description)
 			}
 			if err == nil && answersOfType.Selected == "oauth" {
 				err1 := survey.Ask(oauthDetails, &answersOauth)
@@ -138,21 +132,20 @@ func create(){
 				}
 				if  answersOauth.CallbackURLs == ""  {
 					grantTypes := []string{"password", "client_credentials", "refresh_token"}
-					createSPOauthApplication(domain.Name,answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+					createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
 				}else  {
 					_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
 					if err!=nil{
 						log.Fatalln(err)
 					}else {
 						grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token"}
-						createSPOauthApplication(domain.Name, answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+						createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
 					}
 				}
 			}
 		}
 
 		if err == nil && answers.Selected == "Get List" {
-			getList(domain.Name)
+			getList()
 		}
-	}
 }

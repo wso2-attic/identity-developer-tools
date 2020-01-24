@@ -107,15 +107,15 @@ type Export struct{
 	ApplicationID string `json:"applicationId"`
 }
 
-func createSPOauthApplication(domainName string,oauthAppName string,description string, callbackURLs string,grantTypes []string){
-	CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+func createSPOauthApplication(oauthAppName string,description string, callbackURLs string,grantTypes []string){
+	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
 
-	var ADDAPPURL =domainName+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var ADDAPPURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
 	var err error
 	var status int
 	var xmlData ServiceProviderXml
 
-	token:=readFile(domainName)
+	token:=readFile()
 
 	toJson:=ServiceProviderOAuth{
 		Name:oauthAppName,
@@ -145,6 +145,7 @@ func createSPOauthApplication(domainName string,oauthAppName string,description 
 
 	defer req.Body.Close()
 
+
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -156,6 +157,8 @@ func createSPOauthApplication(domainName string,oauthAppName string,description 
 
 	if status== 401{
 		fmt.Println("Unauthorized access.\nPlease enter your UserName and password for server.")
+		setServerWithInit(SERVER)
+		createSPOauthApplication(oauthAppName,description,callbackURLs,grantTypes)
 	}
 	if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
@@ -219,5 +222,6 @@ func between(fullString string, start string, end string) string {
 	if posFirstAdjusted >= posLast {
 		return ""
 	}
+
 	return fullString[posFirstAdjusted:posLast]
 }

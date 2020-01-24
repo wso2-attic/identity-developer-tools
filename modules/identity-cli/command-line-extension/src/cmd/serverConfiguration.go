@@ -32,7 +32,15 @@ var configCmd = &cobra.Command{
 		server, _ := cmd.Flags().GetString("server")
 
 		if server =="" {
-			setServer()
+			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+			if CLIENTID ==""{
+				setSampleSP()
+				SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+				setServerWithInit(SERVER)
+			}else{
+				setServer()
+			}
+
 		}else {
 			_, err := url.ParseRequestURI(server)
 			if err != nil {
@@ -48,7 +56,7 @@ var configCmd = &cobra.Command{
 var server = []*survey.Question{
 	{
 		Name:     "server",
-		Prompt:   &survey.Input{Message: "Enter IAM URL:"},
+		Prompt:   &survey.Input{Message: "Enter IAM URL [<schema>://<host>]:"},
 		Validate: survey.Required,
 	},
 }
@@ -90,7 +98,7 @@ func setServer(){
 		log.Fatal(err1)
 		return
 	}
-	_, err := url.ParseRequestURI(serverAnswer.Server)
+	_, err = url.ParseRequestURI(serverAnswer.Server)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -102,4 +110,17 @@ func setServer(){
 	}
 
 	start(serverAnswer.Server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
+}
+func setServerWithInit(server string){
+	userNamePasswordAnswer:= struct {
+		UserName  string `survey:"username"`
+		Password   string `survey:"password"`
+	}{}
+	err1 := survey.Ask(userNamePassword, &userNamePasswordAnswer)
+	if err1 != nil {
+		log.Fatal(err1)
+		return
+	}
+
+	start(server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
 }

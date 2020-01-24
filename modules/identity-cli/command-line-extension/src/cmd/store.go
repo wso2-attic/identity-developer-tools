@@ -99,11 +99,10 @@ func writeFiles(server string,token string,refreshToken string) {
 	}else{
 		fmt.Println("Authorization is done for : "+server)
 	}
-
 	checkError(err)
 }
 
-func readFile(domain string) string {
+func readFile() string {
 
 	var a ServerDetails
 	var data myJSON
@@ -117,11 +116,9 @@ func readFile(domain string) string {
 	if err!=nil{
 		log.Fatalln(err)
 	}
-
+	//as the single host this worked. For multiple host need to read relevant accessToken according to given server
 	for i := 0; i < len(data.Array); i++ {
-		if domain == data.Array[i].Server {
 			a = data.Array[i]
-		}
 	}
 	return a.AccessToken
 }
