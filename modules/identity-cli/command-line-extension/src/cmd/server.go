@@ -67,8 +67,6 @@ func start(serverUrl string,userName string, password string){
 	if accessToken!="" {
 		writeFiles(IAMURL,accessToken,refreshToken)
 	}
-
-
 }
 
 func sendOAuthRequest(userName string, password string) (string,string) {
@@ -130,12 +128,12 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 	}
 
 	err2 := json.Unmarshal(body1, &list)
-	if err2 != nil {
+	if err2!= nil {
 		log.Fatalln(err2)
 	}
 
-	accessToken = list.AccessToken
-	refreshToken = list.RefreshToken
+	accessToken= list.AccessToken
+	refreshToken= list.RefreshToken
 
 	return accessToken, refreshToken
 }

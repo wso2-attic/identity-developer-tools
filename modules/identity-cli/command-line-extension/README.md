@@ -154,14 +154,14 @@ example:-
 ```
 //create an oauth application
 iamctl application add  -n=TestApplication 
-iamctl application add -t=oauth -s=https://localhost:9443  -n=TestApplication
-iamctl application add -t=oauth -s=https://localhost:9443 -n=TestApplication -d=this is description
-iamctl application add -t=oauth -s=https://localhost:9443 -n=TestApplication -c=https://localhost:8010/oauth
-iamctl application add -t=oauth -s=https://localhost:9443 -n=TestApplication -c=https://localhost:8010/oauth -d=this is description
+iamctl application add -t=oauth -n=TestApplication
+iamctl application add -t=oauth -n=TestApplication -d=description
+iamctl application add -t=oauth -n=TestApplication -c=https://localhost:8010/oauth
+iamctl application add -t=oauth -n=TestApplication -c=https://localhost:8010/oauth -d=description
 
 //create an basic application
-iamctl application add -t=basic -s=https://localhost:9443 -n=TestApplication
-iamctl application add -t=basic -s=https://localhost:9443 -n=TestApplication -d=this is description
+iamctl application add -t=basic -n=TestApplication
+iamctl application add -t=basic -n=TestApplication -d=description
 ```
 You cat set server domain and create application at the same time.
 
@@ -185,6 +185,7 @@ iamctl application     list     [flags]
 ```
 Flags:
 ```
+  -h, --help              help for list
   -p, --password string   Password for Identity Server
   -s, --server string     server
   -u, --userName string   User name for Identity Server

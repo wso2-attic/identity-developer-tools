@@ -84,7 +84,7 @@ var createUsingCommand = &cobra.Command{
 					if readFile()==""{
 						return
 					}
-				}else{}
+				}
 			}
 		}
 
@@ -95,7 +95,6 @@ var createUsingCommand = &cobra.Command{
 				createSPBasicApplication(name, description)
 			}
 		}else{
-
 				callbackURl, _ :=cmd.Flags().GetString("callbackURl")
 
 				if callbackURl == "" {
