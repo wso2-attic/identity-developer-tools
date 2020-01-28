@@ -27,17 +27,17 @@ import (
 	"strings"
 )
 
-type Parts struct{
-	GrantTypes []string `json:"grantTypes"`
+type Parts struct {
+	GrantTypes   []string `json:"grantTypes"`
 	CallbackURLs []string `json:"callbackURLs"`
-	PublicClient bool `json:"publicClient"`
+	PublicClient bool     `json:"publicClient"`
 }
-type Parts1 struct{
+type Parts1 struct {
 	Oidc Parts `json:"oidc"`
 }
-type ServiceProviderOAuth struct{
-	Name string `json:"name"`
-	Description string `json:"description"`
+type ServiceProviderOAuth struct {
+	Name                         string `json:"name"`
+	Description                  string `json:"description"`
 	InboundProtocolConfiguration Parts1 `json:"inboundProtocolConfiguration"`
 }
 type ServiceProviderXml struct {
@@ -103,25 +103,25 @@ type ServiceProviderXml struct {
 	AccessUrl      string `xml:"AccessUrl"`
 	IsDiscoverable string `xml:"IsDiscoverable"`
 }
-type Export struct{
+type Export struct {
 	ApplicationID string `json:"applicationId"`
 }
 
-func createSPOauthApplication(oauthAppName string,description string, callbackURLs string,grantTypes []string){
+func createSPOauthApplication(oauthAppName string, description string, callbackURLs string, grantTypes []string) {
 
-	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
-	var ADDAPPURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var ADDAPPURL = SERVER + "/t/" + TENANTDOMAIN + "/api/server/v1/applications"
 	var err error
 	var status int
 	var xmlData ServiceProviderXml
 
-	token:=readFile()
+	token := readFile()
 
-	toJson:=ServiceProviderOAuth{
-		Name:oauthAppName,
-		Description:description,
-		InboundProtocolConfiguration:Parts1{
+	toJson := ServiceProviderOAuth{
+		Name:        oauthAppName,
+		Description: description,
+		InboundProtocolConfiguration: Parts1{
 			Parts{
 				grantTypes,
 				[]string{callbackURLs},
@@ -129,23 +129,22 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 			},
 		},
 	}
-	jsonData, err:= json.Marshal(toJson)
+	jsonData, err := json.Marshal(toJson)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-	req, err := http.NewRequest("POST", ADDAPPURL,bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", ADDAPPURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	req.Header.Set("Authorization","Bearer "+token)
-	req.Header.Set("accept","*/*")
-	req.Header.Set("Content-Type","application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("accept", "*/*")
+	req.Header.Set("Content-Type", "application/json")
 
 	defer req.Body.Close()
-
 
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
@@ -153,32 +152,32 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 		log.Fatalln(err)
 	}
 
-	status=resp.StatusCode
+	status = resp.StatusCode
 	defer resp.Body.Close()
 
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your UserName and password for server.")
 		setServerWithInit(SERVER)
-		createSPOauthApplication(oauthAppName,description,callbackURLs,grantTypes)
+		createSPOauthApplication(oauthAppName, description, callbackURLs, grantTypes)
 	} else if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
 	} else if status == 403 {
 		fmt.Println("Forbidden")
-	} else if status == 201{
-		fmt.Println("Successfully created the service provider named '"+oauthAppName+"' at "+resp.Header.Get("Date"))
-		location:=resp.Header.Get("Location")
+	} else if status == 201 {
+		fmt.Println("Successfully created the service provider named '" + oauthAppName + "' at " + resp.Header.Get("Date"))
+		location := resp.Header.Get("Location")
 
 		splits := strings.SplitAfter(location, "applications/")
-		serviceProviderID:=splits[1]
+		serviceProviderID := splits[1]
 
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-		req, err := http.NewRequest("GET", ADDAPPURL+"/"+serviceProviderID+"/export",bytes.NewBuffer(nil))
+		req, err := http.NewRequest("GET", ADDAPPURL+"/"+serviceProviderID+"/export", bytes.NewBuffer(nil))
 		query := req.URL.Query()
 		query.Add("exportSecrets", "true")
 		req.URL.RawQuery = query.Encode()
-		req.Header.Set("Authorization","Bearer "+token)
-		req.Header.Set("accept","*/*")
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("accept", "*/*")
 
 		defer req.Body.Close()
 
@@ -193,16 +192,16 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 			log.Fatalln(err)
 		}
 
-		err= xml.Unmarshal(body, &xmlData)
+		err = xml.Unmarshal(body, &xmlData)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		configuration := xmlData.InboundAuthenticationConfig.InboundAuthenticationRequestConfigs.InboundAuthenticationRequestConfig[0].InboundConfiguration
-		fmt.Println("oauthConsumerKey: "+between(configuration,"<oauthConsumerKey>","</oauthConsumerKey>"))
-		fmt.Println("oauthConsumerSecret: "+between(configuration,"<oauthConsumerSecret>","</oauthConsumerSecret>"))
+		fmt.Println("oauthConsumerKey: " + between(configuration, "<oauthConsumerKey>", "</oauthConsumerKey>"))
+		fmt.Println("oauthConsumerSecret: " + between(configuration, "<oauthConsumerSecret>", "</oauthConsumerSecret>"))
 	} else if status == 409 {
-		fmt.Println("Already exists an application with same name:"+oauthAppName)
+		fmt.Println("Already exists an application with same name:" + oauthAppName)
 	}
 }
 func between(fullString string, start string, end string) string {

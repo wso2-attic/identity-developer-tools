@@ -16,65 +16,66 @@ limitations under the License.
 package cmd
 
 import (
-  "fmt"
-  "github.com/mitchellh/go-homedir"
-  "github.com/spf13/cobra"
-  "github.com/spf13/viper"
-  "log"
-  "os"
+	"fmt"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"log"
+	"os"
 )
 
 const (
-  appName = "IAM-CTL"
-  shortAppDesc = "Service Provider configuration"
-  longAPPConfig = "Service Provider configuration"
+	appName       = "IAM-CTL"
+	shortAppDesc  = "Service Provider configuration"
+	longAPPConfig = "Service Provider configuration"
 )
 
 var cfgFile string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-  Use:   appName,
-  Short: shortAppDesc,
-  Long: longAPPConfig,
-  Run: func(cmd *cobra.Command, args []string) {},
+	Use:   appName,
+	Short: shortAppDesc,
+	Long:  longAPPConfig,
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 func Execute() {
 
-  if err := rootCmd.Execute(); err != nil {
-    log.Fatalln(err)
-    os.Exit(1)
-  }
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatalln(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
 
-  createFile()
-  createSampleSPFile()
+	createFile()
+	createSampleSPFile()
 
-  cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig)
 }
 
 func initConfig() {
 
-  if cfgFile != "" {
-          // Use config file from the flag.
-          viper.SetConfigFile(cfgFile)
-  } else {
-          // Find home directory.
-          home, err := homedir.Dir()
-          if err != nil {
-               fmt.Println(err)
-               os.Exit(1)
-          }
-          // Search config in home directory with name ".iamctl" (without extension).
-          viper.AddConfigPath(home)
-          viper.SetConfigName(".iamctl")
-  }
-  viper.AutomaticEnv() // read in environment variables that match
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		// Search config in home directory with name ".iamctl" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigName(".iamctl")
+	}
+	viper.AutomaticEnv() // read in environment variables that match
 
-  // If a config file is found, read it in.
-  if err := viper.ReadInConfig(); err == nil {
-    fmt.Println("Using config file:", viper.ConfigFileUsed())
-  }
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 }

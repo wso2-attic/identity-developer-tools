@@ -28,9 +28,9 @@ import (
 )
 
 var sampleSPCmd = &cobra.Command{
-	Use:  "init" ,
+	Use:   "init",
 	Short: "you can set your sample SP",
-	Long: "You can set your sample service provider client secret, client id, tenant ",
+	Long:  "You can set your sample service provider client secret, client id, tenant ",
 	Run: func(cmd *cobra.Command, args []string) {
 		setSampleSP()
 	},
@@ -60,16 +60,16 @@ var sampleSP = []*survey.Question{
 		Validate: survey.Required,
 	},
 }
-var pathSampleSPDetails=dir+"/init.json"
+var pathSampleSPDetails = dir + "/init.json"
 
 type SampleSP struct {
-	Server string `json:"server"`
+	Server       string `json:"server"`
 	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
 	Tenant       string `json:"tenant"`
 }
 
-func init(){
+func init() {
 
 	rootCmd.AddCommand(sampleSPCmd)
 }
@@ -80,7 +80,7 @@ func setSampleSP() {
 	renderStr, _ := ascii.Render(appName)
 	fmt.Print(renderStr)
 
-	sampleServer:=struct{
+	sampleServer := struct {
 		Server string `survey:"server"`
 	}{}
 	sampleSPAnswer := struct {
@@ -89,7 +89,7 @@ func setSampleSP() {
 		Tenant       string `survey:"tenantDomain"`
 	}{}
 
-	err := survey.Ask(serverInit,&sampleServer)
+	err := survey.Ask(serverInit, &sampleServer)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -97,31 +97,31 @@ func setSampleSP() {
 
 	_, err = url.ParseRequestURI(sampleServer.Server)
 	if err != nil {
-			log.Fatalln(err)
+		log.Fatalln(err)
 	} else {
-			err1 := survey.Ask(sampleSP, &sampleSPAnswer)
-			if err1 != nil {
-				fmt.Println(err1.Error())
-				return
-			}
-			writeSampleAPPFile(sampleServer.Server,sampleSPAnswer.ClientID,sampleSPAnswer.ClientSecret,sampleSPAnswer.Tenant)
+		err1 := survey.Ask(sampleSP, &sampleSPAnswer)
+		if err1 != nil {
+			fmt.Println(err1.Error())
+			return
+		}
+		writeSampleAPPFile(sampleServer.Server, sampleSPAnswer.ClientID, sampleSPAnswer.ClientSecret, sampleSPAnswer.Tenant)
 	}
 }
 
-func writeSampleAPPFile(server string,clientID string,clientSecret string,tenant string){
+func writeSampleAPPFile(server string, clientID string, clientSecret string, tenant string) {
 
 	var data SampleSP
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
 
-	 err := json.Unmarshal(file, &data)
-	 if err != nil {
-	 	log.Fatalln(err)
-	 }
+	err := json.Unmarshal(file, &data)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	data.Server=server
-	data.ClientID=clientID
-	data.ClientSecret=clientSecret
-	data.Tenant=tenant
+	data.Server = server
+	data.ClientID = clientID
+	data.ClientSecret = clientSecret
+	data.Tenant = tenant
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -129,7 +129,7 @@ func writeSampleAPPFile(server string,clientID string,clientSecret string,tenant
 	}
 
 	err = ioutil.WriteFile(pathSampleSPDetails, jsonData, 0644)
-	fmt.Println("successfully set service provider  Client_key: "+clientID+" Client_Secret: ****************************  Tenant Domain "+tenant+" in "+server)
+	fmt.Println("successfully set service provider  Client_key: " + clientID + " Client_Secret: ****************************  Tenant Domain " + tenant + " in " + server)
 }
 func createSampleSPFile() {
 
@@ -152,15 +152,15 @@ func createSampleSPFile() {
 	}
 }
 
-func readSPConfig() (string,string,string,string){
+func readSPConfig() (string, string, string, string) {
 
 	var data SampleSP
 
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
-	err:= json.Unmarshal(file, &data)
+	err := json.Unmarshal(file, &data)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return data.Server,data.ClientID,data.ClientSecret,data.Tenant
+	return data.Server, data.ClientID, data.ClientSecret, data.Tenant
 }

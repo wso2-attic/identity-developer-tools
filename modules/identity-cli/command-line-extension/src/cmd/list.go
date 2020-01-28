@@ -31,91 +31,91 @@ import (
 )
 
 var getListCmd = &cobra.Command{
-	Use:  "list" ,
+	Use:   "list",
 	Short: "get service providers List",
-	Long: `You can get service provider List`,
+	Long:  `You can get service provider List`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server, err:= cmd.Flags().GetString("server")
-		if  server == "" {
-				ascii := figlet4go.NewAsciiRender()
-				renderStr, _ := ascii.Render(appName)
-				fmt.Print(renderStr)
+		server, err := cmd.Flags().GetString("server")
+		if server == "" {
+			ascii := figlet4go.NewAsciiRender()
+			renderStr, _ := ascii.Render(appName)
+			fmt.Print(renderStr)
 
-				getList()
+			getList()
 		} else {
-				_, err = url.ParseRequestURI(server)
-				if err != nil && err.Error() != "parse : empty url" {
-						log.Fatalln(err)
-				} else if err == nil {
-						userName, _ := cmd.Flags().GetString("userName")
-						password, _ := cmd.Flags().GetString("password")
+			_, err = url.ParseRequestURI(server)
+			if err != nil && err.Error() != "parse : empty url" {
+				log.Fatalln(err)
+			} else if err == nil {
+				userName, _ := cmd.Flags().GetString("userName")
+				password, _ := cmd.Flags().GetString("password")
 
-						if userName == "" && password == "" {
-								token := readFile()
-								if token == "" {
-										fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
-										return
-								} else {
-										getList()
-								}
+				if userName == "" && password == "" {
+					token := readFile()
+					if token == "" {
+						fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
+						return
+					} else {
+						getList()
+					}
+				} else {
+					if password == "" {
+						token := readFile()
+						if token == "" {
+							fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
+							return
 						} else {
-								if password == "" {
-										token := readFile()
-										if token == "" {
-												fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
-												return
-										} else {
-												getList()
-										}
-								} else if userName == "" {
-										token := readFile()
-										if token == "" {
-												fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
-												return
-										} else {
-												getList()
-										}
-
-								} else {
-										SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
-										if CLIENTID == "" {
-												setSampleSP()
-												start(server, userName, password)
-												if readFile() == ""{
-								return
-							}else {
-														getList()
-												}
-										} else {
-												start(server, userName, password)
-												if readFile() == ""{
-														return
-												} else {
-														getList()
-												}
-										}
-								}
+							getList()
 						}
+					} else if userName == "" {
+						token := readFile()
+						if token == "" {
+							fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
+							return
+						} else {
+							getList()
+						}
+
+					} else {
+						SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+						if CLIENTID == "" {
+							setSampleSP()
+							start(server, userName, password)
+							if readFile() == "" {
+								return
+							} else {
+								getList()
+							}
+						} else {
+							start(server, userName, password)
+							if readFile() == "" {
+								return
+							} else {
+								getList()
+							}
+						}
+					}
 				}
+			}
 		}
 	},
 }
 
-type List struct{
-	TotalResults int `json:"totalResults"`
-	StartIndex int `json:"startIndex"`
-	Count int `json:"count"`
+type List struct {
+	TotalResults int           `json:"totalResults"`
+	StartIndex   int           `json:"startIndex"`
+	Count        int           `json:"count"`
 	Applications []Application `json:"applications"`
-	Links []string `json:"links"`
+	Links        []string      `json:"links"`
 }
-type Application struct{
+type Application struct {
 	Id          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Self        string `json:"self"`
 }
 
-func init(){
+func init() {
 
 	createSPCmd.AddCommand(getListCmd)
 
@@ -123,11 +123,11 @@ func init(){
 	getListCmd.Flags().StringP("userName", "u", "", "User name for Identity Server")
 	getListCmd.Flags().StringP("password", "p", "", "Password for Identity Server")
 }
-func getList(){
+func getList() {
 
-	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
-	var GETLISTURL = SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var GETLISTURL = SERVER + "/t/" + TENANTDOMAIN + "/api/server/v1/applications"
 	var status int
 	var list List
 	var app Application
@@ -136,7 +136,7 @@ func getList(){
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-	req, err := http.NewRequest("GET", GETLISTURL,bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", GETLISTURL, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("accept", "*/*")
 	defer req.Body.Close()
@@ -154,14 +154,14 @@ func getList(){
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
 		setServerWithInit(SERVER)
 		if readFile() == "" {
-			   return
+			return
 		} else {
-			   getList()
+			getList()
 		}
 	} else if status == 400 {
 		fmt.Println("Bad Request")
 	} else if status == 200 {
-		fmt.Println("Successfully Got the service provider List at "+resp.Header.Get("Date"))
+		fmt.Println("Successfully Got the service provider List at " + resp.Header.Get("Date"))
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalln(err)

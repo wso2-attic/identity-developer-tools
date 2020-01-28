@@ -36,42 +36,42 @@ var accessToken string
 var refreshToken string
 var err error
 
-const SCOPE string ="/permission/admin/manage/identity/applicationmgt/update /permission/admin/manage/identity/applicationmgt/create /permission/admin/manage/identity/applicationmgt/view internal_application_mgt_update internal_application_mgt_create internal_application_mgt_view"
+const SCOPE string = "/permission/admin/manage/identity/applicationmgt/update /permission/admin/manage/identity/applicationmgt/create /permission/admin/manage/identity/applicationmgt/view internal_application_mgt_update internal_application_mgt_create internal_application_mgt_view"
 
 type oAuthResponse struct {
-	AccessToken  string   `json:"access_token"`
-	RefreshToken      string      `json:"refresh_token"`
-	Scope string `json:"scope"`
-	TokenType    string   `json:"token_type"`
-	Expires int `json:"expires_in"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+	TokenType    string `json:"token_type"`
+	Expires      int    `json:"expires_in"`
 }
 
-func start(serverUrl string,userName string, password string){
+func start(serverUrl string, userName string, password string) {
 
 	_, err2 := url.ParseRequestURI(serverUrl)
 	if err2 != nil {
 		log.Fatalln(err2)
 		return
 	}
-	ur, err2:=url.Parse(serverUrl)
+	ur, err2 := url.Parse(serverUrl)
 	if err2 != nil {
-			log.Fatalln(err2)
-			return
+		log.Fatalln(err2)
+		return
 	} else {
-			IAMURL = ur.Scheme+"://"+ur.Host
+		IAMURL = ur.Scheme + "://" + ur.Host
 	}
 
-	AUTHURL = IAMURL+"/oauth2/token"
+	AUTHURL = IAMURL + "/oauth2/token"
 
-	accessToken,refreshToken=sendOAuthRequest(userName,password)
+	accessToken, refreshToken = sendOAuthRequest(userName, password)
 	if accessToken != "" {
-		writeFiles(IAMURL,accessToken,refreshToken)
+		writeFiles(IAMURL, accessToken, refreshToken)
 	}
 }
 
-func sendOAuthRequest(userName string, password string) (string,string) {
+func sendOAuthRequest(userName string, password string) (string, string) {
 
-	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
 	var err error
 	var accessToken string
@@ -80,24 +80,24 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 
 	// Build response body to POST :=
 	body := url.Values{}
-	body.Set("grant_type","password")
-	body.Set("username",userName)
+	body.Set("grant_type", "password")
+	body.Set("username", userName)
 	body.Set("password", password)
 	body.Set("scope", SCOPE)
 
-	req, err := http.NewRequest("POST", AUTHURL,strings.NewReader(body.Encode()))
-	if err != nil{
+	req, err := http.NewRequest("POST", AUTHURL, strings.NewReader(body.Encode()))
+	if err != nil {
 		log.Fatalln(err)
 	}
-	req.SetBasicAuth(CLIENTID,CLIENTSECRET)
-	req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+	req.SetBasicAuth(CLIENTID, CLIENTSECRET)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	defer req.Body.Close()
 
 	httpClient := &http.Client{
 		Transport: &http.Transport{
-			                      TLSClientConfig: &tls.Config{
-				                  InsecureSkipVerify: true,
-				},
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 	}
 
@@ -112,20 +112,20 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 		log.Fatalln(err)
 	}
 
-	if resp.StatusCode == 401{
-		type clientError  struct{
+	if resp.StatusCode == 401 {
+		type clientError struct {
 			Description string `json:"error_description"`
-			Error string `json:"error"`
+			Error       string `json:"error"`
 		}
 		var err = new(clientError)
 
 		err2 := json.Unmarshal(body1, &err)
-		if err2!=nil{
+		if err2 != nil {
 			log.Fatalln(err2)
 		}
-		fmt.Println(err.Error+"\n"+err.Description)
+		fmt.Println(err.Error + "\n" + err.Description)
 		setSampleSP()
-		return accessToken,refreshToken
+		return accessToken, refreshToken
 	}
 
 	err2 := json.Unmarshal(body1, &list)
@@ -133,8 +133,8 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 		log.Fatalln(err2)
 	}
 
-	accessToken= list.AccessToken
-	refreshToken= list.RefreshToken
+	accessToken = list.AccessToken
+	refreshToken = list.RefreshToken
 
 	return accessToken, refreshToken
 }

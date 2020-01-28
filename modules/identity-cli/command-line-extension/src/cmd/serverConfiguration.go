@@ -25,9 +25,9 @@ import (
 )
 
 var configCmd = &cobra.Command{
-	Use:  "serverConfiguration" ,
+	Use:   "serverConfiguration",
 	Short: "you can set your server domain",
-	Long: `You can set your server domain`,
+	Long:  `You can set your server domain`,
 	Run: func(cmd *cobra.Command, args []string) {
 		server, err := cmd.Flags().GetString("server")
 		if err != nil {
@@ -35,23 +35,23 @@ var configCmd = &cobra.Command{
 		}
 
 		if server == "" {
-				SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-				if CLIENTID == "" {
-						setSampleSP()
-						SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-						setServerWithInit(SERVER)
-				} else {
-						setServer()
-				}
+			SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+			if CLIENTID == "" {
+				setSampleSP()
+				SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+				setServerWithInit(SERVER)
+			} else {
+				setServer()
+			}
 
 		} else {
-				_, err := url.ParseRequestURI(server)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				userName, _ := cmd.Flags().GetString("username")
-				password, _ := cmd.Flags().GetString("password")
-				start(server,userName,password)
+			_, err := url.ParseRequestURI(server)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			userName, _ := cmd.Flags().GetString("username")
+			password, _ := cmd.Flags().GetString("password")
+			start(server, userName, password)
 		}
 	},
 }
@@ -76,7 +76,7 @@ var userNamePassword = []*survey.Question{
 	},
 }
 
-func init(){
+func init() {
 
 	rootCmd.AddCommand(configCmd)
 	configCmd.Flags().StringP("server", "s", "", "set server domain")
@@ -84,18 +84,18 @@ func init(){
 	configCmd.Flags().StringP("password", "p", "", "enter your password")
 }
 
-func setServer(){
+func setServer() {
 
 	ascii := figlet4go.NewAsciiRender()
 	renderStr, _ := ascii.Render(appName)
 	fmt.Print(renderStr)
 
-	serverAnswer := struct{
+	serverAnswer := struct {
 		Server string `survey:"server"`
 	}{}
-	userNamePasswordAnswer:= struct {
-		UserName  string `survey:"username"`
-		Password   string `survey:"password"`
+	userNamePasswordAnswer := struct {
+		UserName string `survey:"username"`
+		Password string `survey:"password"`
 	}{}
 
 	err1 := survey.Ask(server, &serverAnswer)
@@ -114,13 +114,13 @@ func setServer(){
 		return
 	}
 
-	start(serverAnswer.Server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
+	start(serverAnswer.Server, userNamePasswordAnswer.UserName, userNamePasswordAnswer.Password)
 }
-func setServerWithInit(server string){
+func setServerWithInit(server string) {
 
 	userNamePasswordAnswer := struct {
-		UserName  string `survey:"username"`
-		Password   string `survey:"password"`
+		UserName string `survey:"username"`
+		Password string `survey:"password"`
 	}{}
 	err1 := survey.Ask(userNamePassword, &userNamePasswordAnswer)
 	if err1 != nil {
@@ -128,5 +128,5 @@ func setServerWithInit(server string){
 		return
 	}
 
-	start(server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
+	start(server, userNamePasswordAnswer.UserName, userNamePasswordAnswer.Password)
 }

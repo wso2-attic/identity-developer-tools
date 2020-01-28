@@ -27,15 +27,15 @@ import (
 var createSPCmd = &cobra.Command{
 	Use:   "application",
 	Short: "Create a service provider",
-	Long: `This will help you to create the service providers`,
-	Run: func(cmd *cobra.Command, args []string) { create() },}
+	Long:  `This will help you to create the service providers`,
+	Run:   func(cmd *cobra.Command, args []string) { create() },}
 
 var qs = []*survey.Question{
 	{
 		Name: "question",
 		Prompt: &survey.Select{
 			Message: "Select the option to move on:",
-			Options: []string{"Add application", "Get List" , "Exit"},
+			Options: []string{"Add application", "Get List", "Exit"},
 			Default: "Add application",
 		},
 	},
@@ -52,9 +52,9 @@ var types = []*survey.Question{
 }
 var details = []*survey.Question{
 	{
-		Name:     "spName",
-		Prompt:   &survey.Input{Message: "Enter service provider name:"},
-		Validate: survey.Required,
+		Name:      "spName",
+		Prompt:    &survey.Input{Message: "Enter service provider name:"},
+		Validate:  survey.Required,
 		Transform: survey.Title,
 	},
 	{
@@ -71,8 +71,8 @@ var oauthDetails = []*survey.Question{
 		Transform: survey.Title,
 	},
 	{
-		Name:      "callbackURls",
-		Prompt:    &survey.Input{Message: "Enter callbackURLs(not mandatory):"},
+		Name:   "callbackURls",
+		Prompt: &survey.Input{Message: "Enter callbackURLs(not mandatory):"},
 	},
 }
 
@@ -81,72 +81,72 @@ func init() {
 	rootCmd.AddCommand(createSPCmd)
 }
 
-func create(){
+func create() {
 
-	answers := struct{
-		Selected string `survey:"question"`
-		Name string  `survey:"spName"`
+	answers := struct {
+		Selected    string `survey:"question"`
+		Name        string `survey:"spName"`
 		Description string `survey:"spDescription"`
 	}{}
-	answersOfType := struct{
+	answersOfType := struct {
 		Selected string `survey:"type"`
 	}{}
-	answersOauth:= struct {
-		Name string `survey:"oauthName"`
+	answersOauth := struct {
+		Name         string `survey:"oauthName"`
 		CallbackURLs string `survey:"callbackURls"`
 	}{}
 
-	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
 	if CLIENTID == "" {
-			setSampleSP()
-			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-			setServerWithInit(SERVER)
+		setSampleSP()
+		SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+		setServerWithInit(SERVER)
 	} else if readFile() == "" {
-			setServer()
-			if readFile() == ""{
+		setServer()
+		if readFile() == "" {
 			return
 		}
 	} else {
-			ascii := figlet4go.NewAsciiRender()
-			renderStr, _ := ascii.Render(appName)
-			fmt.Print(renderStr)
+		ascii := figlet4go.NewAsciiRender()
+		renderStr, _ := ascii.Render(appName)
+		fmt.Print(renderStr)
 	}
 
 	err := survey.Ask(qs, &answers)
 	if err == nil && answers.Selected == "Add application" {
 
-			err := survey.Ask(types, &answersOfType)
-			if err == nil && answersOfType.Selected == "Basic application" {
-					err1 := survey.Ask(details, &answers)
-					if err1 != nil {
-						log.Fatalln(err1)
-						return
-					}
-					createSPBasicApplication( answers.Name, answers.Description)
+		err := survey.Ask(types, &answersOfType)
+		if err == nil && answersOfType.Selected == "Basic application" {
+			err1 := survey.Ask(details, &answers)
+			if err1 != nil {
+				log.Fatalln(err1)
+				return
 			}
-			if err == nil && answersOfType.Selected == "oauth" {
-					err1 := survey.Ask(oauthDetails, &answersOauth)
-					if err1 != nil {
-							log.Fatalln(err)
-							return
-					}
-					if  answersOauth.CallbackURLs == ""  {
-							grantTypes := []string{"password", "client_credentials", "refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
-							createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
-					} else  {
-							_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
-							if err != nil {
-									log.Fatalln(err)
-							} else {
-									grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
-									createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
-							}
-					}
+			createSPBasicApplication(answers.Name, answers.Description)
+		}
+		if err == nil && answersOfType.Selected == "oauth" {
+			err1 := survey.Ask(oauthDetails, &answersOauth)
+			if err1 != nil {
+				log.Fatalln(err)
+				return
 			}
+			if answersOauth.CallbackURLs == "" {
+				grantTypes := []string{"password", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code", "iwa:ntlm", "urn:ietf:params:oauth:grant-type:jwt-bearer", "account_switch", "urn:ietf:params:oauth:grant-type:saml2-bearer", "urn:ietf:params:oauth:grant-type:uma-ticket"}
+				createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+			} else {
+				_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
+				if err != nil {
+					log.Fatalln(err)
+				} else {
+					grantTypes := []string{"authorization_code", "implicit", "password", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code", "iwa:ntlm", "urn:ietf:params:oauth:grant-type:jwt-bearer", "account_switch", "urn:ietf:params:oauth:grant-type:saml2-bearer", "urn:ietf:params:oauth:grant-type:uma-ticket"}
+					createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+				}
+			}
+		}
 	}
 
 	if err == nil && answers.Selected == "Get List" {
-			getList()
+		getList()
 	}
 }

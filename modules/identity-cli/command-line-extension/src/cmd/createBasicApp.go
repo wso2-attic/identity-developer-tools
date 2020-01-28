@@ -24,16 +24,16 @@ import (
 	"net/http"
 )
 
-type ServiceProvider struct{
-	Name string `json:"name"`
+type ServiceProvider struct {
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
 func createSPBasicApplication(spName string, spDescription string) {
 
-	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
-	var ADDAPPURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var ADDAPPURL = SERVER + "/t/" + TENANTDOMAIN + "/api/server/v1/applications"
 	var err error
 	var status int
 
@@ -69,14 +69,14 @@ func createSPBasicApplication(spName string, spDescription string) {
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
 		setServerWithInit(SERVER)
-		createSPBasicApplication(spName,spDescription)
+		createSPBasicApplication(spName, spDescription)
 	} else if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
 	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}else if status == 201{
-		fmt.Println("Successfully created the service provider named '"+spName+"' at "+resp.Header.Get("Date"))
+	} else if status == 201 {
+		fmt.Println("Successfully created the service provider named '" + spName + "' at " + resp.Header.Get("Date"))
 	} else if status == 409 {
-		fmt.Println("Already exists an application with same name:"+spName)
+		fmt.Println("Already exists an application with same name:" + spName)
 	}
 }
