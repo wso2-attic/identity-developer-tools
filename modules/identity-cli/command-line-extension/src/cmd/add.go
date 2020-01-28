@@ -28,94 +28,94 @@ var createUsingCommand = &cobra.Command{
 	Long: `A brief description about use flags to service provider `,
 	Run: func(cmd *cobra.Command, args []string) {
 		typeOfAPP, _ := cmd.Flags().GetString("type")
-		name, _ :=cmd.Flags().GetString("name")
-		description, _ :=cmd.Flags().GetString("description")
-		domain,_:=cmd.Flags().GetString("serverDomain")
+		name, _ := cmd.Flags().GetString("name")
+		description, _ := cmd.Flags().GetString("description")
 
+		domain,_ := cmd.Flags().GetString("serverDomain")
 		_, err = url.ParseRequestURI(domain)
-		if err != nil && err.Error()!="parse : empty url" {
-			log.Fatalln(err)
-		} else if err==nil {
-			userName,_:=cmd.Flags().GetString("userName")
-			password,_:=cmd.Flags().GetString("password")
+		if err != nil && err.Error() != "parse : empty url" {
+				log.Fatalln(err)
+		} else if err == nil {
+				userName,_ := cmd.Flags().GetString("userName")
+				password,_ := cmd.Flags().GetString("password")
 
-			if userName =="" && password==""{
-				token:=readFile()
-				if token==""{
-					fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
-					return
-				}else{}
-			}else{
-			 if password==""{
-					fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
-					return
-				}else if userName==""{
-					fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
-				 	return
-				}else {
-				 	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-				 	if CLIENTID =="" {
-						 setSampleSP()
-					 	start(domain, userName, password)
-						if readFile()==""{
+				if userName == "" && password == "" {
+						token := readFile()
+						if token == "" {
+							fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
 							return
 						}
-				 	}else{
-					 	start(domain, userName, password)
-						if readFile()==""{
+				} else {
+						if password == "" {
+								fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
+								return
+						} else if userName == "" {
+								fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
+								return
+						} else {
+								SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+								if CLIENTID == "" {
+										setSampleSP()
+										start(domain, userName, password)
+										if readFile() == ""{
 							return
 						}
-				 	}
+								} else	{
+										start(domain, userName, password)
+										if readFile() == ""{
+							return
+						}
+								}
+						}
 				}
-			}
-		}else{
-			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-			if CLIENTID =="" {
-				setSampleSP()
+		} else {
 				SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-				setServerWithInit(SERVER)
-				if readFile()==""{
+				if CLIENTID == "" {
+						setSampleSP()
+						SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+						setServerWithInit(SERVER)
+						if readFile() == ""{
 					return
 				}
-			}else{
-				token:=readFile()
-				if token==""{
-					setServer()
-					if readFile()==""{
+				} else {
+						token:=readFile()
+						if token == "" {
+							setServer()
+							if readFile() == ""{
 						return
 					}
+						}
 				}
-			}
 		}
 
-		if typeOfAPP=="basic" {
-			if  description==""{
-				createSPBasicApplication(name, name)
-			}else{
-				createSPBasicApplication(name, description)
-			}
-		}else{
-				callbackURl, _ :=cmd.Flags().GetString("callbackURl")
+		if typeOfAPP == "basic" {
+				if  description == ""{
+						createSPBasicApplication(name, name)
+				} else {
+						createSPBasicApplication(name, description)
+				}
+		} else {
+				callbackURl, _ := cmd.Flags().GetString("callbackURl")
 
 				if callbackURl == "" {
-					grantTypes:=[]string{"password","client_credentials","refresh_token"}
-					if description!=""{
-						createSPOauthApplication(name,description,callbackURl, grantTypes)
-					}else{
-						createSPOauthApplication(name,description,callbackURl, grantTypes)
-					}
-				} else {
-					grantTypes:=[]string{"authorization_code","implicit","password","client_credentials","refresh_token"}
-					_, err := url.ParseRequestURI(callbackURl)
-					if err != nil{
-						log.Fatalln(err)
-					}else {
-						if description != "" {
-							createSPOauthApplication(name, description, callbackURl, grantTypes)
+						grantTypes := []string{"password","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
+						if description != ""{
+								createSPOauthApplication(name,description,callbackURl, grantTypes)
 						} else {
-							createSPOauthApplication(name, description, callbackURl, grantTypes)
+								createSPOauthApplication(name,name,callbackURl, grantTypes)
 						}
-					}
+				} else {
+						grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
+						_, err := url.ParseRequestURI(callbackURl)
+						if err != nil {
+								log.Fatalln(err)
+					    } else {
+							if description != "" {
+									createSPOauthApplication(name, description, callbackURl, grantTypes)
+							} else {
+									createSPOauthApplication(name, name, callbackURl, grantTypes)
+							}
+						}
 				}
 		}
 	},
@@ -125,13 +125,14 @@ var serverDomain string
 var applicationName string
 
 func init(){
+
 	createSPCmd.AddCommand(createUsingCommand)
 
 	createUsingCommand.Flags().StringP("type", "t", "oauth", "Enter application type")
-	name:=createUsingCommand.Flags()
+	name := createUsingCommand.Flags()
 	name.StringVarP(&applicationName,"name", "n", "", "name of service provider - **compulsory")
 	err := cobra.MarkFlagRequired(name, "name")
-	if err!= nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 	createUsingCommand.Flags().StringP("description", "d", "", "description of SP - **for basic application")

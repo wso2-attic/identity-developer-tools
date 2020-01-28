@@ -48,7 +48,7 @@ func createSPBasicApplication(spName string, spDescription string) {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	req, err := http.NewRequest("POST", ADDAPPURL, bytes.NewBuffer(jsonData))
-	if err!=nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -70,17 +70,13 @@ func createSPBasicApplication(spName string, spDescription string) {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
 		setServerWithInit(SERVER)
 		createSPBasicApplication(spName,spDescription)
-	}
-	if status == 400 {
+	} else if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
-	}
-	if status == 403 {
+	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}
-	if status == 201{
+	}else if status == 201{
 		fmt.Println("Successfully created the service provider named '"+spName+"' at "+resp.Header.Get("Date"))
-	}
-	if status == 409 {
+	} else if status == 409 {
 		fmt.Println("Already exists an application with same name:"+spName)
 	}
 }

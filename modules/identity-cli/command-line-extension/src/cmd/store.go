@@ -36,6 +36,7 @@ type myJSON struct {
 }
 
 func createFile() {
+
 	// detect if file exists
 	var _, err = os.Stat(path)
 	// create file if not exists
@@ -44,31 +45,32 @@ func createFile() {
 		checkError(err)
 		defer file.Close()
 
-		jsondat := &myJSON{Array: []ServerDetails{}}
-		encjson, _ := json.Marshal(jsondat)
+		jsonData := &myJSON{Array: []ServerDetails{}}
+		encodeJson, _ := json.Marshal(jsonData)
 
 		if err != nil {
 			log.Fatalln(err)
 		}
-		err = ioutil.WriteFile(path, encjson, 0644)
-		if err!=nil{
+		err = ioutil.WriteFile(path, encodeJson, 0644)
+		if err != nil {
 			log.Fatalln(err)
 		}
 	}
 }
 
 func writeFiles(server string,token string,refreshToken string) {
+
 	var err error
 	var data myJSON
 	var msg=new(ServerDetails)
 
 	file, err := ioutil.ReadFile(path)
-	if err!=nil{
+	if err != nil{
 		log.Fatalln(err)
 	}
 
-	err= json.Unmarshal(file, &data)
-	if err!=nil{
+	err = json.Unmarshal(file, &data)
+	if err != nil {
 		log.Fatalln(err)
 	}
 
@@ -76,17 +78,17 @@ func writeFiles(server string,token string,refreshToken string) {
 	msg.Server=server
 	msg.RefreshToken=refreshToken
 
-	if len(data.Array)==0{
-		data.Array = append(data.Array, *msg)
-	}else {
-		for i := 0; i < len(data.Array); i++ {
-			if data.Array[i].Server == server {
-				data.Array[i].AccessToken = token
-				data.Array[i].RefreshToken = refreshToken
-			} else {
-				data.Array = append(data.Array, *msg)
+	if len(data.Array) == 0 {
+			data.Array = append(data.Array, *msg)
+	} else {
+			for i := 0; i < len(data.Array); i++ {
+				if data.Array[i].Server == server {
+						data.Array[i].AccessToken = token
+						data.Array[i].RefreshToken = refreshToken
+				} else {
+						data.Array = append(data.Array, *msg)
+				}
 			}
-		}
 	}
 
 	jsonData, err := json.Marshal(data)
@@ -94,10 +96,10 @@ func writeFiles(server string,token string,refreshToken string) {
 		log.Fatalln(err)
 	}
 	err = ioutil.WriteFile(path, jsonData, 0644)
-	if err!=nil{
-		log.Fatalln(err)
-	}else{
-		fmt.Println("Authorization is done for : "+server)
+	if err != nil {
+			log.Fatalln(err)
+	} else {
+			fmt.Println("Authorization is done for : "+server)
 	}
 	checkError(err)
 }
@@ -108,12 +110,12 @@ func readFile() string {
 	var data myJSON
 
 	file,err := ioutil.ReadFile(path)
-	if err!=nil{
+	if err != nil{
 		log.Fatalln(err)
 	}
 
-	err= json.Unmarshal(file, &data)
-	if err!=nil{
+	err = json.Unmarshal(file, &data)
+	if err != nil {
 		log.Fatalln(err)
 	}
 	//as the single host this worked. For multiple host need to read relevant accessToken according to given server
@@ -124,6 +126,7 @@ func readFile() string {
 }
 
 func checkError(err error) {
+
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(0)

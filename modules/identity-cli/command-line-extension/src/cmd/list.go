@@ -29,73 +29,74 @@ import (
 	"os"
 	"text/tabwriter"
 )
+
 var getListCmd = &cobra.Command{
 	Use:  "list" ,
 	Short: "get service providers List",
 	Long: `You can get service provider List`,
 	Run: func(cmd *cobra.Command, args []string) {
 		server, err:= cmd.Flags().GetString("server")
-		if  server=="" {
-			ascii := figlet4go.NewAsciiRender()
-			renderStr, _ := ascii.Render(appName)
-			fmt.Print(renderStr)
+		if  server == "" {
+				ascii := figlet4go.NewAsciiRender()
+				renderStr, _ := ascii.Render(appName)
+				fmt.Print(renderStr)
 
-			getList()
-		}else {
-			_, err = url.ParseRequestURI(server)
-			if err != nil && err.Error() != "parse : empty url" {
-				log.Fatalln(err)
-			} else if err == nil {
-				userName, _ := cmd.Flags().GetString("userName")
-				password, _ := cmd.Flags().GetString("password")
+				getList()
+		} else {
+				_, err = url.ParseRequestURI(server)
+				if err != nil && err.Error() != "parse : empty url" {
+						log.Fatalln(err)
+				} else if err == nil {
+						userName, _ := cmd.Flags().GetString("userName")
+						password, _ := cmd.Flags().GetString("password")
 
-				if userName == "" && password == "" {
-					token := readFile()
-					if token == "" {
-						fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
-						return
-					} else {
-						getList()
-					}
-				} else {
-					if password == "" {
-						token := readFile()
-						if token == "" {
-							fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
-							return
-						}else {
-							getList()
-						}
-					} else if userName == "" {
-						token := readFile()
-						if token == "" {
-							fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
-							return
-						}else {
-							getList()
-						}
-
-					} else {
-						SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
-						if CLIENTID == "" {
-							setSampleSP()
-							start(server, userName, password)
-							if readFile()==""{
-								return
-							}else {
-								getList()
-							}
+						if userName == "" && password == "" {
+								token := readFile()
+								if token == "" {
+										fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
+										return
+								} else {
+										getList()
+								}
 						} else {
-							start(server, userName, password)
-							if readFile()==""{
+								if password == "" {
+										token := readFile()
+										if token == "" {
+												fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
+												return
+										} else {
+												getList()
+										}
+								} else if userName == "" {
+										token := readFile()
+										if token == "" {
+												fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
+												return
+										} else {
+												getList()
+										}
+
+								} else {
+										SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+										if CLIENTID == "" {
+												setSampleSP()
+												start(server, userName, password)
+												if readFile() == ""{
 								return
 							}else {
-								getList()
-							}
+														getList()
+												}
+										} else {
+												start(server, userName, password)
+												if readFile() == ""{
+														return
+												} else {
+														getList()
+												}
+										}
+								}
 						}
-					}
 				}
-			}
 		}
 	},
 }
@@ -115,6 +116,7 @@ type Application struct{
 }
 
 func init(){
+
 	createSPCmd.AddCommand(getListCmd)
 
 	getListCmd.Flags().StringP("server", "s", "", "server")
@@ -122,9 +124,10 @@ func init(){
 	getListCmd.Flags().StringP("password", "p", "", "Password for Identity Server")
 }
 func getList(){
+
 	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
 
-	var GETLISTURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var GETLISTURL = SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
 	var status int
 	var list List
 	var app Application
@@ -150,16 +153,14 @@ func getList(){
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
 		setServerWithInit(SERVER)
-		if readFile()==""{
-			return
-		}else {
-			getList()
+		if readFile() == "" {
+			   return
+		} else {
+			   getList()
 		}
-	}
-	if status == 400 {
+	} else if status == 400 {
 		fmt.Println("Bad Request")
-	}
-	if status == 200{
+	} else if status == 200 {
 		fmt.Println("Successfully Got the service provider List at "+resp.Header.Get("Date"))
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
@@ -169,27 +170,29 @@ func getList(){
 		writer.Init(os.Stdout, 8, 8, 0, '\t', 0)
 		defer writer.Flush()
 
-		_ = json.Unmarshal(body, &list)
-		_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", "Application Id ","Name", "Description")
-		_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", " ----", "----", "----", )
-		for i := 0; i < len(list.Applications); i++ {
-			app.Id=list.Applications[i].Id
-			app.Name=list.Applications[i].Name
-			app.Description=list.Applications[i].Description
-			_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", app.Id, app.Name, app.Description)
+		err = json.Unmarshal(body, &list)
+		if err != nil {
+			log.Fatalln(err)
 		}
-		_ = resp.Body.Close()
-	}
-	if status == 403 {
+		fmt.Fprintf(writer, "\n %s\t%s\t%s\t", "Application Id ", "Name", "Description")
+		fmt.Fprintf(writer, "\n %s\t%s\t%s\t", " ----", "----", "----", )
+
+		for i := 0; i < len(list.Applications); i++ {
+			app.Id = list.Applications[i].Id
+			app.Name = list.Applications[i].Name
+			app.Description = list.Applications[i].Description
+			fmt.Fprintf(writer, "\n %s\t%s\t%s\t", app.Id, app.Name, app.Description)
+		}
+
+		resp.Body.Close()
+
+	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}
-	if status == 404 {
+	} else if status == 404 {
 		fmt.Println("Not Found")
-	}
-	if status == 500 {
+	} else if status == 500 {
 		fmt.Println("Server Error")
-	}
-	if status == 501 {
+	} else if status == 501 {
 		fmt.Println("Not Implemented")
 	}
 }

@@ -53,18 +53,18 @@ func start(serverUrl string,userName string, password string){
 		log.Fatalln(err2)
 		return
 	}
-	u, err2:=url.Parse(serverUrl)
+	ur, err2:=url.Parse(serverUrl)
 	if err2 != nil {
-		log.Fatalln(err2)
-		return
-	}else{
-		IAMURL=u.Scheme+"://"+u.Host
+			log.Fatalln(err2)
+			return
+	} else {
+			IAMURL = ur.Scheme+"://"+ur.Host
 	}
 
-	AUTHURL= IAMURL+"/oauth2/token"
+	AUTHURL = IAMURL+"/oauth2/token"
 
 	accessToken,refreshToken=sendOAuthRequest(userName,password)
-	if accessToken!="" {
+	if accessToken != "" {
 		writeFiles(IAMURL,accessToken,refreshToken)
 	}
 }
@@ -79,14 +79,14 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 	var list oAuthResponse
 
 	// Build response body to POST :=
-	body :=url.Values{}
+	body := url.Values{}
 	body.Set("grant_type","password")
 	body.Set("username",userName)
 	body.Set("password", password)
 	body.Set("scope", SCOPE)
 
 	req, err := http.NewRequest("POST", AUTHURL,strings.NewReader(body.Encode()))
-	if err!=nil{
+	if err != nil{
 		log.Fatalln(err)
 	}
 	req.SetBasicAuth(CLIENTID,CLIENTSECRET)
@@ -117,7 +117,8 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 			Description string `json:"error_description"`
 			Error string `json:"error"`
 		}
-		var err=new(clientError)
+		var err = new(clientError)
+
 		err2 := json.Unmarshal(body1, &err)
 		if err2!=nil{
 			log.Fatalln(err2)
@@ -128,7 +129,7 @@ func sendOAuthRequest(userName string, password string) (string,string) {
 	}
 
 	err2 := json.Unmarshal(body1, &list)
-	if err2!= nil {
+	if err2 != nil {
 		log.Fatalln(err2)
 	}
 

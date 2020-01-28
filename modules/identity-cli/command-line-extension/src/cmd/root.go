@@ -25,9 +25,9 @@ import (
 )
 
 const (
-  appName="IAM-CTL"
-  shortAppDesc="Service Provider configuration"
-  longAPPConfig="Service Provider configuration"
+  appName = "IAM-CTL"
+  shortAppDesc = "Service Provider configuration"
+  longAPPConfig = "Service Provider configuration"
 )
 
 var cfgFile string
@@ -36,10 +36,11 @@ var rootCmd = &cobra.Command{
   Use:   appName,
   Short: shortAppDesc,
   Long: longAPPConfig,
-  	Run: func(cmd *cobra.Command, args []string) {},
+  Run: func(cmd *cobra.Command, args []string) {},
 }
 
 func Execute() {
+
   if err := rootCmd.Execute(); err != nil {
     log.Fatalln(err)
     os.Exit(1)
@@ -47,6 +48,7 @@ func Execute() {
 }
 
 func init() {
+
   createFile()
   createSampleSPFile()
 
@@ -56,18 +58,18 @@ func init() {
 func initConfig() {
 
   if cfgFile != "" {
-    // Use config file from the flag.
-    viper.SetConfigFile(cfgFile)
+          // Use config file from the flag.
+          viper.SetConfigFile(cfgFile)
   } else {
-    // Find home directory.
-    home, err := homedir.Dir()
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
-    // Search config in home directory with name ".iamctl" (without extension).
-    viper.AddConfigPath(home)
-    viper.SetConfigName(".iamctl")
+          // Find home directory.
+          home, err := homedir.Dir()
+          if err != nil {
+               fmt.Println(err)
+               os.Exit(1)
+          }
+          // Search config in home directory with name ".iamctl" (without extension).
+          viper.AddConfigPath(home)
+          viper.SetConfigName(".iamctl")
   }
   viper.AutomaticEnv() // read in environment variables that match
 

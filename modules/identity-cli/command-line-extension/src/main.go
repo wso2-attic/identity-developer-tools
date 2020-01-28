@@ -24,9 +24,9 @@ limitations under the License.
 
  func main() {
 
-  if len(os.Args)>1{
-   cmd.Execute()
-  }else{
-   fmt.Println("Use \" IAM-CTL [command] --help\" or \" IAM-CTL [command] -h\" for more information about a command.")
-  }
+   if len(os.Args) > 1 {
+          cmd.Execute()
+   } else {
+          fmt.Println("Use \" IAM-CTL [command] --help\" or \" IAM-CTL [command] -h\" for more information about a command.")
+   }
  }

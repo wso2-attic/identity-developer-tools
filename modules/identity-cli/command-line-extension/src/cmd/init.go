@@ -70,10 +70,12 @@ type SampleSP struct {
 }
 
 func init(){
+
 	rootCmd.AddCommand(sampleSPCmd)
 }
 
 func setSampleSP() {
+
 	ascii := figlet4go.NewAsciiRender()
 	renderStr, _ := ascii.Render(appName)
 	fmt.Print(renderStr)
@@ -86,29 +88,36 @@ func setSampleSP() {
 		ClientSecret string `survey:"clientSecret"`
 		Tenant       string `survey:"tenantDomain"`
 	}{}
+
 	err := survey.Ask(serverInit,&sampleServer)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
+
 	_, err = url.ParseRequestURI(sampleServer.Server)
 	if err != nil {
-		log.Fatalln(err)
-	}else{
-		err1 := survey.Ask(sampleSP, &sampleSPAnswer)
-		if err1 != nil {
-			fmt.Println(err1.Error())
-			return
-		}
-		writeSampleAPPFile(sampleServer.Server,sampleSPAnswer.ClientID,sampleSPAnswer.ClientSecret,sampleSPAnswer.Tenant)
+			log.Fatalln(err)
+	} else {
+			err1 := survey.Ask(sampleSP, &sampleSPAnswer)
+			if err1 != nil {
+				fmt.Println(err1.Error())
+				return
+			}
+			writeSampleAPPFile(sampleServer.Server,sampleSPAnswer.ClientID,sampleSPAnswer.ClientSecret,sampleSPAnswer.Tenant)
 	}
 }
 
 func writeSampleAPPFile(server string,clientID string,clientSecret string,tenant string){
+
 	var data SampleSP
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
 
-	_ = json.Unmarshal(file, &data)
+	 err := json.Unmarshal(file, &data)
+	 if err != nil {
+	 	log.Fatalln(err)
+	 }
+
 	data.Server=server
 	data.ClientID=clientID
 	data.ClientSecret=clientSecret
@@ -123,6 +132,7 @@ func writeSampleAPPFile(server string,clientID string,clientSecret string,tenant
 	fmt.Println("successfully set service provider  Client_key: "+clientID+" Client_Secret: ****************************  Tenant Domain "+tenant+" in "+server)
 }
 func createSampleSPFile() {
+
 	// detect if file exists
 	var _, err = os.Stat(pathSampleSPDetails)
 	// create file if not exists
@@ -130,21 +140,25 @@ func createSampleSPFile() {
 		var file, err = os.Create(pathSampleSPDetails)
 		checkError(err)
 		defer file.Close()
-		jsondat := &SampleSP{}
-		encjson, _ := json.Marshal(jsondat)
+		jsonData := &SampleSP{}
+		encodeJson, _ := json.Marshal(jsonData)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		err = ioutil.WriteFile(pathSampleSPDetails, encjson, 0644)
+		err = ioutil.WriteFile(pathSampleSPDetails, encodeJson, 0644)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
 func readSPConfig() (string,string,string,string){
+
 	var data SampleSP
 
 	file, _ := ioutil.ReadFile(pathSampleSPDetails)
 	err:= json.Unmarshal(file, &data)
-	if err!=nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 

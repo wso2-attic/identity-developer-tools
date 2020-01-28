@@ -29,26 +29,29 @@ var configCmd = &cobra.Command{
 	Short: "you can set your server domain",
 	Long: `You can set your server domain`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server, _ := cmd.Flags().GetString("server")
+		server, err := cmd.Flags().GetString("server")
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-		if server =="" {
-			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-			if CLIENTID ==""{
-				setSampleSP()
+		if server == "" {
 				SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-				setServerWithInit(SERVER)
-			}else{
-				setServer()
-			}
+				if CLIENTID == "" {
+						setSampleSP()
+						SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+						setServerWithInit(SERVER)
+				} else {
+						setServer()
+				}
 
-		}else {
-			_, err := url.ParseRequestURI(server)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			userName, _ := cmd.Flags().GetString("username")
-			password, _ := cmd.Flags().GetString("password")
-			start(server,userName,password)
+		} else {
+				_, err := url.ParseRequestURI(server)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				userName, _ := cmd.Flags().GetString("username")
+				password, _ := cmd.Flags().GetString("password")
+				start(server,userName,password)
 		}
 	},
 }
@@ -74,6 +77,7 @@ var userNamePassword = []*survey.Question{
 }
 
 func init(){
+
 	rootCmd.AddCommand(configCmd)
 	configCmd.Flags().StringP("server", "s", "", "set server domain")
 	configCmd.Flags().StringP("username", "u", "", "enter your username")
@@ -81,6 +85,7 @@ func init(){
 }
 
 func setServer(){
+
 	ascii := figlet4go.NewAsciiRender()
 	renderStr, _ := ascii.Render(appName)
 	fmt.Print(renderStr)
@@ -112,7 +117,8 @@ func setServer(){
 	start(serverAnswer.Server,userNamePasswordAnswer.UserName,userNamePasswordAnswer.Password)
 }
 func setServerWithInit(server string){
-	userNamePasswordAnswer:= struct {
+
+	userNamePasswordAnswer := struct {
 		UserName  string `survey:"username"`
 		Password   string `survey:"password"`
 	}{}

@@ -108,6 +108,7 @@ type Export struct{
 }
 
 func createSPOauthApplication(oauthAppName string,description string, callbackURLs string,grantTypes []string){
+
 	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
 
 	var ADDAPPURL =SERVER+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
@@ -136,7 +137,7 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	req, err := http.NewRequest("POST", ADDAPPURL,bytes.NewBuffer(jsonData))
-	if err!=nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 	req.Header.Set("Authorization","Bearer "+token)
@@ -155,18 +156,15 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 	status=resp.StatusCode
 	defer resp.Body.Close()
 
-	if status== 401{
+	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your UserName and password for server.")
 		setServerWithInit(SERVER)
 		createSPOauthApplication(oauthAppName,description,callbackURLs,grantTypes)
-	}
-	if status == 400 {
+	} else if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
-	}
-	if status == 403 {
+	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}
-	if status == 201{
+	} else if status == 201{
 		fmt.Println("Successfully created the service provider named '"+oauthAppName+"' at "+resp.Header.Get("Date"))
 		location:=resp.Header.Get("Location")
 
@@ -196,19 +194,19 @@ func createSPOauthApplication(oauthAppName string,description string, callbackUR
 		}
 
 		err= xml.Unmarshal(body, &xmlData)
-		if err!=nil{
+		if err != nil {
 			log.Fatalln(err)
 		}
 
 		configuration := xmlData.InboundAuthenticationConfig.InboundAuthenticationRequestConfigs.InboundAuthenticationRequestConfig[0].InboundConfiguration
 		fmt.Println("oauthConsumerKey: "+between(configuration,"<oauthConsumerKey>","</oauthConsumerKey>"))
 		fmt.Println("oauthConsumerSecret: "+between(configuration,"<oauthConsumerSecret>","</oauthConsumerSecret>"))
-	}
-	if status == 409 {
+	} else if status == 409 {
 		fmt.Println("Already exists an application with same name:"+oauthAppName)
 	}
 }
 func between(fullString string, start string, end string) string {
+
 	// Get substring between two strings.
 	posFirst := strings.Index(fullString, start)
 	if posFirst == -1 {

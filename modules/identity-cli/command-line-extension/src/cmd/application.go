@@ -98,54 +98,55 @@ func create(){
 
 	SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
 
-	if CLIENTID =="" {
-		setSampleSP()
-		SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
-		setServerWithInit(SERVER)
-	}else if readFile()==""{
-		setServer()
-		if readFile()==""{
+	if CLIENTID == "" {
+			setSampleSP()
+			SERVER,CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+			setServerWithInit(SERVER)
+	} else if readFile() == "" {
+			setServer()
+			if readFile() == ""{
 			return
 		}
-
-	}else{
-		ascii := figlet4go.NewAsciiRender()
-		renderStr, _ := ascii.Render(appName)
-		fmt.Print(renderStr)
+	} else {
+			ascii := figlet4go.NewAsciiRender()
+			renderStr, _ := ascii.Render(appName)
+			fmt.Print(renderStr)
 	}
-		err := survey.Ask(qs, &answers)
-		if err == nil && answers.Selected == "Add application" {
+
+	err := survey.Ask(qs, &answers)
+	if err == nil && answers.Selected == "Add application" {
+
 			err := survey.Ask(types, &answersOfType)
 			if err == nil && answersOfType.Selected == "Basic application" {
-				err1 := survey.Ask(details, &answers)
-				if err1 != nil {
-					log.Fatalln(err1)
-					return
-				}
-				createSPBasicApplication( answers.Name, answers.Description)
+					err1 := survey.Ask(details, &answers)
+					if err1 != nil {
+						log.Fatalln(err1)
+						return
+					}
+					createSPBasicApplication( answers.Name, answers.Description)
 			}
 			if err == nil && answersOfType.Selected == "oauth" {
-				err1 := survey.Ask(oauthDetails, &answersOauth)
-				if err1 != nil {
-					log.Fatalln(err)
-					return
-				}
-				if  answersOauth.CallbackURLs == ""  {
-					grantTypes := []string{"password", "client_credentials", "refresh_token"}
-					createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
-				}else  {
-					_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
-					if err!=nil{
-						log.Fatalln(err)
-					}else {
-						grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token"}
-						createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+					err1 := survey.Ask(oauthDetails, &answersOauth)
+					if err1 != nil {
+							log.Fatalln(err)
+							return
 					}
-				}
+					if  answersOauth.CallbackURLs == ""  {
+							grantTypes := []string{"password", "client_credentials", "refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
+							createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+					} else  {
+							_, err := url.ParseRequestURI(answersOauth.CallbackURLs)
+							if err != nil {
+									log.Fatalln(err)
+							} else {
+									grantTypes := []string{"authorization_code","implicit","password","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code","iwa:ntlm","urn:ietf:params:oauth:grant-type:jwt-bearer","account_switch","urn:ietf:params:oauth:grant-type:saml2-bearer","urn:ietf:params:oauth:grant-type:uma-ticket"}
+									createSPOauthApplication(answersOauth.Name, answersOauth.Name, answersOauth.CallbackURLs, grantTypes)
+							}
+					}
 			}
-		}
+	}
 
-		if err == nil && answers.Selected == "Get List" {
+	if err == nil && answers.Selected == "Get List" {
 			getList()
-		}
+	}
 }
