@@ -18,6 +18,7 @@ package cmd
 import (
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,35 +31,47 @@ var AUTHURL string
 var CLIENTID string
 var CLIENTSECRET string
 var TENANTDOMAIN string
+var SERVER string
 var accessToken string
 var refreshToken string
 var err error
 
-const SCOPE string ="/permission/admin/manage/identity/applicationmgt/update /permission/admin/manage/identity/applicationmgt/create /permission/admin/manage/identity/applicationmgt/view internal_application_mgt_update internal_application_mgt_create internal_application_mgt_view"
+const SCOPE string = "/permission/admin/manage/identity/applicationmgt/update /permission/admin/manage/identity/applicationmgt/create /permission/admin/manage/identity/applicationmgt/view internal_application_mgt_update internal_application_mgt_create internal_application_mgt_view"
 
 type oAuthResponse struct {
-	AccessToken  string   `json:"access_token"`
-	RefreshToken      string      `json:"refresh_token"`
-	Scope string `json:"scope"`
-	TokenType    string   `json:"token_type"`
-	Expires int `json:"expires_in"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+	TokenType    string `json:"token_type"`
+	Expires      int    `json:"expires_in"`
 }
 
-func start(url string,userName string, password string){
-	IAMURL=url
-	AUTHURL= IAMURL+"/oauth2/token"
+func start(serverUrl string, userName string, password string) {
 
-	accessToken,refreshToken,err=sendOAuthRequest(userName,password)
-	if err != nil {
-				log.Fatalln(err)
+	_, err2 := url.ParseRequestURI(serverUrl)
+	if err2 != nil {
+		log.Fatalln(err2)
+		return
+	}
+	ur, err2 := url.Parse(serverUrl)
+	if err2 != nil {
+		log.Fatalln(err2)
+		return
+	} else {
+		IAMURL = ur.Scheme + "://" + ur.Host
 	}
 
-	writeFiles(IAMURL,accessToken,refreshToken)
+	AUTHURL = IAMURL + "/oauth2/token"
+
+	accessToken, refreshToken = sendOAuthRequest(userName, password)
+	if accessToken != "" {
+		writeFiles(IAMURL, accessToken, refreshToken)
+	}
 }
 
-func sendOAuthRequest(userName string, password string) (string,string, error) {
+func sendOAuthRequest(userName string, password string) (string, string) {
 
-	CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
 	var err error
 	var accessToken string
@@ -66,29 +79,31 @@ func sendOAuthRequest(userName string, password string) (string,string, error) {
 	var list oAuthResponse
 
 	// Build response body to POST :=
-	body :=url.Values{}
-	body.Set("grant_type","password")
-	body.Set("username",userName)
+	body := url.Values{}
+	body.Set("grant_type", "password")
+	body.Set("username", userName)
 	body.Set("password", password)
 	body.Set("scope", SCOPE)
 
-	req, err := http.NewRequest("POST", AUTHURL,strings.NewReader(body.Encode()))
-	req.SetBasicAuth(CLIENTID,CLIENTSECRET)
-	req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+	req, err := http.NewRequest("POST", AUTHURL, strings.NewReader(body.Encode()))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.SetBasicAuth(CLIENTID, CLIENTSECRET)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	defer req.Body.Close()
 
 	httpClient := &http.Client{
 		Transport: &http.Transport{
-			                      TLSClientConfig: &tls.Config{
-				                  InsecureSkipVerify: true,
-				},
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 	}
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		log.Fatalln(err)
-		return accessToken,refreshToken, err
 	}
 	defer resp.Body.Close()
 
@@ -97,13 +112,29 @@ func sendOAuthRequest(userName string, password string) (string,string, error) {
 		log.Fatalln(err)
 	}
 
+	if resp.StatusCode == 401 {
+		type clientError struct {
+			Description string `json:"error_description"`
+			Error       string `json:"error"`
+		}
+		var err = new(clientError)
+
+		err2 := json.Unmarshal(body1, &err)
+		if err2 != nil {
+			log.Fatalln(err2)
+		}
+		fmt.Println(err.Error + "\n" + err.Description)
+		setSampleSP()
+		return accessToken, refreshToken
+	}
+
 	err2 := json.Unmarshal(body1, &list)
-	if err2!=nil{
+	if err2 != nil {
 		log.Fatalln(err2)
 	}
 
 	accessToken = list.AccessToken
-	refreshToken= list.RefreshToken
+	refreshToken = list.RefreshToken
 
-	return accessToken,refreshToken, err
+	return accessToken, refreshToken
 }

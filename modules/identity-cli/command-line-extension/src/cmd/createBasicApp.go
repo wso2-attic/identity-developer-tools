@@ -24,20 +24,20 @@ import (
 	"net/http"
 )
 
-type ServiceProvider struct{
-	Name string `json:"name"`
+type ServiceProvider struct {
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
-func createSPBasicApplication(domainName string,spName string, spDescription string) {
+func createSPBasicApplication(spName string, spDescription string) {
 
-	CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
 
-	var ADDAPPURL =domainName+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	var ADDAPPURL = SERVER + "/t/" + TENANTDOMAIN + "/api/server/v1/applications"
 	var err error
 	var status int
 
-	token := readFile(domainName)
+	token := readFile()
 
 	toJson := ServiceProvider{spName, spDescription}
 	jsonData, err := json.Marshal(toJson)
@@ -48,7 +48,7 @@ func createSPBasicApplication(domainName string,spName string, spDescription str
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	req, err := http.NewRequest("POST", ADDAPPURL, bytes.NewBuffer(jsonData))
-	if err!=nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -68,17 +68,15 @@ func createSPBasicApplication(domainName string,spName string, spDescription str
 
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
-	}
-	if status == 400 {
+		setServerWithInit(SERVER)
+		createSPBasicApplication(spName, spDescription)
+	} else if status == 400 {
 		fmt.Println("Provided parameters are not in correct format.")
-	}
-	if status == 403 {
+	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}
-	if status == 201{
-		fmt.Println("Successfully created the service provider named '"+spName+"' at "+resp.Header.Get("Date"))
-	}
-	if status == 409 {
-		fmt.Println("Already exists an application with same name:"+spName)
+	} else if status == 201 {
+		fmt.Println("Successfully created the service provider named '" + spName + "' at " + resp.Header.Get("Date"))
+	} else if status == 409 {
+		fmt.Println("Already exists an application with same name:" + spName)
 	}
 }

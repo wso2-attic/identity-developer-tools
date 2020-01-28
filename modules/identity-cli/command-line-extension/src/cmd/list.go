@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/mbndr/figlet4go"
 	"github.com/spf13/cobra"
 	"io/ioutil"
@@ -30,81 +29,114 @@ import (
 	"os"
 	"text/tabwriter"
 )
+
 var getListCmd = &cobra.Command{
-	Use:  "list" ,
+	Use:   "list",
 	Short: "get service providers List",
-	Long: `You can get service provider List`,
+	Long:  `You can get service provider List`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server1, _ := cmd.Flags().GetString("server")
-		if  server1==""  {
-			var server = []*survey.Question{
-				{
-					Name:     "server",
-					Prompt:   &survey.Input{Message: "Enter IAM URL:"},
-					Validate: survey.Required,
-				},
-			}
+		server, err := cmd.Flags().GetString("server")
+		if server == "" {
 			ascii := figlet4go.NewAsciiRender()
 			renderStr, _ := ascii.Render(appName)
 			fmt.Print(renderStr)
 
-			serverAnswer := struct{
-				Server string `survey:"server"`
-			}{}
+			getList()
+		} else {
+			_, err = url.ParseRequestURI(server)
+			if err != nil && err.Error() != "parse : empty url" {
+				log.Fatalln(err)
+			} else if err == nil {
+				userName, _ := cmd.Flags().GetString("userName")
+				password, _ := cmd.Flags().GetString("password")
 
-			err1 := survey.Ask(server, &serverAnswer)
-			_, err := url.ParseRequestURI(serverAnswer.Server)
-			if err != nil {
-				fmt.Println(err)
-			}
-			if err1 != nil {
-				fmt.Println(err1.Error())
-				return
-			}
-			getList(serverAnswer.Server)
+				if userName == "" && password == "" {
+					token := readFile()
+					if token == "" {
+						fmt.Println("required flag(s) \"password\",\"userName\" not set \nFlags:\n-u, --userName string       Username for Identity Server\n-p, --password string       Password for Identity Server")
+						return
+					} else {
+						getList()
+					}
+				} else {
+					if password == "" {
+						token := readFile()
+						if token == "" {
+							fmt.Println("required flag(s) \"password\" not set \nFlag:\n-p, --password string       Password for Identity Server ")
+							return
+						} else {
+							getList()
+						}
+					} else if userName == "" {
+						token := readFile()
+						if token == "" {
+							fmt.Println("required flag(s) \"userName\" not set \nFlag:\n-u, --userName string       Username for Identity Server ")
+							return
+						} else {
+							getList()
+						}
 
-		}else if  server1!=""{
-			_, err := url.ParseRequestURI(server1)
-			if err != nil {
-				fmt.Println(err)
+					} else {
+						SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+						if CLIENTID == "" {
+							setSampleSP()
+							start(server, userName, password)
+							if readFile() == "" {
+								return
+							} else {
+								getList()
+							}
+						} else {
+							start(server, userName, password)
+							if readFile() == "" {
+								return
+							} else {
+								getList()
+							}
+						}
+					}
+				}
 			}
-			getList(server1)
 		}
 	},
 }
 
-type List struct{
-	TotalResults int `json:"totalResults"`
-	StartIndex int `json:"startIndex"`
-	Count int `json:"count"`
+type List struct {
+	TotalResults int           `json:"totalResults"`
+	StartIndex   int           `json:"startIndex"`
+	Count        int           `json:"count"`
 	Applications []Application `json:"applications"`
-	Links []string `json:"links"`
+	Links        []string      `json:"links"`
 }
-type Application struct{
+type Application struct {
 	Id          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Self        string `json:"self"`
 }
 
-func init(){
+func init() {
+
 	createSPCmd.AddCommand(getListCmd)
 
 	getListCmd.Flags().StringP("server", "s", "", "server")
+	getListCmd.Flags().StringP("userName", "u", "", "User name for Identity Server")
+	getListCmd.Flags().StringP("password", "p", "", "Password for Identity Server")
 }
-func getList(domainName string){
-	CLIENTID,CLIENTSECRET,TENANTDOMAIN=readSPConfig()
+func getList() {
 
-	var GETLISTURL =domainName+"/t/"+TENANTDOMAIN+"/api/server/v1/applications"
+	SERVER, CLIENTID, CLIENTSECRET, TENANTDOMAIN = readSPConfig()
+
+	var GETLISTURL = SERVER + "/t/" + TENANTDOMAIN + "/api/server/v1/applications"
 	var status int
 	var list List
 	var app Application
 
-	token := readFile(domainName)
+	token := readFile()
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-	req, err := http.NewRequest("GET", GETLISTURL,bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", GETLISTURL, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("accept", "*/*")
 	defer req.Body.Close()
@@ -120,12 +152,16 @@ func getList(domainName string){
 
 	if status == 401 {
 		fmt.Println("Unauthorized access.\nPlease enter your Username and password for server.")
-	}
-	if status == 400 {
+		setServerWithInit(SERVER)
+		if readFile() == "" {
+			return
+		} else {
+			getList()
+		}
+	} else if status == 400 {
 		fmt.Println("Bad Request")
-	}
-	if status == 200{
-		fmt.Println("Successfully Got the service provider List at "+resp.Header.Get("Date"))
+	} else if status == 200 {
+		fmt.Println("Successfully Got the service provider List at " + resp.Header.Get("Date"))
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalln(err)
@@ -134,27 +170,29 @@ func getList(domainName string){
 		writer.Init(os.Stdout, 8, 8, 0, '\t', 0)
 		defer writer.Flush()
 
-		_ = json.Unmarshal(body, &list)
-		_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", "Application Id ","Name", "Description")
-		_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", " ----", "----", "----", )
-		for i := 0; i < len(list.Applications); i++ {
-			app.Id=list.Applications[i].Id
-			app.Name=list.Applications[i].Name
-			app.Description=list.Applications[i].Description
-			_, _ = fmt.Fprintf(writer, "\n %s\t%s\t%s\t", app.Id, app.Name, app.Description)
+		err = json.Unmarshal(body, &list)
+		if err != nil {
+			log.Fatalln(err)
 		}
-		_ = resp.Body.Close()
-	}
-	if status == 403 {
+		fmt.Fprintf(writer, "\n %s\t%s\t%s\t", "Application Id ", "Name", "Description")
+		fmt.Fprintf(writer, "\n %s\t%s\t%s\t", " ----", "----", "----", )
+
+		for i := 0; i < len(list.Applications); i++ {
+			app.Id = list.Applications[i].Id
+			app.Name = list.Applications[i].Name
+			app.Description = list.Applications[i].Description
+			fmt.Fprintf(writer, "\n %s\t%s\t%s\t", app.Id, app.Name, app.Description)
+		}
+
+		resp.Body.Close()
+
+	} else if status == 403 {
 		fmt.Println("Forbidden")
-	}
-	if status == 404 {
+	} else if status == 404 {
 		fmt.Println("Not Found")
-	}
-	if status == 500 {
+	} else if status == 500 {
 		fmt.Println("Server Error")
-	}
-	if status == 501 {
+	} else if status == 501 {
 		fmt.Println("Not Implemented")
 	}
 }
