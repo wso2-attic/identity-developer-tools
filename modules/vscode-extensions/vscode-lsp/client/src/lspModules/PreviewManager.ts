@@ -6,7 +6,7 @@ import { Wso2OAuth } from './oAuthService';
 const keytar = require('keytar');
 // Object of the FileHandler.
 const fileHandler = new FileHandler();
-const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_identity_mgt_view internal_identity_mgt_create internal_identity_mgt_delete internal_identity_mgt_update";
+const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_functional_lib_view";
 export class PreviewManager {
 
 	/**
