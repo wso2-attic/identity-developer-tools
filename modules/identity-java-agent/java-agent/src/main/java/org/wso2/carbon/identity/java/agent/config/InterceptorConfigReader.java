@@ -27,26 +27,22 @@ import java.util.List;
  * Reads the interceptor config from the resources file in the classpath.
  */
 public class InterceptorConfigReader {
-   
-    }
+
     /**
      * Reads the configs in the class resource
      * "instrumentation-config.json".
      *
      * @return
      */
-   public List<InterceptorConfig> readConfig() {
+    public List<InterceptorConfig> readConfig() {
+
         ArrayList<InterceptorConfig> result = new ArrayList<>();
-
-        result.add(interceptorConfig);
-
-        interceptorConfig = new InterceptorConfig();
+        InterceptorConfig interceptorConfig = new InterceptorConfig();
         interceptorConfig.setClassName(
-                "jdk/nashorn/internal/runtime/DebuggerSupport");
-        interceptorConfig.addMethodSignature("notifyInvoke",
-                "(Ljava/lang/invoke/MethodHandle;)V");
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator");
+        interceptorConfig.addMethodSignature("handle",
+                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
         result.add(interceptorConfig);
-
         return result;
     }
 }

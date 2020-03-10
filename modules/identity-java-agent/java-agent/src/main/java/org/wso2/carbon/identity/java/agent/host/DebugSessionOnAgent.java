@@ -21,6 +21,6 @@ package org.wso2.carbon.identity.java.agent.host;
 /**
  * Contains the debug session information
  */
-public class DebugSession {
+class DebugSession {
 
 }

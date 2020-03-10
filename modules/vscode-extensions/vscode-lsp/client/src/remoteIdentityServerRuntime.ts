@@ -340,17 +340,24 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			onConnection: (rpcConnection: rpc.MessageConnection) => {
 				console.log("connected+ " );
 				this.messageConnection = rpcConnection;
-				let notification = new rpc.NotificationType<string, void>('breakpoint');
+				let breakpoint_notification = new rpc.NotificationType<string, void>('breakpoint');
+				let connected_notification = new rpc.NotificationType<string, void>('connected');
 
-				rpcConnection.onNotification(notification, (param: any) => {
+				rpcConnection.onNotification(breakpoint_notification, (param: any) => {
 					console.log("got notificaiton breakpoint.. "+param );
 					this.fireBreakpoint(param.line);
+				});
+				rpcConnection.onNotification(connected_notification, (param: any) => {
+					console.log("got notificaiton Connected .. "+param );
 				});
 				rpcConnection.onNotification( (param: any) => {
 					console.log("got notificaiton any .. "+param );;
 				});
 				rpcConnection.onRequest((param: any) => {
 					console.log("got Request.. "+param );
+				});
+				rpcConnection.onError((param: any) => {
+					console.log("got Error.. "+param );
 				});
 				rpcConnection.listen();
 			}

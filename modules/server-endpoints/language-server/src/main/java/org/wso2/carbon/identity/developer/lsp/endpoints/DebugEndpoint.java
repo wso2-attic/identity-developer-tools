@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.developer.lsp.endpoints;
 
 import com.google.gson.Gson;
 
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
@@ -64,13 +65,13 @@ public class DebugEndpoint {
 
         debugSessionManager.addSession(session);
         try {
-            Gson gson = new Gson();
-//            session.getBasicRemote().sendText("enwada");
-            session.getBasicRemote().sendObject(gson.toJson("Hello"));
+            JsonDap jsonDap = new JsonDap();
+            jsonDap.init();
+            ProtocolMessage message = new ProtocolMessage("connected");
+            String text = jsonDap.encode(message);
+            session.getBasicRemote().sendText(text);
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (EncodeException e) {
-            e.printStackTrace();
         }
     }
 
