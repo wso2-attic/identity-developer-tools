@@ -61,4 +61,11 @@ public interface DebugSessionManager {
      * @param session
      */
     void removeSession(Session session);
+
+    /**
+     * Get DebugSession using session.
+     * @param session
+     * @return
+     */
+    DebugSession getDebugSession(Session session);
 }

@@ -185,7 +185,7 @@
 				{
 					"when": "view == script-libraries",
 					"command": "extension.refreshScripts",
-					"group": "navigation"				
+					"group": "navigation"
 				}
 			]
 		},

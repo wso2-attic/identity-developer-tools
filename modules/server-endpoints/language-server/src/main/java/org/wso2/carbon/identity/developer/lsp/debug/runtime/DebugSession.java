@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 import java.util.ArrayList;
@@ -31,11 +33,14 @@ import javax.websocket.Session;
  * Contains the information about the breakpoints.
  */
 public class DebugSession {
+    private static final Log log = LogFactory.getLog(DebugSession.class);
 
     private Session session;
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
     private MethodContext currentMethodContext;
     private List<Object> calledObjectStack = new ArrayList<>();
+    private Object waitObject = new Object();
+    private static final long MAX_THREAD_SUSPEND_TIME_MILLIS = 5000;
 
     public Session getSession() {
 
@@ -124,6 +129,31 @@ public class DebugSession {
         }
         return breakpointInfoMap.values().stream().findFirst().get();
     }
+
+
+    public void suspendCurrentThread() {
+        try {
+            synchronized (this.waitObject) {
+                this.waitObject.wait(MAX_THREAD_SUSPEND_TIME_MILLIS);
+            }
+        } catch (InterruptedException e) {
+            log.warn("Thread was resumed, which was suspended due to breakpoint. " +
+                    "There was no instruction received from remote debug client for " + MAX_THREAD_SUSPEND_TIME_MILLIS +
+                    " milliseconds. Remote client was: " + getSessionInfo());
+        }
+    }
+
+    private String getSessionInfo() {
+
+        return session.getId();
+    }
+
+    public void resumeSuspendedThread() {
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
+
 
     private int getCurrentJavascriptFunctionObject(List<Object> calledObjectStack) {
 

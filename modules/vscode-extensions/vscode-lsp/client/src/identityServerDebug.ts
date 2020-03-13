@@ -235,13 +235,20 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 		const variables: DebugProtocol.Variable[] = [];
 		if(this._iamRemoteRuntime != null) {
 			// Create the remote variable request and await the response
-			// var varaiablesRequest = new rpc.RequestType0<DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
-			// var answer = this.messageConnection.sendRequest(varaiablesRequest);
 			var answer = this._iamRemoteRuntime.fetchVariables(response, args, request);
 			console.log("Variables "+answer);
 			answer.then((remoteResponse) => {
 				console.log("Remote variable Values "+remoteResponse.body);
-				response.body = remoteResponse.body;
+				const id = this._variableHandles.get(args.variablesReference);
+
+				remoteResponse.body.variables.forEach( (element) => {
+					element.variablesReference=0;
+					variables.push(element);
+				});
+
+				response.body = {
+					variables: variables
+				};
 				this.sendResponse(response);
 			});
 		} else {

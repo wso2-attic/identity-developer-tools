@@ -29,9 +29,9 @@ import java.lang.reflect.Type;
 /**
  * Success Response Serializer
  */
-public class ResponseSerializer implements JsonSerializer<Response> {
+public class ResponseSerializer<T extends Response> implements JsonSerializer<T> {
 
-    public JsonElement serialize(Response response, Type type,
+    public JsonElement serialize(T response, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();

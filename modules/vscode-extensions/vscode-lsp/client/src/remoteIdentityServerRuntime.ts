@@ -172,6 +172,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * Continue execution to the end/beginning.
 	 */
 	public continue(reverse = false) {
+		var notification = new rpc.NotificationType("continue");
+		this.messageConnection.sendNotification(notification);
 		this.run(reverse, undefined);
 	}
 
@@ -340,15 +342,19 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			onConnection: (rpcConnection: rpc.MessageConnection) => {
 				console.log("connected+ " );
 				this.messageConnection = rpcConnection;
-				let breakpoint_notification = new rpc.NotificationType<string, void>('breakpoint');
-				let connected_notification = new rpc.NotificationType<string, void>('connected');
+				let breakpointNotification = new rpc.NotificationType<string, void>('breakpoint');
+				let connectedNotification = new rpc.NotificationType<string, void>('connected');
+				let continueNotification = new rpc.NotificationType<string, void>('continue');
 
-				rpcConnection.onNotification(breakpoint_notification, (param: any) => {
+				rpcConnection.onNotification(breakpointNotification, (param: any) => {
 					console.log("got notificaiton breakpoint.. "+param );
 					this.fireBreakpoint(param.line);
 				});
-				rpcConnection.onNotification(connected_notification, (param: any) => {
+				rpcConnection.onNotification(connectedNotification, (param: any) => {
 					console.log("got notificaiton Connected .. "+param );
+				});
+				rpcConnection.onNotification(continueNotification, (param: any) => {
+					console.log("got notificaiton continue.. ");
 				});
 				rpcConnection.onNotification( (param: any) => {
 					console.log("got notificaiton any .. "+param );;
