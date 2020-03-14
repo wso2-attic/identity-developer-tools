@@ -24,7 +24,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.developer.lsp.ServiceReferenceHolder;
 
 import java.lang.reflect.Field;
-import java.util.function.BiConsumer;
 import javax.websocket.server.ServerEndpointConfig;
 
 /**
@@ -58,7 +57,9 @@ public class OSGIBindingConfigurator extends ServerEndpointConfig.Configurator {
                         field.set(result, service);
                     } catch (IllegalAccessException e) {
                         log.error(
-                                "Could not assign the service to the field: " + endpointClass.getName() + ":" + field.getName() + ", service :" + service,
+                                "Could not assign the service to the field: "
+                                        + endpointClass.getName() + ":"
+                                        + field.getName() + ", service :" + service,
                                 e);
                     }
                 }
@@ -80,7 +81,8 @@ public class OSGIBindingConfigurator extends ServerEndpointConfig.Configurator {
                         field.set(result, service);
                     } catch (IllegalAccessException e) {
                         log.error(
-                                "Could not assign the service to the field: " + endpointClass.getName() + ":" + field.getName() + ", service :" + service,
+                                "Could not assign the service to the field: " + endpointClass.getName() + ":"
+                                        + field.getName() + ", service :" + service,
                                 e);
                     }
                 }

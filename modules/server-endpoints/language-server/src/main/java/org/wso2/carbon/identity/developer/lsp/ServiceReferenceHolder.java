@@ -21,6 +21,9 @@ package org.wso2.carbon.identity.developer.lsp;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *  ServiceReferenceHolder. TODO Have to add proper docs.
+ */
 public class ServiceReferenceHolder {
 
     private static final ServiceReferenceHolder instance = new ServiceReferenceHolder();
@@ -38,7 +41,7 @@ public class ServiceReferenceHolder {
     }
 
     /**
-     * Prevents instantiation
+     * Prevents instantiation.
      */
     private ServiceReferenceHolder() {
 

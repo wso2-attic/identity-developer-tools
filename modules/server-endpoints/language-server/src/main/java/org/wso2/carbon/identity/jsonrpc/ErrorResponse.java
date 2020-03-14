@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.jsonrpc;
 
 /**
- * JSON RPC Error response
+ * JSON RPC Error response.
  *
  */
 public class ErrorResponse extends Response {

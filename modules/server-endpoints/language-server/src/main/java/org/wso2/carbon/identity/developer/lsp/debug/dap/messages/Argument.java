@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
- * Represents an argument of a Debug protocol message
+ * Represents an argument of a Debug protocol message.
  *
  * @param <T>
  */

@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Holder for the breakpoint.
  */

@@ -44,8 +44,9 @@ public class InterceptorConfig {
 
     public boolean hasMethodSignature(String methodName, String signature) {
 
-        for(MethodInfoConfig methodInfoConfig: methodInfoConfigs) {
-            if(methodInfoConfig.getMethodName().equals(methodName) && methodInfoConfig.getSignature().equals(signature)) {
+        for (MethodInfoConfig methodInfoConfig: methodInfoConfigs) {
+            if (methodInfoConfig.getMethodName().equals(methodName) && methodInfoConfig.getSignature()
+                    .equals(signature)) {
                 return true;
             }
         }

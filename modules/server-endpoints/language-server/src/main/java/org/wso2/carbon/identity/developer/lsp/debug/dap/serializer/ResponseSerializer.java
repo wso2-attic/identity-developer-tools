@@ -27,7 +27,8 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import java.lang.reflect.Type;
 
 /**
- * Success Response Serializer
+ * Success Response Serializer.
+ * @param <T>
  */
 public class ResponseSerializer<T extends Response> implements JsonSerializer<T> {
 

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.jsonrpc;
 
+/**
+ * Class for JsonRpcError.
+ */
 public class JsonRpcError {
 
 }

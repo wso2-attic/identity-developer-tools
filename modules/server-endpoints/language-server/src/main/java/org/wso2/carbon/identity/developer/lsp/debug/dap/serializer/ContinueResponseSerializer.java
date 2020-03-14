@@ -7,14 +7,17 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRespons
 
 import java.lang.reflect.Type;
 
+/**
+ * Success ContinueResponseSerializer Serializer.
+ */
 public class ContinueResponseSerializer extends ResponseSerializer<ContinueResponse> {
 
     public JsonElement serialize(ContinueResponse response, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
 
-        JsonObject object = (JsonObject) super.serialize(response,type,jsonSerializationContext);
-        if (response.getAllThreadsContinued()!=null){
-            object.addProperty("allThreadsContinued",response.getAllThreadsContinued() );
+        JsonObject object = (JsonObject) super.serialize(response, type, jsonSerializationContext);
+        if (response.getAllThreadsContinued() != null) {
+            object.addProperty("allThreadsContinued", response.getAllThreadsContinued());
         }
         return object;
     }

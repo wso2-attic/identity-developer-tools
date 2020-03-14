@@ -20,7 +20,16 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.*;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueResponse;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.config.DebugListenerConfigurator;
 import org.wso2.carbon.identity.java.agent.AgentHelper;
@@ -214,7 +223,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         //For not, just return the first entry. We need to have a better filter later.
         if (!methodContext.getClassName().equals(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator")) {
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+                        "/impl/DefaultRequestCoordinator")) {
             return null;
         }
         if (!activeDebugSessions.isEmpty()) {

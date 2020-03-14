@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
+/**
+ * An EventRequest request for the debug protocol.
+ * A debug adapter initiated event.
+ */
 public class EventRequest extends ProtocolMessage {
 
     public EventRequest(String type, String command) {

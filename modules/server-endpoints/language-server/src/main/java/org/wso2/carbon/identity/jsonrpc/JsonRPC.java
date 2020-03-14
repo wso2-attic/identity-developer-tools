@@ -58,7 +58,7 @@ public class JsonRPC {
     }
 
     /**
-     * Decode the request from the json string
+     * Decode the request from the json string.
      *
      * @param json The JSON string
      * @return The decoded request

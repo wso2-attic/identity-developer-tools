@@ -23,12 +23,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.wso2.carbon.identity.jsonrpc.ErrorResponse;
-import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
 
 import java.lang.reflect.Type;
 
 /**
- * Success Response Serializer
+ * Success Response Serializer.
  */
 public class ErrorResponseSerializer implements JsonSerializer<ErrorResponse> {
 
@@ -36,12 +35,9 @@ public class ErrorResponseSerializer implements JsonSerializer<ErrorResponse> {
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-
         object.addProperty("jsonrpc", errorResponse.getJsonrpc());
         object.addProperty("id", errorResponse.getId());
-
         object.add("error", jsonSerializationContext.serialize(errorResponse.getJsonRpcError()));
-
         return object;
     }
 }

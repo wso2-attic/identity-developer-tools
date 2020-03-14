@@ -114,7 +114,7 @@ public class DebugSession {
 
         BreakpointInfo breakpointInfo = findAnyStoppableBreakpoint(methodContext);
         if (breakpointInfo != null) {
-            if(breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length >0) {
+            if (breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length > 0) {
                 DebugProcessingResult result = new DebugProcessingResult(DebugProcessingResult.InstructionType.STOP);
                 result.setBreakpointInfo(breakpointInfo);
                 return result;
@@ -124,7 +124,7 @@ public class DebugSession {
     }
 
     private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
-        if(breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
+        if (breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
             return null;
         }
         return breakpointInfoMap.values().stream().findFirst().get();
@@ -183,7 +183,8 @@ public class DebugSession {
 
     private boolean isHttpRequestEntry(MethodContext methodContext) {
 
-        if ("org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator".equals(
+        if (("org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+                "/impl/DefaultRequestCoordinator").equals(
                 methodContext.getClassName())) {
             return "handle".equals(
                     methodContext.getMethodName());

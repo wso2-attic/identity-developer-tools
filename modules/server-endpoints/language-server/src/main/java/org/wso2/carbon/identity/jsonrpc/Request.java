@@ -18,35 +18,33 @@
 
 package org.wso2.carbon.identity.jsonrpc;
 
-import com.google.gson.stream.JsonReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.developer.lsp.endpoints.OSGIBindingConfigurator;
 
 /**
- * JSON RPC Request
+ * JSON RPC Request.
  */
 public class Request {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
     /**
-     * The id of the request
+     * The id of the request.
      */
     private String id;
 
     /**
-     * The method requested
+     * The method requested.
      */
     private String method;
 
     /**
-     * The request parameters
+     * The request parameters.
      */
     private ParametersList paramsList;
 
     /**
-     * Default constructor for un-marshallers
+     * Default constructor for un-marshallers.
      */
     public Request() {
 

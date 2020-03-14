@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Deserialize the JSON RPC Request
+ * Deserialize the JSON RPC Request.
  */
 public class RequestDeserializer implements JsonDeserializer<Request> {
 
@@ -83,7 +83,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
                 Gson gson = new Gson();
                 JsonObject subObject  = gson.fromJson(jsonValueStr, JsonObject.class);
 
-                for (Map.Entry<String, JsonElement> entry: subObject.entrySet() ) {
+                for (Map.Entry<String, JsonElement> entry: subObject.entrySet()) {
                     Parameter parameter = new Parameter(entry.getKey(), entry.getValue().getAsString());
                     params.add(parameter);
                 }
@@ -93,7 +93,7 @@ public class RequestDeserializer implements JsonDeserializer<Request> {
         ParametersList list = new ParametersList(params);
 
         JsonElement idElement = jsonObject.get(LOCAL_NAME_ID);
-        String id = idElement == null? UUID.randomUUID().toString() : idElement.getAsString();
+        String id = idElement == null ? UUID.randomUUID().toString() : idElement.getAsString();
 
         return new Request(id, jsonObject.get(LOCAL_NAME_METHOD).getAsString(),
                 list);

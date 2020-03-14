@@ -38,7 +38,8 @@ public class DebugListenerConfigurator {
     public void configure(InterceptionEngine interceptionEngine) {
 
         MethodEntryInterceptionFilter frameworkEntryFilter = new MethodEntryInterceptionFilter(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator",
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+                        "/impl/DefaultRequestCoordinator",
                 "handle",
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 

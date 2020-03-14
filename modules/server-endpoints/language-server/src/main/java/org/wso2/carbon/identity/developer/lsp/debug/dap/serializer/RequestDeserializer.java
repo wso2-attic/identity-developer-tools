@@ -26,22 +26,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.*;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.EventRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.UnknownRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+
 
 /**
- * Deserialize the JSON RPC Request
+ * Deserialize the JSON RPC Request.
  */
 public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private static final Log log = LogFactory.getLog(RequestDeserializer.class);
 
     private static final String LOCAL_NAME_SEQ = "seq";
-    private static final String LOCAL_NAME_ID= "id";
+    private static final String LOCAL_NAME_ID = "id";
     private static final String LOCAL_NAME_TYPE = "type";
     private static final String LOCAL_NAME_COMMAND = "command";
     private static final String LOCAL_NAME_CONTINUE = "continue";
@@ -95,12 +100,15 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
         return new UnknownRequest(LOCAL_NAME_UNKNOWN, id, method, null);
     }
+
     private Request constructContinueRequest(String method, long id, JsonObject jsonObject) {
-        ContinueRequest request=new ContinueRequest(LOCAL_NAME_MESSAGE,id, method,null);
+
+        ContinueRequest request = new ContinueRequest(LOCAL_NAME_MESSAGE, id, method, null);
         return request;
     }
 
     private VariablesRequest constructVariablesRequest(String method, long id, JsonObject jsonObject) {
+
         VariablesRequest request = new VariablesRequest(LOCAL_NAME_MESSAGE, id, LOCAL_NAME_VARIABLES, null);
         return request;
     }

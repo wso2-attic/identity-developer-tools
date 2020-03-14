@@ -19,21 +19,22 @@
 package org.wso2.carbon.identity.developer.lsp.endpoints;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.framework.JsFunctionRegistry;
 import org.wso2.carbon.identity.developer.lsp.LanguageException;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
-import org.wso2.carbon.identity.developer.lsp.completion.CompletionListGenerator;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSession;
 import org.wso2.carbon.identity.jsonrpc.JsonRPC;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;
 import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
-import org.wso2.carbon.identity.parser.ParserT;
+
 
 import java.io.IOException;
-import javax.script.ScriptException;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -46,9 +47,10 @@ import javax.websocket.server.ServerEndpoint;
  * The entry endpoint for language server.
  */
 
-@ServerEndpoint(value = "/lsp", configurator = OSGIBindingConfigurator.class )
+@ServerEndpoint(value = "/lsp", configurator = OSGIBindingConfigurator.class)
 public class LspEndpoint {
 
+    private static final Log log = LogFactory.getLog(LspEndpoint.class);
     private JsonRPC jsonRPC;
 
     @OsgiService
@@ -73,15 +75,16 @@ public class LspEndpoint {
     @OnOpen
     public void onOpen(Session session) {
 
-        System.out.println(session.getId() + " has opened a connection");
+        log.info("Session " + session.getId() + " has opened a connection.");
+
         try {
             Gson gson = new Gson();
-//            session.getBasicRemote().sendText("enwada");
             session.getBasicRemote().sendObject(gson.toJson("Hello"));
         } catch (IOException ex) {
+            log.error("Error on sending the response to the onOpen Event: ", ex);
             ex.printStackTrace();
         } catch (EncodeException e) {
-            e.printStackTrace();
+            log.error("Error on Encoding the response in onOpen Event: ", e);
         }
     }
 
@@ -93,7 +96,7 @@ public class LspEndpoint {
     @OnClose
     public void onClose(Session session) {
 
-        System.out.println("Session " + session.getId() + " has ended");
+        log.info("Session " + session.getId() + " has ended");
     }
 
     /**
@@ -107,13 +110,13 @@ public class LspEndpoint {
             Request request = jsonRPC.decode(message);
             LanguageProcessor languageProcessor = languageProcessorFactory.getProcessor(request);
             Response response = new SuccessResponse();
-            if(languageProcessor == null) {
+            if (languageProcessor == null) {
                 //TODO: Descriptive error, no processor found
                 response = new SuccessResponse();
             } else {
                 response = languageProcessor.process(request);
             }
-            if(response == null) {
+            if (response == null) {
                 //TODO: Descriptive error
                 response = new SuccessResponse();
             }
@@ -133,7 +136,7 @@ public class LspEndpoint {
     @OnError
     public void onError(Throwable e) {
 
-        e.printStackTrace();
+        log.error("Web socket session error", e);
     }
 
 }

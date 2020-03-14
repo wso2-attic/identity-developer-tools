@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.endpoints;
 
-import com.google.gson.Gson;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
@@ -42,6 +42,8 @@ import javax.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value = "/debug", configurator = OSGIBindingConfigurator.class)
 public class DebugEndpoint {
+
+    private static final Log log = LogFactory.getLog(DebugEndpoint.class);
 
     private JsonDap jsonDap;
 
@@ -83,7 +85,7 @@ public class DebugEndpoint {
     @OnClose
     public void onClose(Session session) {
 
-        System.out.println("Session " + session.getId() + " has ended");
+        log.info("Session " + session.getId() + " has ended");
         debugSessionManager.removeSession(session);
     }
 
@@ -112,7 +114,7 @@ public class DebugEndpoint {
     @OnError
     public void onError(Throwable e) {
 
-        e.printStackTrace();
+        log.error("Web socket session error", e);
     }
 
 }
