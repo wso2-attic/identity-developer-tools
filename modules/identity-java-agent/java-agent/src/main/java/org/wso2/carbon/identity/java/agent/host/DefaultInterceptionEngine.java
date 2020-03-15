@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Java interception and instrumentation engine
+ * Java interception and instrumentation engine.
  */
 public class DefaultInterceptionEngine implements InterceptionEngine, EventPublisher {
 
@@ -43,7 +43,7 @@ public class DefaultInterceptionEngine implements InterceptionEngine, EventPubli
 
         for (Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry : filters.entrySet()) {
             boolean shouldIntercept = entry.getKey().shouldIntercept(type, context);
-            if(shouldIntercept) {
+            if (shouldIntercept) {
                 notifyListener(type, context, entry.getValue());
 
                 //Currently only one event lister per event type is supported.
@@ -62,13 +62,13 @@ public class DefaultInterceptionEngine implements InterceptionEngine, EventPubli
     @Override
     public void removeListener(InterceptionListener listener) {
         MethodEntryInterceptionFilter key = null;
-        for(Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry: filters.entrySet()) {
-            if(entry.getValue() == listener) {
+        for (Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry: filters.entrySet()) {
+            if (entry.getValue() == listener) {
                 key = entry.getKey();
             }
         }
 
-        if(key != null) {
+        if (key != null) {
             filters.remove(key);
         }
     }

@@ -25,8 +25,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
-import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
-import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Event;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
@@ -37,7 +36,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /**
- * Convenience class which handles the JSON RPC serialization and deserialization via
+ * Convenience class which handles the JSON RPC serialization and deserialization via.
  * Google GSON library.
  * <p>
  * init() needs to be called before calling any serialization logic.
@@ -57,11 +56,12 @@ public class JsonDap {
                 .registerTypeAdapter(Response.class, new ResponseSerializer())
                 .registerTypeAdapter(StoppedEvent.class, new StoppedEventSerializer())
                 .registerTypeAdapter(VariablesResponse.class, new VariablesResponseSerializer())
+                .registerTypeAdapter(ContinueResponse.class, new ContinueResponseSerializer())
                 .create();
     }
 
     /**
-     * Decode the request from the json string
+     * Decode the request from the json string.
      *
      * @param json The JSON string
      * @return The decoded request

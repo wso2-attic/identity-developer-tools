@@ -25,6 +25,10 @@ import org.wso2.carbon.identity.java.agent.internal.InterceptingClassTransformer
 import java.lang.instrument.Instrumentation;
 import java.util.List;
 
+/**
+ * Java Agent to intercept the given Java Classes.
+ * and add the relevant methods.
+ */
 public class Agent {
 
     public Agent() {

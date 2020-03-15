@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
+/**
+ * JSON Debug Response.
+ */
 public class Response extends Message {
 
     private long requestSeq;

@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import java.util.List;
 
 /**
- * JSON Debug Request
+ * JSON Debug Request.
  */
 public class Request extends Message {
 

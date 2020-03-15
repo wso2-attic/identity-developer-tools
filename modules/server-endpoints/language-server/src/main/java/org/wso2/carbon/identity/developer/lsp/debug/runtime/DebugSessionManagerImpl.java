@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
@@ -67,6 +69,11 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         initializeListeners();
     }
 
+    public DebugSession getDebugSession(Session session) {
+
+        return activeDebugSessions.get(session);
+    }
+
     public void destroy() {
 
         interceptionEngine.removeListener(this);
@@ -80,12 +87,14 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     @Override
     public Response handle(Session session, Request request) {
 
-        DebugSession debugSession = activeDebugSessions.get(session);
+        DebugSession debugSession = this.getDebugSession(session);
         if (debugSession == null) {
             log.error("No session found in the active session list");
             return null;
         }
         switch (request.getCommand()) {
+            case "continue":
+                return setContinue(debugSession, (ContinueRequest) request);
             case "setBreakpoint":
                 return setBreakpoints(debugSession, (BreakpointRequest) request);
             case "variables":
@@ -204,6 +213,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             jsonDap.init();
             String text = jsonDap.encode(message);
             websocketSession.getBasicRemote().sendText(text);
+            this.getDebugSession(websocketSession).suspendCurrentThread();
         } catch (IOException e) {
             log.error("Error sending back a request to client", e);
         }
@@ -213,7 +223,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         //For not, just return the first entry. We need to have a better filter later.
         if (!methodContext.getClassName().equals(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator")) {
+                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+                        "/impl/DefaultRequestCoordinator")) {
             return null;
         }
         if (!activeDebugSessions.isEmpty()) {
@@ -249,6 +260,15 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         debugSession.setBreakpoints(request.getSourceName(), request.getBreakpoints());
         return response;
+    }
+
+    private Response setContinue(DebugSession debugSession, ContinueRequest request) {
+
+        debugSession.resumeSuspendedThread();
+        ContinueResponse continueResponse = new ContinueResponse("continue", request.getId(), request.getId(),
+                true, "", "", null);
+        continueResponse.setAllThreadsContinued(true);
+        return  continueResponse;
     }
 
     private void initializeListeners() {

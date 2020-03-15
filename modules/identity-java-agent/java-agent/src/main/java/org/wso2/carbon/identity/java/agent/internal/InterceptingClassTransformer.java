@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.java.agent.internal;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
@@ -48,7 +47,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * We use JUL as this is an java agent which should not depend on any other framework than java.
      */
-    private final static Logger log = Logger.getLogger(InterceptingClassTransformer.class.getName());
+    private static final Logger log = Logger.getLogger(InterceptingClassTransformer.class.getName());
 
     private final Map<String, InterceptorConfig> interceptorMap = new HashMap<>();
     private ScopedClassPoolFactoryImpl scopedClassPoolFactory = new ScopedClassPoolFactoryImpl();
@@ -82,16 +81,14 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
 
                 for (CtMethod method : methods) {
                     if (config.hasMethodSignature(method.getName(), method.getSignature())) {
-//                        String[] variableNames = getVariableNames(method);
                         log.info(
-                                "Intercepted method " + className + "." + method.getName() + " " + method.getSignature());
-//                        System.out.println("Var names "+variableNames);
+                                "Intercepted method " + className + "." + method.getName() +
+                                        " " + method.getSignature());
                         isTransformed = true;
                         method.insertBefore(
                                 "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\""
                                         + className + "\", \"" + method.getName() + "\", \"" + method.getSignature()
                                         + "\", $sig, $args );");
-//                                        + "\","+$sig+", $args);");
                     }
                 }
                 if (isTransformed) {
@@ -107,6 +104,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     }
 
     private String[] getVariableNames(CtMethod method) throws NotFoundException {
+
         MethodInfo methodInfo = method.getMethodInfo();
         CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
         LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
@@ -116,7 +114,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         CtClass[] paramTypes = method.getParameterTypes();
         String[] paramNames = new String[method.getParameterTypes().length];
         for (int i = 0; i < paramNames.length; i++) {
-            paramNames[i] = paramTypes[i].getSimpleName()+(i);
+            paramNames[i] = paramTypes[i].getSimpleName() + (i);
         }
         return paramNames;
     }

@@ -22,6 +22,10 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
  * Result of the debug event being processed.
  */
 public class DebugProcessingResult {
+
+    /**
+     *InstructionTypes that can be used.
+     */
     public enum InstructionType {
         STOP,
         CONTINUE

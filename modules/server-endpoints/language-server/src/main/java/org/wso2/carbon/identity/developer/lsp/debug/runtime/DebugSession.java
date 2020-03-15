@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 import java.util.ArrayList;
@@ -31,11 +33,14 @@ import javax.websocket.Session;
  * Contains the information about the breakpoints.
  */
 public class DebugSession {
+    private static final Log log = LogFactory.getLog(DebugSession.class);
 
     private Session session;
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
     private MethodContext currentMethodContext;
     private List<Object> calledObjectStack = new ArrayList<>();
+    private Object waitObject = new Object();
+    private static final long MAX_THREAD_SUSPEND_TIME_MILLIS = 5000;
 
     public Session getSession() {
 
@@ -109,7 +114,7 @@ public class DebugSession {
 
         BreakpointInfo breakpointInfo = findAnyStoppableBreakpoint(methodContext);
         if (breakpointInfo != null) {
-            if(breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length >0) {
+            if (breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length > 0) {
                 DebugProcessingResult result = new DebugProcessingResult(DebugProcessingResult.InstructionType.STOP);
                 result.setBreakpointInfo(breakpointInfo);
                 return result;
@@ -119,11 +124,36 @@ public class DebugSession {
     }
 
     private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
-        if(breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
+        if (breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
             return null;
         }
         return breakpointInfoMap.values().stream().findFirst().get();
     }
+
+
+    public void suspendCurrentThread() {
+        try {
+            synchronized (this.waitObject) {
+                this.waitObject.wait(MAX_THREAD_SUSPEND_TIME_MILLIS);
+            }
+        } catch (InterruptedException e) {
+            log.warn("Thread was resumed, which was suspended due to breakpoint. " +
+                    "There was no instruction received from remote debug client for " + MAX_THREAD_SUSPEND_TIME_MILLIS +
+                    " milliseconds. Remote client was: " + getSessionInfo());
+        }
+    }
+
+    private String getSessionInfo() {
+
+        return session.getId();
+    }
+
+    public void resumeSuspendedThread() {
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
+
 
     private int getCurrentJavascriptFunctionObject(List<Object> calledObjectStack) {
 
@@ -153,7 +183,8 @@ public class DebugSession {
 
     private boolean isHttpRequestEntry(MethodContext methodContext) {
 
-        if ("org/wso2/carbon/identity/application/authentication/framework/handler/request/impl/DefaultRequestCoordinator".equals(
+        if (("org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+                "/impl/DefaultRequestCoordinator").equals(
                 methodContext.getClassName())) {
             return "handle".equals(
                     methodContext.getMethodName());

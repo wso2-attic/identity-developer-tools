@@ -16,26 +16,26 @@ public class JavaScriptLexer extends JavaScriptBaseLexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		MultiLineComment=1, SingleLineComment=2, RegularExpressionLiteral=3, OpenBracket=4, 
-		CloseBracket=5, OpenParen=6, CloseParen=7, OpenBrace=8, CloseBrace=9, 
-		SemiColon=10, Comma=11, Assign=12, QuestionMark=13, Colon=14, Ellipsis=15, 
-		Dot=16, PlusPlus=17, MinusMinus=18, Plus=19, Minus=20, BitNot=21, Not=22, 
-		Multiply=23, Divide=24, Modulus=25, RightShiftArithmetic=26, LeftShiftArithmetic=27, 
-		RightShiftLogical=28, LessThan=29, MoreThan=30, LessThanEquals=31, GreaterThanEquals=32, 
-		Equals_=33, NotEquals=34, IdentityEquals=35, IdentityNotEquals=36, BitAnd=37, 
-		BitXOr=38, BitOr=39, And=40, Or=41, MultiplyAssign=42, DivideAssign=43, 
-		ModulusAssign=44, PlusAssign=45, MinusAssign=46, LeftShiftArithmeticAssign=47, 
-		RightShiftArithmeticAssign=48, RightShiftLogicalAssign=49, BitAndAssign=50, 
-		BitXorAssign=51, BitOrAssign=52, ARROW=53, NullLiteral=54, BooleanLiteral=55, 
-		DecimalLiteral=56, HexIntegerLiteral=57, OctalIntegerLiteral=58, OctalIntegerLiteral2=59, 
-		BinaryIntegerLiteral=60, Break=61, Do=62, Instanceof=63, Typeof=64, Case=65, 
-		Else=66, New=67, Var=68, Catch=69, Finally=70, Return=71, Void=72, Continue=73, 
-		For=74, Switch=75, While=76, Debugger=77, Function=78, This=79, With=80, 
-		Default=81, If=82, Throw=83, Delete=84, In=85, Try=86, Class=87, Enum=88, 
-		Extends=89, Super=90, Const=91, Export=92, Import=93, Implements=94, Let=95, 
-		Private=96, Public=97, Interface=98, Package=99, Protected=100, Static=101, 
-		Yield=102, Identifier=103, StringLiteral=104, TemplateStringLiteral=105, 
-		WhiteSpaces=106, LineTerminator=107, HtmlComment=108, CDataComment=109, 
+		MultiLineComment=1, SingleLineComment=2, RegularExpressionLiteral=3, OpenBracket=4,
+		CloseBracket=5, OpenParen=6, CloseParen=7, OpenBrace=8, CloseBrace=9,
+		SemiColon=10, Comma=11, Assign=12, QuestionMark=13, Colon=14, Ellipsis=15,
+		Dot=16, PlusPlus=17, MinusMinus=18, Plus=19, Minus=20, BitNot=21, Not=22,
+		Multiply=23, Divide=24, Modulus=25, RightShiftArithmetic=26, LeftShiftArithmetic=27,
+		RightShiftLogical=28, LessThan=29, MoreThan=30, LessThanEquals=31, GreaterThanEquals=32,
+		Equals_=33, NotEquals=34, IdentityEquals=35, IdentityNotEquals=36, BitAnd=37,
+		BitXOr=38, BitOr=39, And=40, Or=41, MultiplyAssign=42, DivideAssign=43,
+		ModulusAssign=44, PlusAssign=45, MinusAssign=46, LeftShiftArithmeticAssign=47,
+		RightShiftArithmeticAssign=48, RightShiftLogicalAssign=49, BitAndAssign=50,
+		BitXorAssign=51, BitOrAssign=52, ARROW=53, NullLiteral=54, BooleanLiteral=55,
+		DecimalLiteral=56, HexIntegerLiteral=57, OctalIntegerLiteral=58, OctalIntegerLiteral2=59,
+		BinaryIntegerLiteral=60, Break=61, Do=62, Instanceof=63, Typeof=64, Case=65,
+		Else=66, New=67, Var=68, Catch=69, Finally=70, Return=71, Void=72, Continue=73,
+		For=74, Switch=75, While=76, Debugger=77, Function=78, This=79, With=80,
+		Default=81, If=82, Throw=83, Delete=84, In=85, Try=86, Class=87, Enum=88,
+		Extends=89, Super=90, Const=91, Export=92, Import=93, Implements=94, Let=95,
+		Private=96, Public=97, Interface=98, Package=99, Protected=100, Static=101,
+		Yield=102, Identifier=103, StringLiteral=104, TemplateStringLiteral=105,
+		WhiteSpaces=106, LineTerminator=107, HtmlComment=108, CDataComment=109,
 		UnexpectedCharacter=110;
 	public static final int
 		ERROR=2;
@@ -49,31 +49,31 @@ public class JavaScriptLexer extends JavaScriptBaseLexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"MultiLineComment", "SingleLineComment", "RegularExpressionLiteral", 
-			"OpenBracket", "CloseBracket", "OpenParen", "CloseParen", "OpenBrace", 
-			"CloseBrace", "SemiColon", "Comma", "Assign", "QuestionMark", "Colon", 
-			"Ellipsis", "Dot", "PlusPlus", "MinusMinus", "Plus", "Minus", "BitNot", 
-			"Not", "Multiply", "Divide", "Modulus", "RightShiftArithmetic", "LeftShiftArithmetic", 
-			"RightShiftLogical", "LessThan", "MoreThan", "LessThanEquals", "GreaterThanEquals", 
-			"Equals_", "NotEquals", "IdentityEquals", "IdentityNotEquals", "BitAnd", 
-			"BitXOr", "BitOr", "And", "Or", "MultiplyAssign", "DivideAssign", "ModulusAssign", 
-			"PlusAssign", "MinusAssign", "LeftShiftArithmeticAssign", "RightShiftArithmeticAssign", 
-			"RightShiftLogicalAssign", "BitAndAssign", "BitXorAssign", "BitOrAssign", 
-			"ARROW", "NullLiteral", "BooleanLiteral", "DecimalLiteral", "HexIntegerLiteral", 
-			"OctalIntegerLiteral", "OctalIntegerLiteral2", "BinaryIntegerLiteral", 
-			"Break", "Do", "Instanceof", "Typeof", "Case", "Else", "New", "Var", 
-			"Catch", "Finally", "Return", "Void", "Continue", "For", "Switch", "While", 
-			"Debugger", "Function", "This", "With", "Default", "If", "Throw", "Delete", 
-			"In", "Try", "Class", "Enum", "Extends", "Super", "Const", "Export", 
-			"Import", "Implements", "Let", "Private", "Public", "Interface", "Package", 
-			"Protected", "Static", "Yield", "Identifier", "StringLiteral", "TemplateStringLiteral", 
-			"WhiteSpaces", "LineTerminator", "HtmlComment", "CDataComment", "UnexpectedCharacter", 
-			"DoubleStringCharacter", "SingleStringCharacter", "EscapeSequence", "CharacterEscapeSequence", 
-			"HexEscapeSequence", "UnicodeEscapeSequence", "ExtendedUnicodeEscapeSequence", 
-			"SingleEscapeCharacter", "NonEscapeCharacter", "EscapeCharacter", "LineContinuation", 
-			"HexDigit", "DecimalIntegerLiteral", "ExponentPart", "IdentifierPart", 
-			"IdentifierStart", "UnicodeLetter", "UnicodeCombiningMark", "UnicodeDigit", 
-			"UnicodeConnectorPunctuation", "RegularExpressionFirstChar", "RegularExpressionChar", 
+			"MultiLineComment", "SingleLineComment", "RegularExpressionLiteral",
+			"OpenBracket", "CloseBracket", "OpenParen", "CloseParen", "OpenBrace",
+			"CloseBrace", "SemiColon", "Comma", "Assign", "QuestionMark", "Colon",
+			"Ellipsis", "Dot", "PlusPlus", "MinusMinus", "Plus", "Minus", "BitNot",
+			"Not", "Multiply", "Divide", "Modulus", "RightShiftArithmetic", "LeftShiftArithmetic",
+			"RightShiftLogical", "LessThan", "MoreThan", "LessThanEquals", "GreaterThanEquals",
+			"Equals_", "NotEquals", "IdentityEquals", "IdentityNotEquals", "BitAnd",
+			"BitXOr", "BitOr", "And", "Or", "MultiplyAssign", "DivideAssign", "ModulusAssign",
+			"PlusAssign", "MinusAssign", "LeftShiftArithmeticAssign", "RightShiftArithmeticAssign",
+			"RightShiftLogicalAssign", "BitAndAssign", "BitXorAssign", "BitOrAssign",
+			"ARROW", "NullLiteral", "BooleanLiteral", "DecimalLiteral", "HexIntegerLiteral",
+			"OctalIntegerLiteral", "OctalIntegerLiteral2", "BinaryIntegerLiteral",
+			"Break", "Do", "Instanceof", "Typeof", "Case", "Else", "New", "Var",
+			"Catch", "Finally", "Return", "Void", "Continue", "For", "Switch", "While",
+			"Debugger", "Function", "This", "With", "Default", "If", "Throw", "Delete",
+			"In", "Try", "Class", "Enum", "Extends", "Super", "Const", "Export",
+			"Import", "Implements", "Let", "Private", "Public", "Interface", "Package",
+			"Protected", "Static", "Yield", "Identifier", "StringLiteral", "TemplateStringLiteral",
+			"WhiteSpaces", "LineTerminator", "HtmlComment", "CDataComment", "UnexpectedCharacter",
+			"DoubleStringCharacter", "SingleStringCharacter", "EscapeSequence", "CharacterEscapeSequence",
+			"HexEscapeSequence", "UnicodeEscapeSequence", "ExtendedUnicodeEscapeSequence",
+			"SingleEscapeCharacter", "NonEscapeCharacter", "EscapeCharacter", "LineContinuation",
+			"HexDigit", "DecimalIntegerLiteral", "ExponentPart", "IdentifierPart",
+			"IdentifierStart", "UnicodeLetter", "UnicodeCombiningMark", "UnicodeDigit",
+			"UnicodeConnectorPunctuation", "RegularExpressionFirstChar", "RegularExpressionChar",
 			"RegularExpressionClassChar", "RegularExpressionBackslashSequence"
 		};
 	}
@@ -81,42 +81,42 @@ public class JavaScriptLexer extends JavaScriptBaseLexer {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, null, null, null, "'['", "']'", "'('", "')'", "'{'", "'}'", "';'", 
-			"','", "'='", "'?'", "':'", "'...'", "'.'", "'++'", "'--'", "'+'", "'-'", 
-			"'~'", "'!'", "'*'", "'/'", "'%'", "'>>'", "'<<'", "'>>>'", "'<'", "'>'", 
-			"'<='", "'>='", "'=='", "'!='", "'==='", "'!=='", "'&'", "'^'", "'|'", 
-			"'&&'", "'||'", "'*='", "'/='", "'%='", "'+='", "'-='", "'<<='", "'>>='", 
-			"'>>>='", "'&='", "'^='", "'|='", "'=>'", "'null'", null, null, null, 
-			null, null, null, "'break'", "'do'", "'instanceof'", "'typeof'", "'case'", 
-			"'else'", "'new'", "'var'", "'catch'", "'finally'", "'return'", "'void'", 
-			"'continue'", "'for'", "'switch'", "'while'", "'debugger'", "'function'", 
-			"'this'", "'with'", "'default'", "'if'", "'throw'", "'delete'", "'in'", 
-			"'try'", "'class'", "'enum'", "'extends'", "'super'", "'const'", "'export'", 
-			"'import'", "'implements'", "'let'", "'private'", "'public'", "'interface'", 
+			null, null, null, null, "'['", "']'", "'('", "')'", "'{'", "'}'", "';'",
+			"','", "'='", "'?'", "':'", "'...'", "'.'", "'++'", "'--'", "'+'", "'-'",
+			"'~'", "'!'", "'*'", "'/'", "'%'", "'>>'", "'<<'", "'>>>'", "'<'", "'>'",
+			"'<='", "'>='", "'=='", "'!='", "'==='", "'!=='", "'&'", "'^'", "'|'",
+			"'&&'", "'||'", "'*='", "'/='", "'%='", "'+='", "'-='", "'<<='", "'>>='",
+			"'>>>='", "'&='", "'^='", "'|='", "'=>'", "'null'", null, null, null,
+			null, null, null, "'break'", "'do'", "'instanceof'", "'typeof'", "'case'",
+			"'else'", "'new'", "'var'", "'catch'", "'finally'", "'return'", "'void'",
+			"'continue'", "'for'", "'switch'", "'while'", "'debugger'", "'function'",
+			"'this'", "'with'", "'default'", "'if'", "'throw'", "'delete'", "'in'",
+			"'try'", "'class'", "'enum'", "'extends'", "'super'", "'const'", "'export'",
+			"'import'", "'implements'", "'let'", "'private'", "'public'", "'interface'",
 			"'package'", "'protected'", "'static'", "'yield'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "MultiLineComment", "SingleLineComment", "RegularExpressionLiteral", 
-			"OpenBracket", "CloseBracket", "OpenParen", "CloseParen", "OpenBrace", 
-			"CloseBrace", "SemiColon", "Comma", "Assign", "QuestionMark", "Colon", 
-			"Ellipsis", "Dot", "PlusPlus", "MinusMinus", "Plus", "Minus", "BitNot", 
-			"Not", "Multiply", "Divide", "Modulus", "RightShiftArithmetic", "LeftShiftArithmetic", 
-			"RightShiftLogical", "LessThan", "MoreThan", "LessThanEquals", "GreaterThanEquals", 
-			"Equals_", "NotEquals", "IdentityEquals", "IdentityNotEquals", "BitAnd", 
-			"BitXOr", "BitOr", "And", "Or", "MultiplyAssign", "DivideAssign", "ModulusAssign", 
-			"PlusAssign", "MinusAssign", "LeftShiftArithmeticAssign", "RightShiftArithmeticAssign", 
-			"RightShiftLogicalAssign", "BitAndAssign", "BitXorAssign", "BitOrAssign", 
-			"ARROW", "NullLiteral", "BooleanLiteral", "DecimalLiteral", "HexIntegerLiteral", 
-			"OctalIntegerLiteral", "OctalIntegerLiteral2", "BinaryIntegerLiteral", 
-			"Break", "Do", "Instanceof", "Typeof", "Case", "Else", "New", "Var", 
-			"Catch", "Finally", "Return", "Void", "Continue", "For", "Switch", "While", 
-			"Debugger", "Function", "This", "With", "Default", "If", "Throw", "Delete", 
-			"In", "Try", "Class", "Enum", "Extends", "Super", "Const", "Export", 
-			"Import", "Implements", "Let", "Private", "Public", "Interface", "Package", 
-			"Protected", "Static", "Yield", "Identifier", "StringLiteral", "TemplateStringLiteral", 
+			null, "MultiLineComment", "SingleLineComment", "RegularExpressionLiteral",
+			"OpenBracket", "CloseBracket", "OpenParen", "CloseParen", "OpenBrace",
+			"CloseBrace", "SemiColon", "Comma", "Assign", "QuestionMark", "Colon",
+			"Ellipsis", "Dot", "PlusPlus", "MinusMinus", "Plus", "Minus", "BitNot",
+			"Not", "Multiply", "Divide", "Modulus", "RightShiftArithmetic", "LeftShiftArithmetic",
+			"RightShiftLogical", "LessThan", "MoreThan", "LessThanEquals", "GreaterThanEquals",
+			"Equals_", "NotEquals", "IdentityEquals", "IdentityNotEquals", "BitAnd",
+			"BitXOr", "BitOr", "And", "Or", "MultiplyAssign", "DivideAssign", "ModulusAssign",
+			"PlusAssign", "MinusAssign", "LeftShiftArithmeticAssign", "RightShiftArithmeticAssign",
+			"RightShiftLogicalAssign", "BitAndAssign", "BitXorAssign", "BitOrAssign",
+			"ARROW", "NullLiteral", "BooleanLiteral", "DecimalLiteral", "HexIntegerLiteral",
+			"OctalIntegerLiteral", "OctalIntegerLiteral2", "BinaryIntegerLiteral",
+			"Break", "Do", "Instanceof", "Typeof", "Case", "Else", "New", "Var",
+			"Catch", "Finally", "Return", "Void", "Continue", "For", "Switch", "While",
+			"Debugger", "Function", "This", "With", "Default", "If", "Throw", "Delete",
+			"In", "Try", "Class", "Enum", "Extends", "Super", "Const", "Export",
+			"Import", "Implements", "Let", "Private", "Public", "Interface", "Package",
+			"Protected", "Static", "Yield", "Identifier", "StringLiteral", "TemplateStringLiteral",
 			"WhiteSpaces", "LineTerminator", "HtmlComment", "CDataComment", "UnexpectedCharacter"
 		};
 	}
@@ -195,21 +195,21 @@ public class JavaScriptLexer extends JavaScriptBaseLexer {
 	private void OpenBrace_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
 		case 0:
-			this.ProcessOpenBrace();
+			this.processOpenBrace();
 			break;
 		}
 	}
 	private void CloseBrace_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
 		case 1:
-			this.ProcessCloseBrace();
+			this.processCloseBrace();
 			break;
 		}
 	}
 	private void StringLiteral_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
 		case 2:
-			this.ProcessStringLiteral();
+			this.processStringLiteral();
 			break;
 		}
 	}
@@ -244,77 +244,77 @@ public class JavaScriptLexer extends JavaScriptBaseLexer {
 	private boolean RegularExpressionLiteral_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return this.IsRegexPossible();
+			return this.isRegexPossible();
 		}
 		return true;
 	}
 	private boolean OctalIntegerLiteral_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 1:
-			return !this.IsStrictMode();
+			return !this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Implements_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 2:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Let_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 3:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Private_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 4:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Public_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 5:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Interface_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 6:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Package_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 7:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Protected_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 8:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Static_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 9:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}
 	private boolean Yield_sempred(RuleContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 10:
-			return this.IsStrictMode();
+			return this.isStrictMode();
 		}
 		return true;
 	}

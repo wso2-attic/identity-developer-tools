@@ -23,8 +23,6 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.java.agent.host.InterceptionEventType;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.websocket.Session;
 
 /**
@@ -37,7 +35,7 @@ public interface DebugSessionManager {
      *
      * @param session
      */
-    void addSession(Session session) ;
+    void addSession(Session session);
 
     /**
      * Handles the debug request.
@@ -61,4 +59,11 @@ public interface DebugSessionManager {
      * @param session
      */
     void removeSession(Session session);
+
+    /**
+     * Get DebugSession using session.
+     * @param session
+     * @return
+     */
+    DebugSession getDebugSession(Session session);
 }

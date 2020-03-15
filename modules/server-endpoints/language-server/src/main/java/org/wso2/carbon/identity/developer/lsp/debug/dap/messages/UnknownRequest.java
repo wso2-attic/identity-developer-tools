@@ -24,7 +24,7 @@ import java.util.List;
  * An unknown request for the debug protocol.
  * This is the case where any unknownm message arrives.
  */
-public class UnknownRequest extends Request{
+public class UnknownRequest extends Request {
 
     public UnknownRequest(String type, long seq, String command,
                           List<Argument> arguments) {

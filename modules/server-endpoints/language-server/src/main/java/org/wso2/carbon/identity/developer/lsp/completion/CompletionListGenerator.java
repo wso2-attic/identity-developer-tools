@@ -6,14 +6,15 @@ import org.wso2.carbon.identity.application.authentication.framework.JsFunctionR
 
 import java.util.HashMap;
 
+/**
+ *  CompletionListGenerator. #Todo Add the relevant comment.
+ */
 public class CompletionListGenerator {
 
     private JsFunctionRegistry jsFunctionRegistry;
 
 
-    public void setJsFunctionRegistry(
-            JsFunctionRegistry jsFunctionRegistry) {
-
+    public void setJsFunctionRegistry(JsFunctionRegistry jsFunctionRegistry) {
         this.jsFunctionRegistry = jsFunctionRegistry;
     }
 

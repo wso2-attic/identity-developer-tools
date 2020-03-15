@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.jsonrpc.SuccessResponse;
 import java.lang.reflect.Type;
 
 /**
- * Success Response Serializer
+ * Success Response Serializer.
  */
 public class SuccessResponseSerializer implements JsonSerializer<SuccessResponse> {
 

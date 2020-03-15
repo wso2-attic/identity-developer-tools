@@ -35,7 +35,8 @@ public class MethodEntryListener {
      * @param signature  The signature of the method being called
      * @param args       The arguments (values) of the method.
      */
-    public static void methodEntered(String className, String methodName, String signature, Class[] sig, Object[] args) {
+    public static void methodEntered(String className, String methodName, String signature,
+                                     Class[] sig, Object[] args) {
 
         InterceptionEngine engine = AgentHelper.getInstance().getInterceptionEngine();
         if (engine instanceof EventPublisher) {

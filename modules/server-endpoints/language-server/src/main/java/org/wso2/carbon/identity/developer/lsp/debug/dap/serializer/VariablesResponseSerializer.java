@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
-import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 
 import java.lang.reflect.Type;
@@ -37,7 +36,8 @@ import java.util.Map;
 public class VariablesResponseSerializer implements JsonSerializer<VariablesResponse> {
 
     @Override
-    public JsonElement serialize(VariablesResponse response, Type type, JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(VariablesResponse response, Type type,
+                                 JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
 
@@ -50,6 +50,7 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
     }
 
     private JsonElement generateResultObject(VariablesResponse response) {
+
         JsonObject object = new JsonObject();
 
         object.addProperty("command", response.getCommand());
@@ -65,14 +66,14 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
     private JsonElement generateVariablesArray(VariablesResponse response) {
 
         JsonArray jsonArray = new JsonArray();
-        Argument<HashMap<String, Object>> body =  response.getBody();
-        HashMap<String, Object> variables  = body.getValue();
+        Argument<HashMap<String, Object>> body = response.getBody();
+        HashMap<String, Object> variables = body.getValue();
 
-        if(variables == null) {
+        if (variables == null) {
             return jsonArray;
         }
 
-        for(Map.Entry<String, Object> entry : variables.entrySet()) {
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
             JsonObject arrayElement = new JsonObject();
             arrayElement.addProperty("name", entry.getKey());
             arrayElement.addProperty("type", "string"); //TODO: Get Type

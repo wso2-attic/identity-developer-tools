@@ -27,7 +27,8 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Event;
 import java.lang.reflect.Type;
 
 /**
- * Serializes the DAP event to protocol payload
+ * Serializes the DAP event to protocol payload.
+ * @param <T>
  */
 public abstract class EventSerializer<T extends Event> implements JsonSerializer<T> {
 
@@ -35,13 +36,10 @@ public abstract class EventSerializer<T extends Event> implements JsonSerializer
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-
-
         object.addProperty("jsonrpc", "2.0");
         object.addProperty("method", event.getEvent()); //This is the type of event
         object.addProperty("event", event.getEvent());
         object.add("params", formatParams(event));
-
         return object;
     }
 

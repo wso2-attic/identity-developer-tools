@@ -1,6 +1,26 @@
+/*
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.identity.parser;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 
 import java.util.Stack;
 
@@ -8,22 +28,23 @@ import java.util.Stack;
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-public abstract class JavaScriptBaseLexer extends Lexer
-{
+public abstract class JavaScriptBaseLexer extends Lexer {
+
     /**
-     * Stores values of nested modes. By default mode is strict or
+     * Stores values of nested modes. By default mode is strict.
+     * or
      * defined externally (useStrictDefault)
      */
     private Stack<Boolean> scopeStrictModes = new Stack<Boolean>();
 
     private Token lastToken = null;
     /**
-     * Default value of strict mode
+     * Default value of strict mode.
      * Can be defined externally by setUseStrictDefault
      */
     private boolean useStrictDefault = false;
     /**
-     * Current value of strict mode
+     * Current value of strict mode.
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
     private boolean useStrictCurrent = false;
@@ -41,7 +62,7 @@ public abstract class JavaScriptBaseLexer extends Lexer
         useStrictCurrent = value;
     }
 
-    public boolean IsStrictMode() {
+    public boolean isStrictMode() {
         return useStrictCurrent;
     }
 
@@ -66,26 +87,27 @@ public abstract class JavaScriptBaseLexer extends Lexer
         return next;
     }
 
-    protected void ProcessOpenBrace()
-    {
+    protected void processOpenBrace() {
+
         useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.peek() ? true : useStrictDefault;
         scopeStrictModes.push(useStrictCurrent);
     }
 
-    protected void ProcessCloseBrace()
-    {
+    protected void processCloseBrace() {
+
         useStrictCurrent = scopeStrictModes.size() > 0 ? scopeStrictModes.pop() : useStrictDefault;
     }
 
-    protected void ProcessStringLiteral()
-    {
-        if (lastToken == null || lastToken.getType() == JavaScriptLexer.OpenBrace)
-        {
+    protected void processStringLiteral() {
+
+        if (lastToken == null || lastToken.getType() == JavaScriptLexer.OpenBrace) {
+
             String text = getText();
-            if (text.equals("\"use strict\"") || text.equals("'use strict'"))
-            {
-                if (scopeStrictModes.size() > 0)
+            if (text.equals("\"use strict\"") || text.equals("'use strict'")) {
+
+                if (scopeStrictModes.size() > 0) {
                     scopeStrictModes.pop();
+                }
                 useStrictCurrent = true;
                 scopeStrictModes.push(useStrictCurrent);
             }
@@ -95,7 +117,7 @@ public abstract class JavaScriptBaseLexer extends Lexer
     /**
      * Returns {@code true} if the lexer can match a regex literal.
      */
-    protected boolean IsRegexPossible() {
+    protected boolean isRegexPossible() {
                                        
         if (this.lastToken == null) {
             // No token has been produced yet: at the start of the input,

@@ -22,6 +22,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 
+/**
+ * Success StoppedEventSerializer Serializer.
+ */
 public class StoppedEventSerializer extends EventSerializer<StoppedEvent> {
 
     @Override

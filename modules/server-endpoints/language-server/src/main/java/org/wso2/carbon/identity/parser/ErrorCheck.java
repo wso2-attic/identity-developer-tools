@@ -1,10 +1,18 @@
 package org.wso2.carbon.identity.parser;
 
-import org.antlr.v4.runtime.*;
 
-public class ErrorCheck extends DefaultErrorStrategy  {
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
+
+/**
+ * ErrorCheck class #Todo Add relevant comments.
+ */
+public class ErrorCheck extends DefaultErrorStrategy {
     private LS ls;
-    public ErrorCheck(LS ls){
+    public ErrorCheck(LS ls) {
         this.ls = ls;
     }
 

@@ -1,40 +1,61 @@
+/*
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.identity.parser;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 
 /**
- * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
+ * All parser methods that used in grammar (p, prev, notLineTerminator, etc.).
  * should start with lower case char similar to parser rules.
  */
-public abstract class JavaScriptBaseParser extends Parser
-{
+public abstract class JavaScriptBaseParser extends Parser {
+
     public JavaScriptBaseParser(TokenStream input) {
         super(input);
     }
 
     /**
-     * Short form for prev(String str)
+     * Short form for prev(String str).
      */
     protected boolean p(String str) {
         return prev(str);
     }
 
     /**
-     * Whether the previous token value equals to @param str
+     * Whether the previous token value equals to @param str.
      */
     protected boolean prev(String str) {
         return _input.LT(-1).getText().equals(str);
     }
 
     /**
-     * Short form for next(String str)
+     * Short form for next(String str).
      */
     protected boolean n(String str) {
         return next(str);
     }
 
     /**
-     * Whether the next token value equals to @param str
+     * Whether the next token value equals to @param str.
      */
     protected boolean next(String str) {
         return _input.LT(1).getText().equals(str);

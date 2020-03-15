@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.java.agent.config;
 
 /**
- * Configuration for method and method signature
+ * Configuration for method and method signature.
  */
 public class MethodInfoConfig {
     private String methodName;

@@ -19,29 +19,29 @@
 package org.wso2.carbon.identity.jsonrpc;
 
 /**
- * Parameter in the JSON RPC Request
+ * Parameter in the JSON RPC Request.
  */
 public class Parameter {
 
     /**
-     * The parameter name
+     * The parameter name.
      */
     private String name;
 
     /**
-     * The value of the paramweter
+     * The value of the paramweter.
      */
     private String value;
 
     /**
-     * Default constructor for un-marshallers
+     * Default constructor for un-marshallers.
      */
     public Parameter() {
 
     }
 
     /**
-     * Constructor taking name and value
+     * Constructor taking name and value.
      * @param name
      * @param value
      */
