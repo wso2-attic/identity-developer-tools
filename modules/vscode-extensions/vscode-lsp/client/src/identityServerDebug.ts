@@ -239,9 +239,8 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			console.log("Variables "+answer);
 			answer.then((remoteResponse) => {
 				console.log("Remote variable Values "+remoteResponse.body);
-				const id = this._variableHandles.get(args.variablesReference);
-
 				remoteResponse.body.variables.forEach( (element) => {
+					element.type=typeof(element.value);
 					element.variablesReference=0;
 					variables.push(element);
 				});
