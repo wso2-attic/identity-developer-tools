@@ -25,10 +25,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
-
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.Cookie;
 
 /**
  * Serializes the variables response.
@@ -76,12 +76,52 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
         for (Map.Entry<String, Object> entry : variables.entrySet()) {
             JsonObject arrayElement = new JsonObject();
             arrayElement.addProperty("name", entry.getKey());
-            arrayElement.addProperty("type", "string"); //TODO: Get Type
-            arrayElement.addProperty("value", String.valueOf(entry.getValue()));
+
+            JsonObject valueObject = new JsonObject();
+
+            if (entry.getKey().equals("httpServletRequest")) {
+                arrayElement.addProperty("type", "JSon"); //TODO: Get Type
+                if (entry.getValue() instanceof HashMap) {
+                    HashMap<String, Object> requestdetails = (HashMap<String, Object>) entry.getValue();
+                    valueObject.add("cookies", this.getCookies(requestdetails.get("cookies")));
+                    valueObject.add("headers", getHeaders((HashMap<String, String>) requestdetails.get("headers")));
+                }
+                arrayElement.add("value", valueObject);
+            } else {
+                arrayElement.add("value", new JsonObject());
+            }
+
             arrayElement.addProperty("variablesReference", "0");
             jsonArray.add(arrayElement);
         }
-
         return jsonArray;
     }
+
+    private JsonArray getCookies(Object object) {
+
+        Cookie[] cookies = (Cookie[]) object;
+        JsonArray cookieJsonArray = new JsonArray();
+        for (Cookie cookie : cookies) {
+            JsonObject valueObject = new JsonObject();
+            valueObject.addProperty("name", cookie.getName());
+            valueObject.addProperty("value", cookie.getValue());
+            valueObject.addProperty("version", cookie.getVersion());
+            valueObject.addProperty("secure", cookie.getSecure());
+            valueObject.addProperty("path", cookie.getPath());
+            valueObject.addProperty("maxage", cookie.getMaxAge());
+            valueObject.addProperty("domain", cookie.getDomain());
+            cookieJsonArray.add(valueObject);
+        }
+        return cookieJsonArray;
+    }
+
+    private JsonObject getHeaders(HashMap<String, String> headers) {
+
+        JsonObject arrayElement = new JsonObject();
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            arrayElement.addProperty(header.getKey(), header.getValue());
+        }
+        return arrayElement;
+    }
+
 }

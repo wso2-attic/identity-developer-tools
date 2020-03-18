@@ -22,6 +22,5 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
  * Variables translator for an internal object to external form.
  */
 public interface VariableTranslator {
-
     Object translate(Object in);
 }
