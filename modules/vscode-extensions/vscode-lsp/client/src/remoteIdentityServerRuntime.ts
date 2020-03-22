@@ -139,8 +139,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * @param request 
 	 */
 	public fetchVariables(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) :Thenable<DebugProtocol.VariablesResponse> {
-		var varaiablesRequest = new rpc.RequestType0<DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
-		var answer = this.messageConnection.sendRequest(varaiablesRequest);
+		var varaiablesRequest = new rpc.RequestType1<DebugProtocol.VariablesArguments,DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
+		var answer = this.messageConnection.sendRequest(varaiablesRequest,args);
 		return answer;
 	}
 

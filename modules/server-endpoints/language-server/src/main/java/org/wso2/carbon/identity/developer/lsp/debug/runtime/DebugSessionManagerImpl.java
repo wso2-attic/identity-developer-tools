@@ -122,7 +122,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 String variableName = deriveVariableName(methodContext.getArgumentTypes(), i);
-                variables.put(variableName, variableTranslator.translate(arguments[i]));
+                variables.put(variableName, variableTranslator.translate(arguments[i],
+                        request.getVariablesReference()));
             }
         }
         Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
@@ -222,9 +223,11 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Map.Entry<Session, DebugSession> findInterestedDebugSession(MethodContext methodContext) {
 
         //For not, just return the first entry. We need to have a better filter later.
+//        if (!methodContext.getClassName().equals(
+//                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
+//                        "/impl/DefaultRequestCoordinator")) {
         if (!methodContext.getClassName().equals(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-                        "/impl/DefaultRequestCoordinator")) {
+                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet")) {
             return null;
         }
         if (!activeDebugSessions.isEmpty()) {

@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.EventRequest;
@@ -35,7 +36,9 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.UnknownRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -66,6 +69,7 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
     private static final String LOCAL_NAME_SOURCEMODIFIED = "sourceModified";
     private static final String LOCAL_NAME_BODY = "body";
     private static final String LOCAL_NAME_UNKNOWN = "unknown";
+    private static final String LOCAL_NAME_VARIABLES_REFERENCE = "variablesReference";
 
     public ProtocolMessage deserialize(JsonElement jsonElement, Type type,
                                        JsonDeserializationContext jsonDeserializationContext)
@@ -109,7 +113,19 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private VariablesRequest constructVariablesRequest(String method, long id, JsonObject jsonObject) {
 
-        VariablesRequest request = new VariablesRequest(LOCAL_NAME_MESSAGE, id, LOCAL_NAME_VARIABLES, null);
+        JsonElement paramElement = jsonObject.get(LOCAL_NAME_PARAMS);
+        if (paramElement == null) {
+            log.error("Set breakpoint request received without params");
+            return (VariablesRequest) (Request) new UnknownRequest(LOCAL_NAME_UNKNOWN, 0, method, null);
+        }
+        // get the arguments from the request
+        JsonObject paramsObject = paramElement.getAsJsonObject();
+        JsonElement variablesReference = paramsObject.get(LOCAL_NAME_VARIABLES_REFERENCE);
+        Argument argument = new Argument(variablesReference);
+        List<Argument> arguments = new ArrayList<>();
+        arguments.add(argument);
+
+        VariablesRequest request = new VariablesRequest(LOCAL_NAME_MESSAGE, id, LOCAL_NAME_VARIABLES, arguments);
         return request;
     }
 
