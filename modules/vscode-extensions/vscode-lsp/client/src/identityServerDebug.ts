@@ -240,8 +240,9 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			answer.then((remoteResponse) => {
 				console.log("Remote variable Values "+remoteResponse.body);
 				remoteResponse.body.variables.forEach( (element) => {
+					element.value=JSON.stringify(element.value)
 					element.type=typeof(element.value);
-					element.variablesReference=0;
+					element.variablesReference=args.variablesReference;
 					variables.push(element);
 				});
 

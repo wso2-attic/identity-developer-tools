@@ -39,9 +39,11 @@ public class InterceptorConfigReader {
         ArrayList<InterceptorConfig> result = new ArrayList<>();
         InterceptorConfig interceptorConfig = new InterceptorConfig();
         interceptorConfig.setClassName(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl" +
-                        "/DefaultRequestCoordinator");
-        interceptorConfig.addMethodSignature("handle",
+                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet");
+//        interceptorConfig.setClassName(
+//                "org/wso2/carbon/identity/application/authentication/framework/handler/request/impl" +
+//                        "/DefaultRequestCoordinator");
+        interceptorConfig.addMethodSignature("doPost",
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
         result.add(interceptorConfig);
         return result;

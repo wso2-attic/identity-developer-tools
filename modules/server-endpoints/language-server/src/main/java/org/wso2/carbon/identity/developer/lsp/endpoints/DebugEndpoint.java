@@ -91,7 +91,8 @@ public class DebugEndpoint {
 
     /**
      * Method is called when a user sends a message to this server endpoint.
-     * Method intercepts the message and allows us to react accordingly.
+     * Method intercepts the message and allows us to react accordingly.var onLoginRequest = function (context) {
+
      */
     @OnMessage
     public void onMessage(String message, Session session) throws IOException, EncodeException {

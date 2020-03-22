@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
+import com.google.gson.JsonElement;
+
 import java.util.List;
 
 /**
@@ -25,9 +27,24 @@ import java.util.List;
  */
 public class VariablesRequest extends Request {
 
+    private int variablesReference;
+
     public VariablesRequest(String type, long id, String command,
                             List<Argument> arguments) {
 
         super(type, id, command, arguments);
+        if (arguments.get(0) != null) {
+            this.variablesReference = ((JsonElement) arguments.get(0).getValue()).getAsInt();
+        }
+    }
+
+    public int getVariablesReference() {
+
+        return variablesReference;
+    }
+
+    public void setVariablesReference(int variablesReference) {
+
+        this.variablesReference = variablesReference;
     }
 }

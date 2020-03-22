@@ -21,13 +21,13 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Scanner;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 
 /**
@@ -38,66 +38,72 @@ public class DefaultVariableTranslator implements VariableTranslator {
     private static Log log = LogFactory.getLog(DebugSessionManagerImpl.class);
 
     @Override
-    public Object translate(Object object) {
-        if (object instanceof  HttpServletRequest) {
+    public Object translate(Object object, int variablesReference) {
+
+        if (object instanceof HttpServletRequest) {
             HashMap<String, Object> requestdetails = new HashMap<>();
             HttpServletRequest httpServletRequest = (HttpServletRequest) object;
             requestdetails.put("cookies", httpServletRequest.getCookies());
-            requestdetails.put("headers", this.getHeaders(httpServletRequest));
-            try {
-                requestdetails.put("body", this.getBody(httpServletRequest));
-            } catch (IOException e) {
-                log.error("Error Parsing the body of the Request. ",e);
-            } finally {
-                return requestdetails;
-            }
-
+            requestdetails.put("headers", this.getRequestHeaders(httpServletRequest));
+            requestdetails.put("body", this.getRequestBody(httpServletRequest));
+            requestdetails.put("variablesReference", variablesReference);
+            return requestdetails;
         } else if (object instanceof HttpServletResponse) {
-            return object;
+            HashMap<String, Object> responsedetails = new HashMap<>();
+            HttpServletResponse httpServletResponse = (HttpServletResponse) object;
+            responsedetails.put("status", httpServletResponse.getStatus());
+            responsedetails.put("headers", this.getResponseHeaders(httpServletResponse));
+            responsedetails.put("body", this.getResponseBody(httpServletResponse));
+            responsedetails.put("variablesReference", variablesReference);
+            return responsedetails;
         }
 
         return object;
     }
 
 
-    private String getBody(HttpServletRequest request) throws IOException {
+    private String getRequestBody(HttpServletRequest request) {
 
-        String body = null;
-        BufferedReader bufferedReader = null;
-        try {
-            StringBuilder buffer = new StringBuilder();
-            bufferedReader = request.getReader();
-            if (bufferedReader != null) {
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                body = buffer.toString();
-            } else {
-                body = "";
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            Scanner s = null;
+            try {
+                s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
+            } catch (IOException e) {
+                log.error("Error Parsing the body of the Request.", e);
             }
-        } catch (IOException ex) {
-            throw ex;
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException ex) {
-                    log.error("Error Parsing the body of the Request.", ex);
-                }
-            }
+            return s.hasNext() ? s.next() : "";
         }
-        return body;
+        return "";
+    }
+
+    private String getResponseBody(HttpServletResponse response) {
+            return "";
     }
 
 
-    private HashMap<String, String> getHeaders(HttpServletRequest request) {
+    private HashMap<String, String> getRequestHeaders(HttpServletRequest request) {
+
         HashMap<String, String> headerdetails = new HashMap<>();
-        for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();) {
+        for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements(); ) {
             String nextHeaderName = (String) e.nextElement();
             String headerValue = request.getHeader(nextHeaderName);
             headerdetails.put(nextHeaderName, headerValue);
         }
         return headerdetails;
     }
+
+    private HashMap<String, String> getResponseHeaders(HttpServletResponse response) {
+
+        HashMap<String, String> headerdetails = new HashMap<>();
+        for (String nextHeaderName : response.getHeaderNames()) {
+            String headerValue = response.getHeader(nextHeaderName);
+            headerdetails.put(nextHeaderName, headerValue);
+        }
+        return headerdetails;
+    }
+
+
+
+
+
 }

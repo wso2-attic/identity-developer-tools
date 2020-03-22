@@ -51,5 +51,13 @@ public class DebugListenerConfigurator {
                 "(Ljava/lang/invoke/MethodHandle;)V");
 
         interceptionEngine.addListener(nashornListener, sessionManager);
+
+        MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
+                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet",
+                "doPost",
+                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
+
+        interceptionEngine.addListener(samlEntryFilter, sessionManager);
+
     }
 }
