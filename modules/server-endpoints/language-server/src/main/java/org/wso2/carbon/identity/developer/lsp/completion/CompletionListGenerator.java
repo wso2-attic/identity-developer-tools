@@ -13,10 +13,10 @@ public class CompletionListGenerator {
 
     private JsFunctionRegistry jsFunctionRegistry;
 
-    private HashMap<String, JsonArray> coreMap;
+    private HashMap<String, JsonArray> keywordsMap;
 
     public CompletionListGenerator() {
-        coreMap = new HashMap<String, JsonArray>();
+        keywordsMap = new HashMap<String, JsonArray>();
     }
 
     public void setJsFunctionRegistry(JsFunctionRegistry jsFunctionRegistry) {
@@ -38,7 +38,7 @@ public class CompletionListGenerator {
     }
 
     /**
-     * This function gets JSON array from coreMap.
+     * This function gets JSON array from keywordsMap.
      *
      * @param scope scope of typed string
      * @return JSON Object with required hashmap
@@ -46,7 +46,7 @@ public class CompletionListGenerator {
     public JsonArray generateJsonArray(String scope) {
 
         final Keywords keywords = new Keywords();
-        if (!coreMap.containsKey(scope)) {
+        if (!keywordsMap.containsKey(scope)) {
             switch (scope) {
                 case "program":
                     HashMap<String, String[]> program = new HashMap<String, String[]>() {{
@@ -63,7 +63,7 @@ public class CompletionListGenerator {
                         put("switch", keywords.switch_keyword);
 
                     }};
-                    coreMap.put(scope, generateArray(program));
+                    keywordsMap.put(scope, generateArray(program));
                     break;
                 case "sourceelement":
                     HashMap<String, String[]> sourceElement = new HashMap<String, String[]>() {{
@@ -80,7 +80,7 @@ public class CompletionListGenerator {
                         put("return", keywords.return_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(sourceElement));
+                    keywordsMap.put(scope, generateArray(sourceElement));
                     break;
                 case "statement":
                     HashMap<String, String[]> statement = new HashMap<String, String[]>() {{
@@ -97,7 +97,7 @@ public class CompletionListGenerator {
                         put("return", keywords.return_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(statement));
+                    keywordsMap.put(scope, generateArray(statement));
                     break;
                 case "block":
                     HashMap<String, String[]> block = new HashMap<String, String[]>() {{
@@ -116,7 +116,7 @@ public class CompletionListGenerator {
                         put("return", keywords.return_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(block));
+                    keywordsMap.put(scope, generateArray(block));
                     break;
                 case "statementlist":
                     HashMap<String, String[]> statementList = new HashMap<String, String[]>() {{
@@ -132,13 +132,13 @@ public class CompletionListGenerator {
                         put("const", keywords.const_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(statementList));
+                    keywordsMap.put(scope, generateArray(statementList));
                     break;
                 case "variablestatement":
                     HashMap<String, String[]> variableStatement = new HashMap<String, String[]>() {{
                         put("variableStatement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(variableStatement));
+                    keywordsMap.put(scope, generateArray(variableStatement));
                     break;
                 case "variabledeclarationlist":
                     HashMap<String, String[]> variableDeclarationList = new HashMap<String, String[]>() {{
@@ -146,7 +146,7 @@ public class CompletionListGenerator {
                         put("false", keywords.false_keyword);
                         put("null", keywords.null_keyword);
                     }};
-                    coreMap.put(scope, generateArray(variableDeclarationList));
+                    keywordsMap.put(scope, generateArray(variableDeclarationList));
                     break;
                 case "variabledeclaration":
                     HashMap<String, String[]> variableDeclaration = new HashMap<String, String[]>() {{
@@ -154,13 +154,13 @@ public class CompletionListGenerator {
                         put("let", keywords.let_keyword);
                         put("const", keywords.const_keyword);
                     }};
-                    coreMap.put(scope, generateArray(variableDeclaration));
+                    keywordsMap.put(scope, generateArray(variableDeclaration));
                     break;
                 case "emptystatement":
                     HashMap<String, String[]> emptyStatement = new HashMap<String, String[]>() {{
                         put("emptyAStatement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(emptyStatement));
+                    keywordsMap.put(scope, generateArray(emptyStatement));
                     break;
                 case "expressionstatement":
                     HashMap<String, String[]> expressionStatement = new HashMap<String, String[]>() {{
@@ -176,13 +176,13 @@ public class CompletionListGenerator {
                         put("const", keywords.const_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(expressionStatement));
+                    keywordsMap.put(scope, generateArray(expressionStatement));
                     break;
                 case "ifstatement":
                     HashMap<String, String[]> ifStatement = new HashMap<String, String[]>() {{
                         put("if", keywords.if_keyword);
                     }};
-                    coreMap.put(scope, generateArray(ifStatement));
+                    keywordsMap.put(scope, generateArray(ifStatement));
                     break;
                 case "iterationstatement":
                     HashMap<String, String[]> iterationStatement = new HashMap<String, String[]>() {{
@@ -190,7 +190,7 @@ public class CompletionListGenerator {
                         put("while", keywords.while_keyword);
                         put("do", keywords.do_keyword);
                     }};
-                    coreMap.put(scope, generateArray(iterationStatement));
+                    keywordsMap.put(scope, generateArray(iterationStatement));
                     break;
                 case "varmodifier":
                     HashMap<String, String[]> varModifier = new HashMap<String, String[]>() {{
@@ -198,43 +198,43 @@ public class CompletionListGenerator {
                         put("let", keywords.let_keyword);
                         put("const", keywords.const_keyword);
                     }};
-                    coreMap.put(scope, generateArray(varModifier));
+                    keywordsMap.put(scope, generateArray(varModifier));
                     break;
                 case "continuestatement":
                     HashMap<String, String[]> continueStatement = new HashMap<String, String[]>() {{
                         put("continue", keywords.continue_keyword);
                     }};
-                    coreMap.put(scope, generateArray(continueStatement));
+                    keywordsMap.put(scope, generateArray(continueStatement));
                     break;
                 case "breakstatement":
                     HashMap<String, String[]> breakStatement = new HashMap<String, String[]>() {{
                         put("break", keywords.break_keyword);
                     }};
-                    coreMap.put(scope, generateArray(breakStatement));
+                    keywordsMap.put(scope, generateArray(breakStatement));
                     break;
                 case "returnstatement":
                     final HashMap<String, String[]> returnStatement = new HashMap<String, String[]>() {{
                         put("return", keywords.return_keyword);
                     }};
-                    coreMap.put(scope, generateArray(returnStatement));
+                    keywordsMap.put(scope, generateArray(returnStatement));
                     break;
                 case "withstatement":
                     HashMap<String, String[]> withStatement = new HashMap<String, String[]>() {{
                         put("withStatement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(withStatement));
+                    keywordsMap.put(scope, generateArray(withStatement));
                     break;
                 case "switchstatement":
                     HashMap<String, String[]> switchStatement = new HashMap<String, String[]>() {{
                         put("switchStatement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(switchStatement));
+                    keywordsMap.put(scope, generateArray(switchStatement));
                     break;
                 case "caseblock":
                     HashMap<String, String[]> caseBlock = new HashMap<String, String[]>() {{
                         put("case", keywords.case_keyword);
                     }};
-                    coreMap.put(scope, generateArray(caseBlock));
+                    keywordsMap.put(scope, generateArray(caseBlock));
                     break;
                 case "caseclauses":
                     HashMap<String, String[]> caseClauses = new HashMap<String, String[]>() {{
@@ -249,75 +249,75 @@ public class CompletionListGenerator {
                         put("const", keywords.const_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(caseClauses));
+                    keywordsMap.put(scope, generateArray(caseClauses));
                     break;
                 case "caseclause":
                     HashMap<String, String[]> caseClause = new HashMap<String, String[]>() {{
                         put("caseclause", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(caseClause));
+                    keywordsMap.put(scope, generateArray(caseClause));
                     break;
                 case "defaultclause":
                     HashMap<String, String[]> defaultClause = new HashMap<String, String[]>() {{
                         put("default", keywords.default_keyword);
                         put("case", keywords.case_keyword);
                     }};
-                    coreMap.put(scope, generateArray(defaultClause));
+                    keywordsMap.put(scope, generateArray(defaultClause));
                     break;
                 case "labelledstatement":
                     HashMap<String, String[]> labelledStatement = new HashMap<String, String[]>() {{
                         put("labelled", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(labelledStatement));
+                    keywordsMap.put(scope, generateArray(labelledStatement));
                     break;
                 case "throwstatement":
                     HashMap<String, String[]> throwStatement = new HashMap<String, String[]>() {{
                         put("throw", keywords.throw_keyword);
                     }};
-                    coreMap.put(scope, generateArray(throwStatement));
+                    keywordsMap.put(scope, generateArray(throwStatement));
                     break;
                 case "trystatement":
                     HashMap<String, String[]> tryStatement = new HashMap<String, String[]>() {{
                         put("try", keywords.try_keyword);
                     }};
-                    coreMap.put(scope, generateArray(tryStatement));
+                    keywordsMap.put(scope, generateArray(tryStatement));
                     break;
                 case "catchproduction":
                     HashMap<String, String[]> catchProduction = new HashMap<String, String[]>() {{
                         put("catch", keywords.catch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(catchProduction));
+                    keywordsMap.put(scope, generateArray(catchProduction));
                     break;
                 case "finallyproduction":
                     HashMap<String, String[]> finallyProduction = new HashMap<String, String[]>() {{
                         put("finally", keywords.finally_keyword);
                     }};
-                    coreMap.put(scope, generateArray(finallyProduction));
+                    keywordsMap.put(scope, generateArray(finallyProduction));
                     break;
                 case "debuggerstatement":
                     HashMap<String, String[]> debuggerStatement = new HashMap<String, String[]>() {{
                         put("debugger", keywords.debugger_keyword);
                     }};
-                    coreMap.put(scope, generateArray(debuggerStatement));
+                    keywordsMap.put(scope, generateArray(debuggerStatement));
                     break;
                 case "functiondeclaration":
                     HashMap<String, String[]> functionDeclaration = new HashMap<String, String[]>() {{
                         put("function", new String[]{"Function", "function"});
                     }};
-                    coreMap.put(scope, generateArray(functionDeclaration));
+                    keywordsMap.put(scope, generateArray(functionDeclaration));
                     break;
                 case "classdeclaration":
                     HashMap<String, String[]> classDeclaration = new HashMap<String, String[]>() {{
                         put("class", new String[]{"Class", "class"});
                     }};
-                    coreMap.put(scope, generateArray(classDeclaration));
+                    keywordsMap.put(scope, generateArray(classDeclaration));
                     break;
                 case "classtail":
                     HashMap<String, String[]> classTail = new HashMap<String, String[]>() {{
                         put("extends", keywords.extends_keyword);
                         put("implements", keywords.implements_keyword);
                     }};
-                    coreMap.put(scope, generateArray(classTail));
+                    keywordsMap.put(scope, generateArray(classTail));
                     break;
                 case "classelement":
                     HashMap<String, String[]> classElement = new HashMap<String, String[]>() {{
@@ -332,37 +332,37 @@ public class CompletionListGenerator {
                         put("const", keywords.const_keyword);
 
                     }};
-                    coreMap.put(scope, generateArray(classElement));
+                    keywordsMap.put(scope, generateArray(classElement));
                     break;
                 case "methoddefinition":
                     HashMap<String, String[]> methodDefinition = new HashMap<String, String[]>() {{
                         put("methodDEfinition", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(methodDefinition));
+                    keywordsMap.put(scope, generateArray(methodDefinition));
                     break;
                 case "generatormethod":
                     HashMap<String, String[]> generatorMethod = new HashMap<String, String[]>() {{
                         put("generatorMethod", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(generatorMethod));
+                    keywordsMap.put(scope, generateArray(generatorMethod));
                     break;
                 case "formalparameterlist":
                     HashMap<String, String[]> formalParameterList = new HashMap<String, String[]>() {{
                         put("formalparametrListt", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(formalParameterList));
+                    keywordsMap.put(scope, generateArray(formalParameterList));
                     break;
                 case "formalparameterarg":
                     HashMap<String, String[]> formalParameterArg = new HashMap<String, String[]>() {{
                         put("formalParamaterArg", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(formalParameterArg));
+                    keywordsMap.put(scope, generateArray(formalParameterArg));
                     break;
                 case "lastformalparameterarg":
                     HashMap<String, String[]> lastFormalParameterArg = new HashMap<String, String[]>() {{
                         put("lastFormalPArameter", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(lastFormalParameterArg));
+                    keywordsMap.put(scope, generateArray(lastFormalParameterArg));
                     break;
                 case "functionbody":
                     HashMap<String, String[]> functionBody = new HashMap<String, String[]>() {{
@@ -384,61 +384,61 @@ public class CompletionListGenerator {
                             functionBody.put(jsFunctionFromRegistry, new String[]{"Code", jsFunctionFromRegistry});
                         }
                     }
-                    coreMap.put(scope, generateArray(functionBody));
+                    keywordsMap.put(scope, generateArray(functionBody));
                     break;
                 case "sourceelements":
                     HashMap<String, String[]> sourceElements = new HashMap<String, String[]>() {{
                         put("sourceElement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(sourceElements));
+                    keywordsMap.put(scope, generateArray(sourceElements));
                     break;
                 case "arrayliteral":
                     HashMap<String, String[]> arrayLiteral = new HashMap<String, String[]>() {{
                         put("arrayLiteral", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(arrayLiteral));
+                    keywordsMap.put(scope, generateArray(arrayLiteral));
                     break;
                 case "elementlist":
                     HashMap<String, String[]> elementList = new HashMap<String, String[]>() {{
                         put("elementList", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(elementList));
+                    keywordsMap.put(scope, generateArray(elementList));
                     break;
                 case "lastelement":
                     HashMap<String, String[]> lastElement = new HashMap<String, String[]>() {{
                         put("lastElement", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(lastElement));
+                    keywordsMap.put(scope, generateArray(lastElement));
                     break;
                 case "objectliteral":
                     HashMap<String, String[]> objectLiteral = new HashMap<String, String[]>() {{
                         put("objectiveLiteral", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(objectLiteral));
+                    keywordsMap.put(scope, generateArray(objectLiteral));
                     break;
                 case "propertyassignment":
                     HashMap<String, String[]> propertyAssignment = new HashMap<String, String[]>() {{
                         put("propertyAssignment", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(propertyAssignment));
+                    keywordsMap.put(scope, generateArray(propertyAssignment));
                     break;
                 case "propertyname":
                     HashMap<String, String[]> propertyName = new HashMap<String, String[]>() {{
                         put("propertyName", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(propertyName));
+                    keywordsMap.put(scope, generateArray(propertyName));
                     break;
                 case "arguments":
                     HashMap<String, String[]> arguments = new HashMap<String, String[]>() {{
                         put("argument", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(arguments));
+                    keywordsMap.put(scope, generateArray(arguments));
                     break;
                 case "lastargument":
                     HashMap<String, String[]> lastArgument = new HashMap<String, String[]>() {{
                         put("lastargument", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(lastArgument));
+                    keywordsMap.put(scope, generateArray(lastArgument));
                     break;
                 case "expressionsequence":
                     HashMap<String, String[]> expressionSequence = new HashMap<String, String[]>() {{
@@ -454,90 +454,90 @@ public class CompletionListGenerator {
                         put("const", keywords.const_keyword);
                         put("switch", keywords.switch_keyword);
                     }};
-                    coreMap.put(scope, generateArray(expressionSequence));
+                    keywordsMap.put(scope, generateArray(expressionSequence));
                     break;
                 case "singleexpression":
                     HashMap<String, String[]> singleExpression = new HashMap<String, String[]>() {{
                         put("singleExpression", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(singleExpression));
+                    keywordsMap.put(scope, generateArray(singleExpression));
                     break;
                 case "arrowfunctionparameters":
                     HashMap<String, String[]> arrowFunctionParameters = new HashMap<String, String[]>() {{
                         put("arrowFunction", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(arrowFunctionParameters));
+                    keywordsMap.put(scope, generateArray(arrowFunctionParameters));
                     break;
                 case "arrowfunctionbody":
                     HashMap<String, String[]> arrowFunctionBody = new HashMap<String, String[]>() {{
                         put("arrowfunction", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(arrowFunctionBody));
+                    keywordsMap.put(scope, generateArray(arrowFunctionBody));
                     break;
                 case "assignmentoperator":
                     HashMap<String, String[]> assignmentOperator = new HashMap<String, String[]>() {{
                         put("assignmentOpertaor", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(assignmentOperator));
+                    keywordsMap.put(scope, generateArray(assignmentOperator));
                     break;
                 case "literal":
                     HashMap<String, String[]> literal = new HashMap<String, String[]>() {{
                         put("literal", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(literal));
+                    keywordsMap.put(scope, generateArray(literal));
                     break;
                 case "numericliteral":
                     HashMap<String, String[]> numericLiteral = new HashMap<String, String[]>() {{
                         put("numericLiteral", new String[]{"c", "d"});
                     }};
 
-                    coreMap.put(scope, generateArray(numericLiteral));
+                    keywordsMap.put(scope, generateArray(numericLiteral));
                     break;
                 case "identifiername":
                     HashMap<String, String[]> identifierName = new HashMap<String, String[]>() {{
                         put("identifierNAme", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(identifierName));
+                    keywordsMap.put(scope, generateArray(identifierName));
                     break;
                 case "reservedword":
                     HashMap<String, String[]> reservedWord = new HashMap<String, String[]>() {{
                         put("reserved", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(reservedWord));
+                    keywordsMap.put(scope, generateArray(reservedWord));
                     break;
                 case "keyword":
                     HashMap<String, String[]> keyword = new HashMap<String, String[]>() {{
                         put("keyword", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(keyword));
+                    keywordsMap.put(scope, generateArray(keyword));
                     break;
                 case "getter":
                     HashMap<String, String[]> getter = new HashMap<String, String[]>() {{
                         put("getter", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(getter));
+                    keywordsMap.put(scope, generateArray(getter));
                     break;
                 case "setter":
                     HashMap<String, String[]> setter = new HashMap<String, String[]>() {{
                         put("setter", new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(setter));
+                    keywordsMap.put(scope, generateArray(setter));
                     break;
                 case "eos":
                     HashMap<String, String[]> eos = new HashMap<String, String[]>() {{
                         put(";", new String[]{"End of Statement", ";"});
                     }};
-                    coreMap.put(scope, generateArray(eos));
+                    keywordsMap.put(scope, generateArray(eos));
                     break;
                 default:
                     HashMap<String, String[]> whenNull = new HashMap<String, String[]>() {{
                         put(scope, new String[]{"c", "d"});
                     }};
-                    coreMap.put(scope, generateArray(whenNull));
+                    keywordsMap.put(scope, generateArray(whenNull));
                     break;
             }
         }
-        return coreMap.get(scope);
+        return keywordsMap.get(scope);
     }
 
     private JsonArray generateArray(HashMap<String, String[]> keywords) {
