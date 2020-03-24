@@ -223,9 +223,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Map.Entry<Session, DebugSession> findInterestedDebugSession(MethodContext methodContext) {
 
         //For not, just return the first entry. We need to have a better filter later.
-//        if (!methodContext.getClassName().equals(
-//                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-//                        "/impl/DefaultRequestCoordinator")) {
+
         if (!methodContext.getClassName().equals(
                 "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet")) {
             return null;

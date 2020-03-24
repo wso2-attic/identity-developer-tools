@@ -85,7 +85,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
                                 "Intercepted method " + className + "." + method.getName() +
                                         " " + method.getSignature());
                         isTransformed = true;
-                        method.insertBefore(
+                        method.insertAfter(
                                 "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\""
                                         + className + "\", \"" + method.getName() + "\", \"" + method.getSignature()
                                         + "\", $sig, $args );");

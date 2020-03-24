@@ -18,13 +18,16 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.serializer;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.stringtemplate.v4.ST;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
+import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOSessionDTO;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -90,14 +93,28 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
                 HashMap<String, Object> responsedetails = (HashMap<String, Object>) entry.getValue();
                 arrayElement.add("value", new JsonObject());
                 valueObject.add("headers", this.getHeaders(responsedetails));
-                valueObject.addProperty("body", this.getBody(responsedetails));
+                valueObject.addProperty("status", this.getResponseStatus(responsedetails));
                 arrayElement.addProperty("variablesReference", this.getVariablesReference(responsedetails));
                 arrayElement.addProperty("type", "Object");
+            } else if (entry.getKey().equals("sAMLSSOSessionDTO")) {
+                SAMLSSOSessionDTO samlssoSessionDTO = (SAMLSSOSessionDTO) entry.getValue();
+                Gson gson = new Gson();
+                String json = gson.toJson(samlssoSessionDTO);
+                JsonElement element = gson.fromJson (json, JsonElement.class);
+                JsonObject jsonObj = element.getAsJsonObject();
+                arrayElement.add("value", jsonObj);
+            } else if (entry.getKey().equals("string")) {
+                arrayElement.addProperty("value", (String) entry.getValue());
             }
+
             arrayElement.addProperty("variablesReference", "0");
             jsonArray.add(arrayElement);
         }
         return jsonArray;
+    }
+
+    private Integer getResponseStatus(HashMap<String, Object> responsedetails) {
+        return (Integer) responsedetails.get("status");
     }
 
     private JsonArray getCookies(HashMap<String, Object> requestdetails) {
