@@ -1,0 +1,13 @@
+#OAuth Application Properties
+spring.security.oauth2.client.registration.wso2.client-name={{client_name}}
+spring.security.oauth2.client.registration.wso2.client-id={{client_id}}
+spring.security.oauth2.client.registration.wso2.client-secret={{client_secret}}
+spring.security.oauth2.client.registration.wso2.redirect-uri={baseUrl}/login/oauth2/code/wso2
+spring.security.oauth2.client.registration.wso2.authorization-grant-type=authorization_code
+spring.security.oauth2.client.registration.wso2.scope=openid
+
+#Identity Server Properties
+spring.security.oauth2.client.provider.wso2.authorization-uri={{authorization_url}}
+spring.security.oauth2.client.provider.wso2.token-uri={{token_url}}
+spring.security.oauth2.client.provider.wso2.user-info-uri={{user_info_url}}
+spring.security.oauth2.client.provider.wso2.jwk-set-uri={{jwks_url}}
