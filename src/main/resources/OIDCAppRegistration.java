@@ -39,7 +39,7 @@ public class OIDCAppRegistration {
                 .userInfoUri(env.getProperty(WSO2_IS_PROPERTY + "user-info-uri"))
                 .userNameAttributeName(IdTokenClaimNames.SUB)
                 .jwkSetUri(env.getProperty(WSO2_IS_PROPERTY + "jwk-set-uri"))
-                .clientName(env.getProperty(CLIENT_REGISTRATION+ "client-name"))
+                .clientName(env.getProperty(CLIENT_REGISTRATION + "client-name"))
                 .build();
         return registration;
     }
