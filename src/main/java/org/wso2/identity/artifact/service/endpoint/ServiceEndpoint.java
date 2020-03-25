@@ -23,11 +23,16 @@ public class ServiceEndpoint {
     private ServletContext servletContext;
 
     @GET
+    @Path("/names")
     @Produces(MediaType.APPLICATION_JSON)
     public Response<List<ArtifactInfo>> getSupportedArtifacts() {
 
         ArtifactService artifactService = new ArtifactService();
-        return new Response<>(artifactService.getArtifactInfo());
+        try {
+            return new Response<>(artifactService.getArtifactInfo(servletContext));
+        } catch (ServiceException e) {
+            return new Response<>("Error occurred while calling.");
+        }
     }
 
     @GET

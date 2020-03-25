@@ -7,15 +7,20 @@ import org.wso2.identity.artifact.service.exception.BuilderException;
 import org.wso2.identity.artifact.service.exception.ClientException;
 import org.wso2.identity.artifact.service.exception.ServiceException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.ServletContext;
 
 public class ArtifactService {
 
-    public List<ArtifactInfo> getArtifactInfo() {
+    public List<ArtifactInfo> getArtifactInfo(ServletContext servletContext) throws ServiceException {
 
-        return new ArrayList<>();
+        try {
+            ArtifactsRepository artifactsRepository = ArtifactsRepository.getInstance(servletContext);
+            return artifactsRepository.getArtifactNames().stream().map(ArtifactInfo::new).collect(Collectors.toList());
+        } catch (BuilderException e) {
+            throw new ServiceException(e);
+        }
     }
 
     public Artifact getArtifact(String artifactName, ServletContext servletContext)

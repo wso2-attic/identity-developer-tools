@@ -6,6 +6,7 @@ import org.wso2.identity.artifact.service.exception.BuilderException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.ServletContext;
 
 public class ArtifactsRepository {
@@ -31,6 +32,11 @@ public class ArtifactsRepository {
     public Artifact findArtifact(String name) {
 
         return artifactRegistry.get(name);
+    }
+
+    public Set<String> getArtifactNames() {
+
+        return artifactRegistry.keySet();
     }
 
     private void populateArtifactRegistry() throws BuilderException {
