@@ -2,26 +2,24 @@ package org.wso2.identity.artifact.service.artifact;
 
 import org.wso2.identity.artifact.service.artifact.builder.spring.SpringBootArtifactBuilder;
 import org.wso2.identity.artifact.service.exception.BuilderException;
+import org.wso2.identity.artifact.service.exception.ClientException;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.ServletContext;
 
 public class ArtifactsRepository {
 
-    private static Map<String, Artifact> artifactRegistry = new HashMap<>();
     private static ArtifactsRepository instance;
     private static String rootPath;
 
-    private ArtifactsRepository(ServletContext servletContext) throws BuilderException {
+    private ArtifactsRepository(ServletContext servletContext) {
 
         rootPath = Paths.get(servletContext.getRealPath("/"), "WEB-INF", "classes").toString();
-        populateArtifactRegistry();
     }
 
-    public static ArtifactsRepository getInstance(ServletContext servletContext) throws BuilderException {
+    public static ArtifactsRepository getInstance(ServletContext servletContext) {
 
         if (instance == null) {
             instance = new ArtifactsRepository(servletContext);
@@ -29,21 +27,26 @@ public class ArtifactsRepository {
         return instance;
     }
 
-    public Artifact findArtifact(String name) {
+    public Artifact findArtifact(String name, String spName) throws BuilderException, ClientException {
 
-        return artifactRegistry.get(name);
+        switch (name) {
+            case "spring-boot":
+                return getSpringArtifacts(spName);
+            default:
+                throw new ClientException("Cannot find artifact name.");
+        }
     }
 
     public Set<String> getArtifactNames() {
 
-        return artifactRegistry.keySet();
+        return new HashSet<String>() {{
+            add("spring-boot");
+        }};
     }
 
-    private void populateArtifactRegistry() throws BuilderException {
+    private Artifact getSpringArtifacts(String spName) throws BuilderException {
 
-        SpringBootArtifactBuilder springBootArtifactBuilder = new SpringBootArtifactBuilder(rootPath);
-        Artifact springArtifact = springBootArtifactBuilder.build();
-        artifactRegistry.put(springArtifact.getArtifactInfo().getName(), springArtifact);
+        SpringBootArtifactBuilder springBootArtifactBuilder = new SpringBootArtifactBuilder(rootPath, spName);
+        return springBootArtifactBuilder.build();
     }
-
 }

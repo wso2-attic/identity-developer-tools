@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ISServerUtil {
 
-    public Map<String, String> getOAuthProperties() {
+    public Map<String, String> getOAuthProperties(String spName) {
 
         return new HashMap<String, String>() {{
             put("client_name", "WSO2 Identity Server");

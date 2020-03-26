@@ -19,10 +19,12 @@ public class SpringBootArtifactBuilder implements ArtifactBuilder {
     private static final String PROPERTIES_FILE_NAME = "spring-security-properties.j2";
     private static final String ARTIFACT_NAME = "spring-boot";
     private final String resourcePath;
+    private String spName;
 
-    public SpringBootArtifactBuilder(String resourcePath) {
+    public SpringBootArtifactBuilder(String resourcePath, String spName) {
 
         this.resourcePath = resourcePath;
+        this.spName = spName;
     }
 
     private ArtifactData getJavaFile() throws IOException {
@@ -55,7 +57,7 @@ public class SpringBootArtifactBuilder implements ArtifactBuilder {
         artifact.setArtifactInfo(artifactInfo);
 
         ISServerUtil isServerUtil = new ISServerUtil();
-        Map<String, String> context = isServerUtil.getOAuthProperties();
+        Map<String, String> context = isServerUtil.getOAuthProperties(spName);
 
         try {
             artifact.getData().add(getJavaFile());
