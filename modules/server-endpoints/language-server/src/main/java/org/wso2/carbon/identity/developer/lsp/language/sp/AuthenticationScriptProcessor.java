@@ -37,7 +37,11 @@ import javax.script.ScriptException;
  */
 public class AuthenticationScriptProcessor implements LanguageProcessor {
 
-    private JsFunctionRegistry jsFunctionRegistry;
+    private CompletionListGenerator completionListGenerator;
+
+    public AuthenticationScriptProcessor() {
+        this.completionListGenerator = new CompletionListGenerator();
+    }
 
     @Override
     public Response process(Request request) throws LanguageException {
@@ -52,9 +56,6 @@ public class AuthenticationScriptProcessor implements LanguageProcessor {
             String text = request.getParameter("text");
             try {
                 String scope = parserT.generateParseTree(text, line, charPosition);
-
-                CompletionListGenerator completionListGenerator = new CompletionListGenerator();
-                completionListGenerator.setJsFunctionRegistry(jsFunctionRegistry);
                 successResponse.setResult(completionListGenerator.getList(scope));
             } catch (ScriptException e) {
                 throw new LanguageException("Unable to parse the scope :" + text, e);
@@ -76,8 +77,7 @@ public class AuthenticationScriptProcessor implements LanguageProcessor {
      */
     public void setJsFunctionRegistry(
             JsFunctionRegistry jsFunctionRegistry) {
-
-        this.jsFunctionRegistry = jsFunctionRegistry;
+        completionListGenerator.setJsFunctionRegistry(jsFunctionRegistry);
     }
 }
 
