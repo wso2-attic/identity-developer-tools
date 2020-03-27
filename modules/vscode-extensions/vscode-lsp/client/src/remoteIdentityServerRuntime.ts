@@ -40,7 +40,7 @@ export interface RemoteBreakpoint {
  */
 export class RemoteIdentityServerRuntime extends EventEmitter {
 
-	
+
 	private  webSocket: WebSocket;
 	private messageConnection: rpc.MessageConnection;
 
@@ -94,8 +94,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 		this.verifyBreakpoints(path);
 
 		if(this.messageConnection != null) {
-			var notification = new rpc.NotificationType("setBreakpoint")
-			this.messageConnection.sendNotification(notification, args);;
+			var notification = new rpc.NotificationType("setBreakpoint");
+			this.messageConnection.sendNotification(notification, args);
 		}
 
 
@@ -107,7 +107,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 */
 	public clearBreakpoints(path: string): void {
 		if(this.messageConnection != null) {
-			var notification = new rpc.NotificationType("clearBreakpoints")
+			var notification = new rpc.NotificationType("clearBreakpoints");
 			this.messageConnection.sendNotification(notification);
 		}
 		this._breakPoints.delete(path);
@@ -135,9 +135,9 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 
 	/**
 	 * Creates the variable request and returns the promise which can be used to perform the results on the request
-	 * @param response 
-	 * @param args 
-	 * @param request 
+	 * @param response
+	 * @param args
+	 * @param request
 	 */
 	public fetchVariables(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) :Thenable<DebugProtocol.VariablesResponse> {
 		var varaiablesRequest = new rpc.RequestType1<DebugProtocol.VariablesArguments,DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
@@ -262,7 +262,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 		// if 'log(...)' found in source -> send argument to debug console
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
-			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index)
+			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index);
 		}
 
 		// if a word in a line matches a data breakpoint, fire a 'dataBreakpoint' event
@@ -335,19 +335,20 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	}
 
 	private async connectWebsocket() {
+
 		var acessToken;
-		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
 		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.					
+			acessToken = result;
 		});
-        var options = {
-            headers: {
-				Authorization: 'Bearer ' + acessToken,
 
+		var options = {
+			headers: {
+				Authorization: 'Bearer ' + acessToken,
 			},
 			rejectUnauthorized: false
-        }
+		};
+
 		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',options);
 		this.webSocket = webSocket;
 		console.log("Listening.. " );

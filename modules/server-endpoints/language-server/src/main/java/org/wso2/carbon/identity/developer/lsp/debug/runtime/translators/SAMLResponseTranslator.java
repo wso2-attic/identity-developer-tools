@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Base64;
 
 /**
@@ -25,12 +28,15 @@ import java.util.Base64;
  */
 public class SAMLResponseTranslator implements VariableTranslator {
 
+    private static Log log = LogFactory.getLog(SAMLResponseTranslator.class);
+
     @Override
     public Object translate(Object object, int variablesReference) {
         if (object != null) {
             try {
                 return  new String(Base64.getDecoder().decode((String) object));
             } catch (IllegalArgumentException e) {
+                log.error("Error when decoding the SAML Response.", e);
                 return object;
             }
         }

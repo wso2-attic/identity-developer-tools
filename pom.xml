@@ -158,7 +158,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-<<<<<<< HEAD
                 <artifactId>maven-surefire-plugin</artifactId>
                 <executions>
                     <execution>
@@ -176,8 +175,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-=======
->>>>>>> c6fed4f79217e4bae69b331d6954f535dc5ab91a
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>8</source>
@@ -193,7 +190,7 @@
         <antlr4.version>4.7</antlr4.version>
         <developer.java-agent.version>1.0.0-SNAPSHOT</developer.java-agent.version>
         <commons-io.version>2.6</commons-io.version>
-        <identity.inbound.auth.saml.version>5.8.3-SNAPSHOT</identity.inbound.auth.saml.version>
+        <identity.inbound.auth.saml.version>5.8.3</identity.inbound.auth.saml.version>
         <commons-logging.imp.pkg.version.range>[1.2, 2.0)</commons-logging.imp.pkg.version.range>
         <websocket.version>1.1</websocket.version>
         <javassist.version>3.26.0-GA</javassist.version>

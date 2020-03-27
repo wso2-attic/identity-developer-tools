@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
  * Translator to translate the  SAML Request arguments.
  */
 public class SAMLRequestTranslator implements VariableTranslator {
+
+    private static Log log = LogFactory.getLog(SAMLRequestTranslator.class);
 
     @Override
     public Object translate(Object object, int variablesReference) {
@@ -38,6 +42,7 @@ public class SAMLRequestTranslator implements VariableTranslator {
                 try {
                     return SAMLSSOUtil.decodeForPost(samlRequest);
                 } catch (IdentityException e) {
+                    log.error("Error when decoding the SAML Request.", e);
                     return "Error when decoding the SAML Request.";
                 }
             }
