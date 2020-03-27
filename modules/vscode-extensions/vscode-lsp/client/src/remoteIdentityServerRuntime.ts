@@ -21,6 +21,7 @@ import { DebugProtocol } from 'vscode-debugprotocol';
 import { readFileSync } from 'fs';
 import * as rpc from 'vscode-ws-jsonrpc';
 
+const keytar = require('keytar');
 var WebSocket = require('ws');
 
 /**
@@ -333,8 +334,21 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 		}
 	}
 
-	private connectWebsocket() :void {
-		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',{ rejectUnauthorized: false });
+	private async connectWebsocket() {
+		var acessToken;
+		// Get the acess token from the system key chain.
+		var secret = keytar.getPassword("acessToken", "acessToken");
+		await secret.then((result) => {
+			acessToken = result; // Assign the value to acess toke.					
+		});
+        var options = {
+            headers: {
+				Authorization: 'Bearer ' + acessToken,
+
+			},
+			rejectUnauthorized: false
+        }
+		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',options);
 		this.webSocket = webSocket;
 		console.log("Listening.. " );
 		rpc.listen({

@@ -172,9 +172,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <argLine>-javaagent:${project.build.directory}/${project.artifactId}-${project.version}-jar-with-dependencies.${project.packaging}=org.wso2.carbon.identity.java.agent.LoggingInterceptor;${java.io.tmpdir}/${project.artifactId}-tests</argLine>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

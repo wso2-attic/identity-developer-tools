@@ -37,14 +37,21 @@ public class InterceptorConfigReader {
     public List<InterceptorConfig> readConfig() {
 
         ArrayList<InterceptorConfig> result = new ArrayList<>();
-        InterceptorConfig interceptorConfig = new InterceptorConfig();
-        interceptorConfig.setClassName(
+
+        InterceptorConfig samlFilterConfig = new InterceptorConfig();
+        samlFilterConfig.setClassName(
                 "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet");
-        interceptorConfig.addMethodSignature("handleAuthenticationReponseFromFramework",
+
+        samlFilterConfig.addMethodConfigs("doPost",
+                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V",
+                true, false);
+
+        samlFilterConfig.addMethodConfigs("sendResponse",
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;" +
-                        "Ljava/lang/String;" +
-                        "Lorg/wso2/carbon/identity/sso/saml/dto/SAMLSSOSessionDTO;)V");
-        result.add(interceptorConfig);
+                        "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/" +
+                        "String;Ljava/lang/String;)V", false, true);
+
+        result.add(samlFilterConfig);
         return result;
     }
 }

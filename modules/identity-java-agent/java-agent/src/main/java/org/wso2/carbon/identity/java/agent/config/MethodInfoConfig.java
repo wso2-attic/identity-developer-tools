@@ -24,11 +24,26 @@ package org.wso2.carbon.identity.java.agent.config;
 public class MethodInfoConfig {
     private String methodName;
     private String signature;
+    private boolean insertBefore;
+    private boolean insertAfter;
 
-    public MethodInfoConfig(String methodName, String signature) {
+    public boolean isInsertAfter() {
+
+        return insertAfter;
+    }
+
+
+    public boolean isInsertBefore() {
+
+        return insertBefore;
+    }
+
+    public MethodInfoConfig(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
         this.methodName = methodName;
         this.signature = signature;
+        this.insertBefore = insertBefore;
+        this.insertAfter = insertAfter;
     }
 
     public String getMethodName() {
@@ -39,5 +54,10 @@ public class MethodInfoConfig {
     public String getSignature() {
 
         return signature;
+    }
+
+    public boolean verifyMethod(String methodName, String signature) {
+
+        return (this.methodName.equals(methodName) && this.signature.equals(signature));
     }
 }

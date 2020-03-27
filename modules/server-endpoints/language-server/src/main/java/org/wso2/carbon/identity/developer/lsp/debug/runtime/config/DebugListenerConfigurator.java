@@ -37,28 +37,21 @@ public class DebugListenerConfigurator {
 
     public void configure(InterceptionEngine interceptionEngine) {
 
-        MethodEntryInterceptionFilter frameworkEntryFilter = new MethodEntryInterceptionFilter(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-                        "/impl/DefaultRequestCoordinator",
-                "handle",
+         MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
+                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet",
+                "doPost",
                 "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
 
 
-        MethodEntryInterceptionFilter nashornListener = new MethodEntryInterceptionFilter(
-                "jdk/nashorn/internal/runtime/DebuggerSupport",
-                "notifyInvoke",
-                "(Ljava/lang/invoke/MethodHandle;)V");
-
-
-        MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
+        MethodEntryInterceptionFilter samlExitFilter = new MethodEntryInterceptionFilter(
                 "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet",
-                "handleAuthenticationReponseFromFramework",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;" +
-                        "Ljava/lang/String;" +
-                        "Lorg/wso2/carbon/identity/sso/saml/dto/SAMLSSOSessionDTO;)V");
+                "sendResponse",
+                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/" +
+                        "lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;" +
+                        "Ljava/lang/String;)V");
 
-
-        interceptionEngine.addListener(samlEntryFilter, sessionManager);
+        interceptionEngine.addListener(samlExitFilter, this.sessionManager);
+        interceptionEngine.addListener(samlEntryFilter, this.sessionManager);
 
     }
 }

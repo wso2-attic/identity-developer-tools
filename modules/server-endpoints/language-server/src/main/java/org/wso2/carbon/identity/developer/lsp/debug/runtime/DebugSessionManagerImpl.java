@@ -31,7 +31,10 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.VariableBuilder;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.config.DebugListenerConfigurator;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.DefaultVariableTranslator;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.VariableTranslator;
 import org.wso2.carbon.identity.java.agent.AgentHelper;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionEngine;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionListener;
@@ -55,6 +58,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private InterceptionEngine interceptionEngine;
 
     private VariableTranslator variableTranslator;
+
+    private  VariableTranslateRegistry variableTranslateRegistry = new VariableTranslateRegistry();
 
     public void init() {
 
@@ -116,17 +121,9 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             return variablesResponse;
         }
 
-        HashMap<String, Object> variables = new HashMap<>();
-
-        Object[] arguments = methodContext.getArgumentValues();
-        if (arguments != null) {
-            for (int i = 0; i < arguments.length; i++) {
-                String variableName = deriveVariableName(methodContext.getArgumentTypes(), i);
-                variables.put(variableName, variableTranslator.translate(arguments[i],
-                        request.getVariablesReference()));
-            }
-        }
-        Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
+        VariableBuilder variableBuilder = variableTranslateRegistry.getVariablesBuilder(methodContext);
+        Argument<Map<String, Object>> variablesArgument = variableBuilder.build(methodContext.getArgumentValues(),
+                request.getVariablesReference());
 
         VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),
                 true, request.getCommand(),
@@ -148,7 +145,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         }
         Class type = argumentTypes[i];
         String simpleName = type.getSimpleName();
-        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1, simpleName.length());
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1, simpleName.length()) + "_" + i;
     }
 
     @Override

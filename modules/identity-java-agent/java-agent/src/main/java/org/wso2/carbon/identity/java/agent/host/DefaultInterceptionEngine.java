@@ -44,6 +44,9 @@ public class DefaultInterceptionEngine implements InterceptionEngine, EventPubli
         for (Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry : filters.entrySet()) {
             boolean shouldIntercept = entry.getKey().shouldIntercept(type, context);
             if (shouldIntercept) {
+
+
+
                 notifyListener(type, context, entry.getValue());
 
                 //Currently only one event lister per event type is supported.

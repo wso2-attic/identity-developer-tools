@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,11 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime;
+package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
 /**
- * Variables translator for an internal object to external form.
+ * Translator just pass the String arguments as it is.
  */
-public interface VariableTranslator {
-    Object translate(Object in, int variablesReference);
+public class StringPassTranslator implements VariableTranslator {
+
+    @Override
+    public Object translate(Object in, int variablesReference) {
+
+        return null;
+    }
 }

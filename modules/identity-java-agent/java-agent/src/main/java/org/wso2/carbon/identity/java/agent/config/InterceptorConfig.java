@@ -28,6 +28,7 @@ public class InterceptorConfig {
     private String className;
     private List<MethodInfoConfig> methodInfoConfigs = new ArrayList<>();
 
+
     public String getClassName() {
 
         return className;
@@ -38,8 +39,14 @@ public class InterceptorConfig {
         this.className = className;
     }
 
-    public void addMethodSignature(String methodName, String signature) {
-        methodInfoConfigs.add(new MethodInfoConfig(methodName, signature));
+    public void addMethodConfigs(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
+
+        methodInfoConfigs.add(new MethodInfoConfig(methodName, signature, insertBefore, insertAfter));
+    }
+
+    public List<MethodInfoConfig> getMethodInfoConfigs() {
+
+        return methodInfoConfigs;
     }
 
     public boolean hasMethodSignature(String methodName, String signature) {

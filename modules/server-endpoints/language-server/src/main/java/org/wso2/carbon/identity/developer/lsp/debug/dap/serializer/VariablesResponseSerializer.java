@@ -18,16 +18,15 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.serializer;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.stringtemplate.v4.ST;
+
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
-import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOSessionDTO;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -81,33 +80,38 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
             arrayElement.addProperty("name", entry.getKey());
             JsonObject valueObject = new JsonObject();
 
-            if (entry.getKey().equals("httpServletRequest")) {
+            if (entry.getKey().equals(DAPConstants.HTTP_SERVLET_REQUEST)) {
                 arrayElement.addProperty("type", "Object");
                 HashMap<String, Object> requestdetails = (HashMap<String, Object>) entry.getValue();
                 valueObject.add("cookies", this.getCookies(requestdetails));
                 valueObject.add("headers", this.getHeaders(requestdetails));
-                valueObject.addProperty("body", this.getBody(requestdetails));
                 arrayElement.add("value", valueObject);
-                arrayElement.addProperty("variablesReference", this.getVariablesReference(requestdetails));
-            } else if (entry.getKey().equals("httpServletResponse")) {
+                arrayElement.addProperty("variablesReference", 0);
+
+            } else if (entry.getKey().equals(DAPConstants.HTTP_SERVLET_RESPONSE)) {
+                arrayElement.addProperty("type", "Object");
                 HashMap<String, Object> responsedetails = (HashMap<String, Object>) entry.getValue();
+
                 arrayElement.add("value", new JsonObject());
                 valueObject.add("headers", this.getHeaders(responsedetails));
                 valueObject.addProperty("status", this.getResponseStatus(responsedetails));
-                arrayElement.addProperty("variablesReference", this.getVariablesReference(responsedetails));
-                arrayElement.addProperty("type", "Object");
-            } else if (entry.getKey().equals("sAMLSSOSessionDTO")) {
-                SAMLSSOSessionDTO samlssoSessionDTO = (SAMLSSOSessionDTO) entry.getValue();
-                Gson gson = new Gson();
-                String json = gson.toJson(samlssoSessionDTO);
-                JsonElement element = gson.fromJson (json, JsonElement.class);
-                JsonObject jsonObj = element.getAsJsonObject();
-                arrayElement.add("value", jsonObj);
-            } else if (entry.getKey().equals("string")) {
+                arrayElement.add("value", valueObject);
+                arrayElement.addProperty("variablesReference", 0);
+
+
+            } else if (entry.getKey().equals(DAPConstants.SAML_REQUEST)) {
+                arrayElement.addProperty("type", "String");
                 arrayElement.addProperty("value", (String) entry.getValue());
+                arrayElement.addProperty("variablesReference", 0);
+
+            } else if (entry.getKey().equals(DAPConstants.SAML_RESPONSE)) {
+                arrayElement.addProperty("type", "String");
+                arrayElement.addProperty("value", (String) entry.getValue());
+                arrayElement.addProperty("variablesReference", 0);
             }
 
-            arrayElement.addProperty("variablesReference", "0");
+            arrayElement.addProperty("type", "UnKnown");
+            arrayElement.addProperty("variablesReference", 0);
             jsonArray.add(arrayElement);
         }
         return jsonArray;
@@ -139,7 +143,6 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
     }
 
     private JsonObject getHeaders(HashMap<String, Object> requestdetails) {
-
         HashMap<String, String> headers = (HashMap<String, String>) requestdetails.get("headers");
         JsonObject arrayElement = new JsonObject();
         if (headers != null) {
@@ -148,11 +151,6 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
             }
         }
         return arrayElement;
-    }
-
-    private String getBody(HashMap<String, Object> requestdetails) {
-
-        return (String) requestdetails.get("body");
     }
 
     private int getVariablesReference(HashMap<String, Object> requestdetails) {

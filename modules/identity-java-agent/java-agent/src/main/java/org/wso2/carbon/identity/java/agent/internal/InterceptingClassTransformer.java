@@ -29,12 +29,14 @@ import javassist.runtime.Desc;
 import javassist.scopedpool.ScopedClassPoolFactoryImpl;
 import javassist.scopedpool.ScopedClassPoolRepositoryImpl;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
+import org.wso2.carbon.identity.java.agent.config.MethodInfoConfig;
 
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,30 +73,45 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         if (shouldIntercept(loader, className)) {
             log.fine("Transforming the class " + className);
             boolean isTransformed = false;
-            InterceptorConfig config = getInterceptorConfig(loader, className);
+
             try {
                 ClassPool classPool = scopedClassPoolFactory.create(loader, rootPool,
                         ScopedClassPoolRepositoryImpl.getInstance());
                 CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(
                         classfileBuffer));
                 CtMethod[] methods = ctClass.getDeclaredMethods();
+                InterceptorConfig config = getInterceptorConfig(className);
+                List<MethodInfoConfig> methodInfoConfigs = config.getMethodInfoConfigs();
+                int transformedMethodCounts = 0;
 
                 for (CtMethod method : methods) {
-                    if (config.hasMethodSignature(method.getName(), method.getSignature())) {
-                        log.info(
-                                "Intercepted method " + className + "." + method.getName() +
-                                        " " + method.getSignature());
-                        isTransformed = true;
-                        method.insertAfter(
-                                "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener.methodEntered(\""
-                                        + className + "\", \"" + method.getName() + "\", \"" + method.getSignature()
-                                        + "\", $sig, $args );");
+                    for (MethodInfoConfig methodInfoConfig : methodInfoConfigs) {
+                        if (methodInfoConfig.verifyMethod(method.getName(), method.getSignature())) {
+                            if (methodInfoConfig.isInsertBefore()) {
+                                method.insertBefore(
+                                        "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener." +
+                                                "methodEntered(\""
+                                                + className + "\", \"" + method.getName() + "\"," +
+                                                " \"" + method.getSignature()
+                                                + "\", $sig, $args );");
+                            }
+                            if (methodInfoConfig.isInsertAfter()) {
+                                method.insertAfter(
+                                        "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener." +
+                                                "methodEntered(\""
+                                                + className + "\", \"" + method.getName() + "\", \"" +
+                                                 method.getSignature()  + "\", $sig, $args );");
+                            }
+                            transformedMethodCounts++;
+                        }
                     }
                 }
-                if (isTransformed) {
+
+                if (transformedMethodCounts == methodInfoConfigs.size()) {
                     byteCode = ctClass.toBytecode();
                 }
-                ctClass.detach();
+
+              ctClass.detach();
             } catch (Throwable ex) {
                 log.log(Level.SEVERE, "Error in transforming the class: " + className, ex);
             }
@@ -127,13 +144,15 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         return false;
     }
 
-    private InterceptorConfig getInterceptorConfig(ClassLoader loader, String className) {
+    private InterceptorConfig getInterceptorConfig(String className) {
 
         return interceptorMap.get(className);
     }
 
     public void addConfig(InterceptorConfig interceptorConfig) {
 
+
         interceptorMap.put(interceptorConfig.getClassName(), interceptorConfig);
     }
+
 }

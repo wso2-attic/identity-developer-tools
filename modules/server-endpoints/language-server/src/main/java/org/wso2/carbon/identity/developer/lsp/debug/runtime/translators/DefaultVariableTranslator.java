@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,13 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime;
+package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManagerImpl;
+import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import java.io.IOException;
-import java.nio.channels.ReadableByteChannel;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -45,6 +48,15 @@ public class DefaultVariableTranslator implements VariableTranslator {
             HttpServletRequest httpServletRequest = (HttpServletRequest) object;
             requestdetails.put("cookies", httpServletRequest.getCookies());
             requestdetails.put("headers", this.getRequestHeaders(httpServletRequest));
+            if (httpServletRequest.getParameter("SAMLRequest") != null) {
+                String samlRequest = httpServletRequest.getParameter("SAMLRequest");
+                try {
+                    String decodeSAMLRequest = SAMLSSOUtil.decodeForPost(samlRequest);
+                    requestdetails.put("SAMLRequest", decodeSAMLRequest);
+                } catch (IdentityException e) {
+                    log.error("Error when decoding the SAML Request.");
+                }
+            }
             requestdetails.put("body", this.getRequestBody(httpServletRequest));
             requestdetails.put("variablesReference", variablesReference);
             return requestdetails;
@@ -56,8 +68,16 @@ public class DefaultVariableTranslator implements VariableTranslator {
             responsedetails.put("body", this.getResponseBody(httpServletResponse));
             responsedetails.put("variablesReference", variablesReference);
             return responsedetails;
+        } else if (object instanceof String) {
+            if (object != null) {
+                try {
+                     return  (Object) new String(Base64.getDecoder().decode((String) object));
+                } catch (IllegalArgumentException e) {
+                    return object;
+                }
+            }
+            return object;
         }
-
         return object;
     }
 
@@ -101,9 +121,5 @@ public class DefaultVariableTranslator implements VariableTranslator {
         }
         return headerdetails;
     }
-
-
-
-
 
 }
