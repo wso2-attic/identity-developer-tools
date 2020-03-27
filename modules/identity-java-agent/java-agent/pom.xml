@@ -30,7 +30,6 @@
 
 
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
     <name>Java agent for Identity Server-inline debug</name>
     <url>http://wso2.org</url>
 

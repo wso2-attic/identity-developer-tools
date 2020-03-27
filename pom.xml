@@ -23,7 +23,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.identity.developer</groupId>
-    <artifactId>identity-developer</artifactId>
+    <artifactId>identity-developer-tools</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Identity Developer Tools- Identity Server- Inline debug</name>
@@ -158,6 +158,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+<<<<<<< HEAD
                 <artifactId>maven-surefire-plugin</artifactId>
                 <executions>
                     <execution>
@@ -175,6 +176,8 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+=======
+>>>>>>> c6fed4f79217e4bae69b331d6954f535dc5ab91a
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>8</source>
