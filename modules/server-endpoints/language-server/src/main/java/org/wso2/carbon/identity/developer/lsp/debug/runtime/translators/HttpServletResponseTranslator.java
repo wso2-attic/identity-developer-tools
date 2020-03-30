@@ -18,15 +18,26 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 
 import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Translator to translate the  Http Servlet Response arguments.
  */
 public class HttpServletResponseTranslator implements VariableTranslator {
+
+    private HttpServletResponseTranslator() {}
+
+    private static class HttpServletResponseTranslatorHolder {
+        private static final HttpServletResponseTranslator INSTANCE = new HttpServletResponseTranslator();
+    }
+
+    public static HttpServletResponseTranslator getInstance() {
+        return HttpServletResponseTranslatorHolder.INSTANCE;
+    }
 
     @Override
     public Object translate(Object object, int variablesReference) {
@@ -34,9 +45,9 @@ public class HttpServletResponseTranslator implements VariableTranslator {
         HashMap<String, Object> responsedetails = new HashMap<>();
         if (object != null && object instanceof HttpServletRequest) {
             HttpServletResponse httpServletResponse = (HttpServletResponse) object;
-            responsedetails.put("status", httpServletResponse.getStatus());
-            responsedetails.put("headers", this.getResponseHeaders(httpServletResponse));
-            responsedetails.put("variablesReference", variablesReference);
+            responsedetails.put(DAPConstants.JSON_KEY_FOR_STATUS, httpServletResponse.getStatus());
+            responsedetails.put(DAPConstants.JSON_KEY_FOR_HEADERS, this.getResponseHeaders(httpServletResponse));
+            responsedetails.put(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, variablesReference);
         }
         return responsedetails;
 

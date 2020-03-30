@@ -236,12 +236,9 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 		if(this._iamRemoteRuntime != null) {
 			// Create the remote variable request and await the response
 			var answer = this._iamRemoteRuntime.fetchVariables(response, args, request);
-			console.log("Variables "+answer);
 			answer.then((remoteResponse) => {
-				console.log("Remote variable Values "+remoteResponse.body);
 				remoteResponse.body.variables.forEach( (element) => {
 					element.value=JSON.stringify(element.value)
-					console.log(element.value);
 					element.type=typeof(element.value);
 					element.variablesReference=args.variablesReference;
 					variables.push(element);

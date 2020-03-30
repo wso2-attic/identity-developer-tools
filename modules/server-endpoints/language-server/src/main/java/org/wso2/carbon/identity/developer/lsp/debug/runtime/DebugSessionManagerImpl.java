@@ -33,8 +33,6 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRespon
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.VariableBuilder;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.config.DebugListenerConfigurator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.DefaultVariableTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.VariableTranslator;
 import org.wso2.carbon.identity.java.agent.AgentHelper;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionEngine;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionListener;
@@ -52,19 +50,13 @@ import javax.websocket.Session;
 public class DebugSessionManagerImpl implements DebugSessionManager, InterceptionListener {
 
     private static Log log = LogFactory.getLog(DebugSessionManagerImpl.class);
-
     private Map<Session, DebugSession> activeDebugSessions = new HashMap<>();
-
     private InterceptionEngine interceptionEngine;
-
-    private VariableTranslator variableTranslator;
-
     private  VariableTranslateRegistry variableTranslateRegistry = new VariableTranslateRegistry();
 
     public void init() {
 
         interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
-        variableTranslator = new DefaultVariableTranslator();
         if (interceptionEngine == null) {
             log.error(
                     "Java Instrumentation needed for debug is not initialized. Debugging will not function correctly");
@@ -129,23 +121,6 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
                 true, request.getCommand(),
                 request.getCommand(), variablesArgument);
         return variablesResponse;
-    }
-
-    /**
-     * Creates an appropriate variable name for the given argument type.
-     *
-     * @param argumentTypes
-     * @param i
-     * @return
-     */
-    private String deriveVariableName(Class[] argumentTypes, int i) {
-
-        if (argumentTypes == null || argumentTypes.length < i) {
-            return "arg_" + i;
-        }
-        Class type = argumentTypes[i];
-        String simpleName = type.getSimpleName();
-        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1, simpleName.length()) + "_" + i;
     }
 
     @Override

@@ -19,10 +19,7 @@
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.HttpServletResponseTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.SAMLRequestTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.SAMLResponseTranslator;
-
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.VariableTranslateRegistry;
 import java.util.Map;
 
 /**
@@ -31,30 +28,21 @@ import java.util.Map;
 public class SAMLExitVariableBuilder implements VariableBuilder {
 
     private SAMLExitResponseVariable samlExitResponseVariable;
+    private VariableTranslateRegistry variableTranslateRegistry;
 
-    public SAMLExitVariableBuilder() {
+    public SAMLExitVariableBuilder(VariableTranslateRegistry variableTranslateRegistry) {
         this.samlExitResponseVariable = new SAMLExitResponseVariable();
+        this.variableTranslateRegistry = variableTranslateRegistry;
     }
-
-
-    public Object translateHttpResponse(Object[] arguments, int variablesReference) {
-            return new HttpServletResponseTranslator().translate(arguments[1],
-                variablesReference);
-    }
-
-    public Object translateSAMLResponse(Object[] arguments, int variablesReference) {
-        return new SAMLResponseTranslator().translate(arguments[3],
-                variablesReference);
-    }
-
 
     @Override
     public Argument<Map<String, Object>> build(Object[] arguments, int variablesReference) {
 
-        this.samlExitResponseVariable.setHttpServletResponse(translateHttpResponse(arguments,
-                variablesReference + 1));
-        this.samlExitResponseVariable.setSAMLResponse(translateSAMLResponse(arguments,
-                variablesReference + 1));
+        this.samlExitResponseVariable.setHttpServletResponse(
+                variableTranslateRegistry.translateHttpResponse(arguments[1],
+                variablesReference));
+        this.samlExitResponseVariable.setSAMLResponse(variableTranslateRegistry.translateSAMLResponse(arguments[3],
+                variablesReference));
         return new Argument<Map<String, Object>>(samlExitResponseVariable.getVariables());
     }
 
