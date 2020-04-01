@@ -19,7 +19,8 @@
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.VariableTranslateRegistry;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.HttpServletRequestTranslator;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.SAMLRequestTranslator;
 
 import java.util.Map;
 
@@ -29,20 +30,31 @@ import java.util.Map;
 public class SAMLEntryVariableBuilder implements VariableBuilder {
 
     private SAMLEntryRequestVariable samlEntryRequestVariable;
-    private VariableTranslateRegistry variableTranslateRegistry;
 
-    public SAMLEntryVariableBuilder(VariableTranslateRegistry variableTranslateRegistry) {
-        this.variableTranslateRegistry = variableTranslateRegistry;
+    public SAMLEntryVariableBuilder() {
+
         this.samlEntryRequestVariable = new SAMLEntryRequestVariable();
     }
+
+
+    public Object translateHttpRequest(Object[] arguments, int variablesReference) {
+            return new HttpServletRequestTranslator().translate(arguments[0],
+                variablesReference);
+    }
+
+    public Object translateSAMLRequest(Object[] arguments, int variablesReference) {
+        return new SAMLRequestTranslator().translate(arguments[0],
+                variablesReference);
+    }
+
 
     @Override
     public Argument<Map<String, Object>> build(Object[] arguments, int variablesReference) {
 
-        this.samlEntryRequestVariable.setHttpServletRequest(variableTranslateRegistry.translateHttpRequest(arguments[0],
-                variablesReference));
-        this.samlEntryRequestVariable.setSAMLRequest(variableTranslateRegistry.translateSAMLRequest(arguments[0],
-                variablesReference));
+        this.samlEntryRequestVariable.setHttpServletRequest(translateHttpRequest(arguments,
+                variablesReference + 1));
+        this.samlEntryRequestVariable.setSAMLRequest(translateSAMLRequest(arguments,
+                variablesReference + 1));
         return new Argument<Map<String, Object>>(samlEntryRequestVariable.getVariables());
     }
 

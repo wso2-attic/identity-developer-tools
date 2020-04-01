@@ -23,17 +23,6 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
  */
 public class StringPassTranslator implements VariableTranslator {
 
-    private StringPassTranslator() {}
-
-    private static class StringPassTranslatorHolder {
-        private static final StringPassTranslator INSTANCE = new StringPassTranslator();
-    }
-
-    public static StringPassTranslator getInstance() {
-        return StringPassTranslatorHolder.INSTANCE;
-    }
-
-
     @Override
     public Object translate(Object in, int variablesReference) {
 

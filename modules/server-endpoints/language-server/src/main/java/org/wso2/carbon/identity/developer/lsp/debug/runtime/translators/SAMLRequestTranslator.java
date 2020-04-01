@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.base.IdentityException;
-import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,23 +32,13 @@ public class SAMLRequestTranslator implements VariableTranslator {
 
     private static Log log = LogFactory.getLog(SAMLRequestTranslator.class);
 
-    private SAMLRequestTranslator() {}
-
-    private static class SAMLRequestTranslatorHolder {
-        private static final SAMLRequestTranslator INSTANCE = new SAMLRequestTranslator();
-    }
-
-    public static SAMLRequestTranslator getInstance() {
-        return SAMLRequestTranslatorHolder.INSTANCE;
-    }
-
     @Override
     public Object translate(Object object, int variablesReference) {
 
         if (object instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) object;
-            if (httpServletRequest.getParameter(DAPConstants.SAML_REQUEST) != null) {
-                String samlRequest = httpServletRequest.getParameter(DAPConstants.SAML_REQUEST);
+            if (httpServletRequest.getParameter("SAMLRequest") != null) {
+                String samlRequest = httpServletRequest.getParameter("SAMLRequest");
                 try {
                     return SAMLSSOUtil.decodeForPost(samlRequest);
                 } catch (IdentityException e) {

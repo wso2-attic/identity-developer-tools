@@ -92,8 +92,6 @@
 
 
     <build>
-
-        <finalName>lsp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

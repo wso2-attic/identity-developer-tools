@@ -22,72 +22,36 @@ import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.SAMLEntryVariableBuilder;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.SAMLExitVariableBuilder;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.VariableBuilder;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.HttpServletRequestTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.HttpServletResponseTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.SAMLRequestTranslator;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.translators.SAMLResponseTranslator;
 import org.wso2.carbon.identity.java.agent.host.MethodContext;
 
 import java.util.HashMap;
 
 /**
  * Registry to get the relevant Translator for the Method Context.
- *  This class is used to get the corresponding Builder for the Method Context and
- *  Get relavant Translators for the arguments.
  */
 public class VariableTranslateRegistry {
     private HashMap<String, VariableBuilder> registry = new HashMap<>();
 
     public VariableTranslateRegistry() {
-
-        readConfig();
+        readconfig();
 
     }
 
-    private void readConfig() {
+    private void readconfig() {
 
-        String samlEntrykey = getKeyFromContext(DAPConstants.SAML_ENTRY_CLASS, DAPConstants.SAML_ENTRY_METHOD,
-                DAPConstants.SAML_ENTRY_SIGNATURE);
+        String samlEntrykey =
+                DAPConstants.SAML_ENTRY_CLASS + DAPConstants.SAML_ENTRY_METHOD + DAPConstants.SAML_ENTRY_SIGNATURE;
 
         String samlExitkey =
-                getKeyFromContext(DAPConstants.SAML_EXIT_CLASS,
-                        DAPConstants.SAML_EXIT_METHOD, DAPConstants.SAML_EXIT_SIGNATURE);
+                DAPConstants.SAML_EXIT_CLASS + DAPConstants.SAML_EXIT_METHOD + DAPConstants.SAML_EXIT_SIGNATURE;
 
-        registry.put(samlEntrykey, new SAMLEntryVariableBuilder(this));
-        registry.put(samlExitkey, new SAMLExitVariableBuilder(this));
+        registry.put(samlEntrykey, new SAMLEntryVariableBuilder());
+        registry.put(samlExitkey, new SAMLExitVariableBuilder());
     }
 
     public VariableBuilder getVariablesBuilder(MethodContext methodContext) {
-
         return registry.get(
-                getKeyFromContext(methodContext.getClassName(),
-                        methodContext.getMethodName(), methodContext.getMethodSignature()));
+                methodContext.getClassName() + methodContext.getMethodName() + methodContext.getMethodSignature());
     }
-
-    private String getKeyFromContext(String className, String methodName, String methodSignature) {
-
-        return className + "#" + methodName + "#" + methodSignature;
-    }
-
-    public Object translateHttpRequest(Object argument, int variablesReference) {
-        return HttpServletRequestTranslator.getInstance().translate(argument,
-                variablesReference);
-    }
-
-    public Object translateSAMLRequest(Object argument, int variablesReference) {
-        return SAMLRequestTranslator.getInstance().translate(argument,
-                variablesReference);
-    }
-
-    public Object translateHttpResponse(Object argument, int variablesReference) {
-        return HttpServletResponseTranslator.getInstance().translate(argument,
-                variablesReference);
-    }
-
-    public Object translateSAMLResponse(Object argument, int variablesReference) {
-        return SAMLResponseTranslator.getInstance().translate(argument,
-                variablesReference);
-    }
-
 }
 

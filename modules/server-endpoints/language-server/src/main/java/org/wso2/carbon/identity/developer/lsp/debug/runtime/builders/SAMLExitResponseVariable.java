@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
+
 import java.util.HashMap;
 
 /**
@@ -27,6 +28,7 @@ import java.util.HashMap;
 public class SAMLExitResponseVariable implements SAMLExitVariablePlan {
 
     HashMap<String, Object> variables = new HashMap<>();
+
 
     public HashMap<String, Object> getVariables() {
 

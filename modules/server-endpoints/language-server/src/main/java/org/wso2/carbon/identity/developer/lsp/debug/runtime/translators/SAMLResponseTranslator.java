@@ -30,17 +30,6 @@ public class SAMLResponseTranslator implements VariableTranslator {
 
     private static Log log = LogFactory.getLog(SAMLResponseTranslator.class);
 
-    private SAMLResponseTranslator() {}
-
-    private static class SAMLResponseTranslatorHolder {
-        private static final SAMLResponseTranslator INSTANCE = new SAMLResponseTranslator();
-    }
-
-    public static SAMLResponseTranslator getInstance() {
-        return SAMLResponseTranslatorHolder.INSTANCE;
-    }
-
-
     @Override
     public Object translate(Object object, int variablesReference) {
         if (object != null) {
