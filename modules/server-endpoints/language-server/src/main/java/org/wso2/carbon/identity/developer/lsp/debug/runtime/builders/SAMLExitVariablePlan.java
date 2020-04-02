@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,11 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime;
+package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 /**
- * Variables translator for an internal object to external form.
+ * Interface to help build the SAMLEntryVariable.
  */
-public interface VariableTranslator {
-    Object translate(Object in, int variablesReference);
+public interface SAMLExitVariablePlan {
+    public void setHttpServletResponse(Object httpServletResponse);
+    public void setSAMLResponse(Object samlResponse);
 }

@@ -27,9 +27,12 @@ import { basename } from 'path';
 import { RemoteIdentityServerRuntime, RemoteBreakpoint } from './remoteIdentityServerRuntime';
 import * as rpc from 'vscode-ws-jsonrpc';
 import { NotificationType } from 'vscode-ws-jsonrpc';
+import {PreviewManager} from "./lspModules/PreviewManager";
 
 var WebSocket = require('ws');
 const { Subject } = require('await-notify');
+const path = require('path');
+var format = require("string-template");
 
 function timeout(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -182,7 +185,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 					return {
 						line: args.line,
 						column: this.convertDebuggerColumnToClient(col)
-					}
+					};
 				})
 			};
 		} else {
@@ -230,21 +233,59 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
+	protected escapeHtml(unsafe) {
+		return unsafe
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
+	}
+
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
 		const variables: DebugProtocol.Variable[] = [];
 		if(this._iamRemoteRuntime != null) {
 			// Create the remote variable request and await the response
 			var answer = this._iamRemoteRuntime.fetchVariables(response, args, request);
-			console.log("Variables "+answer);
 			answer.then((remoteResponse) => {
-				console.log("Remote variable Values "+remoteResponse.body);
 				remoteResponse.body.variables.forEach( (element) => {
-					element.value=JSON.stringify(element.value)
+
+
+					if (element.name=="SAMLRequest" && !element.value.includes("NO SAML Request Added") ){
+						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
+						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
+						let panel = viewPanelHolder.getPanel();
+						let currentHtml= viewPanelHolder.getCurrentHtml();
+						let newHtml = format(currentHtml, {
+							SAML_REQUEST: this.escapeHtml(element.value),
+							SAML_RESPONSE:"{SAML_RESPONSE}"
+							
+						});
+						panel.webview.html = newHtml;
+						viewPanelHolder.setCurrentHtml(newHtml);
+					}
+					else if(element.name=="SAMLResponse"){
+						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
+						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
+						let panel = viewPanelHolder.getPanel();
+						let currentHtml= viewPanelHolder.getCurrentHtml();
+						let newHtml = format(currentHtml, {
+							SAML_RESPONSE:this.escapeHtml(element.value)
+
+						});
+						panel.webview.html = newHtml;
+						viewPanelHolder.setCurrentHtml(newHtml);
+					}
+
 					element.type=typeof(element.value);
 					element.variablesReference=args.variablesReference;
+					element.value=JSON.stringify(element.value);
 					variables.push(element);
+
+
 				});
+
 
 				response.body = {
 					variables: variables
@@ -280,7 +321,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
 		this._iamRemoteRuntime.continue(true);
 		this.sendResponse(response);
- 	}
+	}
 
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 		this._iamRemoteRuntime.step();
@@ -306,11 +347,11 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected dataBreakpointInfoRequest(response: DebugProtocol.DataBreakpointInfoResponse, args: DebugProtocol.DataBreakpointInfoArguments): void {
 
 		response.body = {
-            dataId: null,
-            description: "cannot break on data access",
-            accessTypes: undefined,
-            canPersist: false
-        };
+			dataId: null,
+			description: "cannot break on data access",
+			accessTypes: undefined,
+			canPersist: false
+		};
 
 		if (args.variablesReference && args.name) {
 			const id = this._variableHandles.get(args.variablesReference);

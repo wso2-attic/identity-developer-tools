@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
+import org.wso2.carbon.identity.developer.lsp.debug.runtime.builders.VariableBuilder;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.config.DebugListenerConfigurator;
 import org.wso2.carbon.identity.java.agent.AgentHelper;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionEngine;
@@ -49,17 +50,13 @@ import javax.websocket.Session;
 public class DebugSessionManagerImpl implements DebugSessionManager, InterceptionListener {
 
     private static Log log = LogFactory.getLog(DebugSessionManagerImpl.class);
-
     private Map<Session, DebugSession> activeDebugSessions = new HashMap<>();
-
     private InterceptionEngine interceptionEngine;
-
-    private VariableTranslator variableTranslator;
+    private  VariableTranslateRegistry variableTranslateRegistry = new VariableTranslateRegistry();
 
     public void init() {
 
         interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
-        variableTranslator = new DefaultVariableTranslator();
         if (interceptionEngine == null) {
             log.error(
                     "Java Instrumentation needed for debug is not initialized. Debugging will not function correctly");
@@ -116,39 +113,14 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             return variablesResponse;
         }
 
-        HashMap<String, Object> variables = new HashMap<>();
-
-        Object[] arguments = methodContext.getArgumentValues();
-        if (arguments != null) {
-            for (int i = 0; i < arguments.length; i++) {
-                String variableName = deriveVariableName(methodContext.getArgumentTypes(), i);
-                variables.put(variableName, variableTranslator.translate(arguments[i],
-                        request.getVariablesReference()));
-            }
-        }
-        Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
+        VariableBuilder variableBuilder = variableTranslateRegistry.getVariablesBuilder(methodContext);
+        Argument<Map<String, Object>> variablesArgument = variableBuilder.build(methodContext.getArgumentValues(),
+                request.getVariablesReference());
 
         VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),
                 true, request.getCommand(),
                 request.getCommand(), variablesArgument);
         return variablesResponse;
-    }
-
-    /**
-     * Creates an appropriate variable name for the given argument type.
-     *
-     * @param argumentTypes
-     * @param i
-     * @return
-     */
-    private String deriveVariableName(Class[] argumentTypes, int i) {
-
-        if (argumentTypes == null || argumentTypes.length < i) {
-            return "arg_" + i;
-        }
-        Class type = argumentTypes[i];
-        String simpleName = type.getSimpleName();
-        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1, simpleName.length());
     }
 
     @Override
@@ -223,9 +195,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Map.Entry<Session, DebugSession> findInterestedDebugSession(MethodContext methodContext) {
 
         //For not, just return the first entry. We need to have a better filter later.
-//        if (!methodContext.getClassName().equals(
-//                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-//                        "/impl/DefaultRequestCoordinator")) {
+
         if (!methodContext.getClassName().equals(
                 "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet")) {
             return null;

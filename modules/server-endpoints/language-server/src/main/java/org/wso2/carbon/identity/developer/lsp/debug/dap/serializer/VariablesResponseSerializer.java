@@ -23,6 +23,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
 
@@ -41,10 +43,9 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-
-        object.addProperty("jsonrpc", "2.0");
-        object.addProperty("id", response.getId());
-        object.add("result", generateResultObject(response));
+        object.addProperty(DAPConstants.JSON_KEY_FOR_JSONRPC, DAPConstants.JSONRPC_VERSION);
+        object.addProperty(DAPConstants.JSON_KEY_FOR_ID, response.getId());
+        object.add(DAPConstants.JSON_KEY_FOR_RESULT, generateResultObject(response));
 
 
         return object;
@@ -53,13 +54,12 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
     private JsonElement generateResultObject(VariablesResponse response) {
 
         JsonObject object = new JsonObject();
-
-        object.addProperty("command", response.getCommand());
-        object.addProperty("message", response.getMessage());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_COMMAND, response.getCommand());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_MESSAGE, response.getMessage());
 
         JsonObject body = new JsonObject();
-        object.add("body", body);
-        body.add("variables", generateVariablesArray(response));
+        object.add(DAPConstants.JSON_KEY_FOR_BODY, body);
+        body.add(DAPConstants.JSON_KEY_FOR_VARIABLES, generateVariablesArray(response));
         return object;
     }
 
@@ -75,46 +75,65 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
 
         for (Map.Entry<String, Object> entry : variables.entrySet()) {
             JsonObject arrayElement = new JsonObject();
-            arrayElement.addProperty("name", entry.getKey());
+            arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_NAME, entry.getKey());
             JsonObject valueObject = new JsonObject();
 
-            if (entry.getKey().equals("httpServletRequest")) {
-                arrayElement.addProperty("type", "Object");
-                HashMap<String, Object> requestdetails = (HashMap<String, Object>) entry.getValue();
-                valueObject.add("cookies", this.getCookies(requestdetails));
-                valueObject.add("headers", this.getHeaders(requestdetails));
-                valueObject.addProperty("body", this.getBody(requestdetails));
-                arrayElement.add("value", valueObject);
-                arrayElement.addProperty("variablesReference", this.getVariablesReference(requestdetails));
-            } else if (entry.getKey().equals("httpServletResponse")) {
-                HashMap<String, Object> responsedetails = (HashMap<String, Object>) entry.getValue();
-                arrayElement.add("value", new JsonObject());
-                valueObject.add("headers", this.getHeaders(responsedetails));
-                valueObject.addProperty("body", this.getBody(responsedetails));
-                arrayElement.addProperty("variablesReference", this.getVariablesReference(responsedetails));
-                arrayElement.addProperty("type", "Object");
+            switch (entry.getKey()) {
+                case DAPConstants.HTTP_SERVLET_REQUEST:
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_OBJECT);
+                    HashMap<String, Object> requestdetails = (HashMap<String, Object>) entry.getValue();
+                    valueObject.add(DAPConstants.JSON_KEY_FOR_COOKIES, this.getCookies(requestdetails));
+                    valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(requestdetails));
+                    arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                    break;
+                case DAPConstants.HTTP_SERVLET_RESPONSE:
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_OBJECT);
+                    HashMap<String, Object> responsedetails = (HashMap<String, Object>) entry.getValue();
+                    valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(responsedetails));
+                    valueObject.addProperty(DAPConstants.JSON_KEY_FOR_STATUS, this.getResponseStatus(responsedetails));
+                    arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                    break;
+                case DAPConstants.SAML_REQUEST:
+                case DAPConstants.SAML_RESPONSE:
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_STRING);
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VALUE, (String) entry.getValue());
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                    break;
+                default:
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_UNKNOWN);
+                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+                    break;
             }
-            arrayElement.addProperty("variablesReference", "0");
             jsonArray.add(arrayElement);
         }
         return jsonArray;
     }
 
+    private Integer getResponseStatus(HashMap<String, Object> responsedetails) {
+
+        return (Integer) responsedetails.get(DAPConstants.JSON_KEY_FOR_STATUS);
+    }
+
     private JsonArray getCookies(HashMap<String, Object> requestdetails) {
 
-        Object object = requestdetails.get("cookies");
+        Object object = requestdetails.get(DAPConstants.JSON_KEY_FOR_COOKIES);
         JsonArray cookieJsonArray = new JsonArray();
         if (object != null) {
             Cookie[] cookies = (Cookie[]) object;
             for (Cookie cookie : cookies) {
                 JsonObject valueObject = new JsonObject();
-                valueObject.addProperty("name", cookie.getName());
-                valueObject.addProperty("value", cookie.getValue());
-                valueObject.addProperty("version", cookie.getVersion());
-                valueObject.addProperty("secure", cookie.getSecure());
-                valueObject.addProperty("path", cookie.getPath());
-                valueObject.addProperty("maxage", cookie.getMaxAge());
-                valueObject.addProperty("domain", cookie.getDomain());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_NAME, cookie.getName());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_VALUE, cookie.getValue());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_VERSION, cookie.getVersion());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_SECURE, cookie.getSecure());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_PATH, cookie.getPath());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_MAXAGE, cookie.getMaxAge());
+                valueObject.addProperty(DAPConstants.JSON_KEY_FOR_DOMAIN, cookie.getDomain());
                 cookieJsonArray.add(valueObject);
             }
         }
@@ -123,7 +142,8 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
 
     private JsonObject getHeaders(HashMap<String, Object> requestdetails) {
 
-        HashMap<String, String> headers = (HashMap<String, String>) requestdetails.get("headers");
+        HashMap<String, String> headers =
+                (HashMap<String, String>) requestdetails.get(DAPConstants.JSON_KEY_FOR_HEADERS);
         JsonObject arrayElement = new JsonObject();
         if (headers != null) {
             for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -133,14 +153,9 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
         return arrayElement;
     }
 
-    private String getBody(HashMap<String, Object> requestdetails) {
-
-        return (String) requestdetails.get("body");
-    }
-
     private int getVariablesReference(HashMap<String, Object> requestdetails) {
 
-        return (int) requestdetails.get("variablesReference");
+        return (int) requestdetails.get(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE);
     }
 
 }

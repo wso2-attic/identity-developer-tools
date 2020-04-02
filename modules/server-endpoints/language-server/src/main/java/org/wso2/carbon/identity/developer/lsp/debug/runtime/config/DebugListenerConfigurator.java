@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.config;
 
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManagerImpl;
 import org.wso2.carbon.identity.java.agent.connect.InterceptionEngine;
 import org.wso2.carbon.identity.java.agent.connect.MethodEntryInterceptionFilter;
@@ -37,27 +38,19 @@ public class DebugListenerConfigurator {
 
     public void configure(InterceptionEngine interceptionEngine) {
 
-        MethodEntryInterceptionFilter frameworkEntryFilter = new MethodEntryInterceptionFilter(
-                "org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-                        "/impl/DefaultRequestCoordinator",
-                "handle",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
+         MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
+                 DAPConstants.SAML_ENTRY_CLASS,
+                 DAPConstants.SAML_ENTRY_METHOD,
+                DAPConstants.SAML_ENTRY_SIGNATURE);
 
-        interceptionEngine.addListener(frameworkEntryFilter, sessionManager);
 
-        MethodEntryInterceptionFilter nashornListener = new MethodEntryInterceptionFilter(
-                "jdk/nashorn/internal/runtime/DebuggerSupport",
-                "notifyInvoke",
-                "(Ljava/lang/invoke/MethodHandle;)V");
+        MethodEntryInterceptionFilter samlExitFilter = new MethodEntryInterceptionFilter(
+                DAPConstants.SAML_EXIT_CLASS,
+                DAPConstants.SAML_EXIT_METHOD,
+                DAPConstants.SAML_EXIT_SIGNATURE);
 
-        interceptionEngine.addListener(nashornListener, sessionManager);
-
-        MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
-                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet",
-                "doPost",
-                "(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V");
-
-        interceptionEngine.addListener(samlEntryFilter, sessionManager);
+        interceptionEngine.addListener(samlExitFilter, this.sessionManager);
+        interceptionEngine.addListener(samlEntryFilter, this.sessionManager);
 
     }
 }

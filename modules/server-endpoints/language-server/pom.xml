@@ -61,7 +61,11 @@
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.wso2.carbon.identity.inbound.auth.saml2</groupId>
+            <artifactId>org.wso2.carbon.identity.query.saml</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.functions.library.mgt</artifactId>
@@ -80,7 +84,16 @@
         </dependency>
 
     </dependencies>
+    <properties>
+        <import.package>
+            org.apache.commons.logging; version="${commons-logging.imp.pkg.version.range}",
+        </import.package>
+    </properties>
+
+
     <build>
+
+        <finalName>lsp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
