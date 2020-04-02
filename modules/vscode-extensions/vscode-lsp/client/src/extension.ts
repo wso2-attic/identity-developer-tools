@@ -51,7 +51,7 @@ export function activate(context: ExtensionContext) {
 	// The Object Of the FileHandler.
 	const fileHandler = new FileHandler();
 	// The Object Of the previewManager.
-	const previewManager = new PreviewManager();
+	const previewManager = PreviewManager.getInstance();
 	// The object of the ServiceManger.
 	const serviceManger = new ServiceManger(context);
 	// The server is implemented in node

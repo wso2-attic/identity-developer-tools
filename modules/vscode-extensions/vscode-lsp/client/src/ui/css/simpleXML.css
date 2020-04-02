@@ -1,0 +1,69 @@
+﻿.simpleXML ul
+{
+    list-style: none;
+    margin: 0px;
+    padding-left: 32px;
+}
+
+.simpleXML
+{
+    font-family: 'Courier New';
+}
+
+.simpleXML-comment
+{
+    color: green;
+}
+
+.simpleXML-tagHeader
+{
+    color: blue;
+}
+
+.simpleXML-cdata
+{
+    color: gray;
+}
+
+.simpleXML-tagValue
+{
+    color: darkred;
+}
+
+.simpleXML-collapsedText
+{
+    color: lightgray;
+}
+
+.simpleXML-attrName {
+	color: red;
+}
+
+.simpleXML-attrValue {
+	color: blue;
+}
+
+.simpleXML span.simpleXML-expander, .simpleXML span.simpleXML-expanderClose
+{
+    height: 12px;
+    width: 12px;
+    display: inline-block;
+}
+
+.simpleXML span.simpleXML-expanderHeader
+{
+    cursor: pointer;
+}
+
+.simpleXML span.simpleXML-expander-expanded:before {
+    content: "▼ ";
+    padding-right: 8px;
+    color: black;
+}
+
+
+.simpleXML span.simpleXML-expander-collapsed:before {
+    content: "▶";
+    padding-right: 8px;
+    color: black;
+}

@@ -3,26 +3,62 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { FileHandler } from './fileHandler';
 import { Wso2OAuth } from './oAuthService';
+import { ViewPanelHolder } from './ViewPanelHolder';
 const keytar = require('keytar');
 // Object of the FileHandler.
 const fileHandler = new FileHandler();
+var format = require("string-template");
 const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_functional_lib_view";
 export class PreviewManager {
+
+
+
+
+	private static instance: PreviewManager;
+	private _previewManagers = new Map<string, ViewPanelHolder>();
+
+
+	private constructor() { }
+
+
+
+	public static getInstance(): PreviewManager {
+		if (!PreviewManager.instance) {
+			PreviewManager.instance = new PreviewManager();
+		}
+
+		return PreviewManager.instance;
+	}
+
+	public getPreviewManagers(){
+		return this._previewManagers;
+	}
+
 
 	/**
 	 * generateWebViewPanel() to generate the web View panel to render web view.
 	 */
 	public generateWebViewPanel(xmlFilePath, context) {
-		const previewManager = new PreviewManager();
+		const previewManager = PreviewManager.getInstance();
 		var serviceName = String(fileHandler.extractFileName(xmlFilePath));
 		// Read the XML file and generate the web view panel.
 		fs.readFile(xmlFilePath, 'utf8', function (err: any, data: any) {
 			// Get the text of the file.
 			const code = String(data);
-			const pathToHtml = vscode.Uri.file(
+
+			const pathUri = vscode.Uri.file(
 				path.join(context.extensionPath, 'client', 'src', 'ui', 'diagram.html')
-			);
-			const pathUri = pathToHtml.with({ scheme: 'vscode-resource' });
+			).with({ scheme: 'vscode-resource' });
+
+			const pathCss = vscode.Uri.file(
+				path.join(context.extensionPath, 'client', 'src', 'ui','css')
+			).with({ scheme: 'vscode-resource' });
+
+			const pathJS = vscode.Uri.file(
+				path.join(context.extensionPath, 'client', 'src', 'ui', 'js')
+			).with({ scheme: 'vscode-resource' });
+
+
 			const panel = vscode.window.createWebviewPanel(
 				'Diagram',
 				serviceName,
@@ -33,8 +69,10 @@ export class PreviewManager {
 
 				}
 			);
-			// Assign html code to the web view panel.	
-			panel.webview.html = previewManager.getWebviewContent(code, pathUri, xmlFilePath);
+			// Assign html code to the web view panel.
+			const htmlGenerated=previewManager.getWebviewContent(code, pathUri, xmlFilePath,pathCss,pathJS);
+
+			panel.webview.html = htmlGenerated;
 			panel.webview.onDidReceiveMessage(
 				message => {
 					fileHandler.handleButtonClick(message, xmlFilePath);
@@ -42,6 +80,10 @@ export class PreviewManager {
 				undefined,
 				context.subscriptions
 			);
+			let key=fileHandler.extractFileName(xmlFilePath).replace('%20', ' ');
+
+			let viewPanelHolder= new ViewPanelHolder(panel,htmlGenerated);
+			previewManager.getPreviewManagers().set(key,viewPanelHolder);
 		});
 	}
 
@@ -49,12 +91,18 @@ export class PreviewManager {
 	/**
 	 * getWebviewContent() to generate the html of web view.
 	 */
-	public getWebviewContent(xmlCode, path, filepath) {
+	public getWebviewContent(xmlCode, path, filepath,pathCss,pathJS) {
 		var htmlCode = fileHandler.getHTMLCode(path.fsPath);
-		var re = /myXML/gi;
-		var pa = /myfilepath/gi;
-		// Replace the xml code and the filepath in html code.	
-		var newHtml = htmlCode.replace(re, xmlCode).replace(pa, filepath);
+
+		let newHtml = format(htmlCode, {
+			myXML: xmlCode,
+			myfilepath:filepath,
+			pathCss:pathCss,
+			pathJS:pathJS,
+			SAML_REQUEST:"{SAML_REQUEST}",
+			SAML_RESPONSE:"{SAML_RESPONSE}"
+		});
+
 		return newHtml;
 	}
 

@@ -1,151 +1,199 @@
 <html lang="en">
 
 <head>
-    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.12.0/js/jsplumb.min.js"></script>
+    <link href="{pathCss}/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="{pathCss}/custom.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="{pathJS}/jquery-3.4.1.js"></script>
+    <script src="{pathJS}/jsplumb.min.js"></script>
+    <script src="{pathJS}/simpleXML.js"></script>
 
     <meta charset="UTF-8">
 
     <title>Diagram</title>
     <style>
-        .item {
-            height: auto;
-            width: 300px;
-            border-radius: 40px;
-            border: 1px solid rgb(202, 202, 245);
-            float: left;
-        }
 
-        .inner {
-            height: auto;
-            width: 100px;
-            margin-left: 30px;
-            border: 1px solid rgb(245, 187, 187);
-            border-radius: 20px;
-            float: left;
-        }
-
-        .block {
-            height: auto;
-            width: 100%;
-            margin-bottom: 30px;
-            float: left;
-        }
-
-        .item_start {
-            height: auto;
-            width: 80px;
-            margin-left: 110px;
-            border-radius: 40px;
-            border: 1px solid rgb(165, 165, 197);
-            float: left;
-        }
-
-        .ds {
-            width: 100px;
-            height: 100px;
-            border: 1px solid brown;
-            float: left;
-            margin-left: 50px;
-        }
-
-        .down {
-            width: 100%;
-            height: auto;
-            float: left;
-        }
-
-        .itemin {
-            margin-top: 10px;
-            border: 2px pink solid;
-            width: 300px;
-            border-radius: 40px;
-            height: auto;
-            float: left;
-        }
-
-        .body {
-            margin-left: 20%;
-            position: fixed;
-        }
-
-        .txt {
-            color: rgb(253, 251, 251);
-            font-size: 11;
-        }
-
-        .circleText {
-            margin-top: 20px;
-            margin-left: 20px
-        }
     </style>
 
 </head>
 
 <body class="body">
-    <p id="a"></p>
-    <div class="block">
-        <div id="start" class="item_start">
-            <p class="circleText">Start </p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <p id="a"></p>
+            <div class="block">
+                <div id="start" class="item_start">
+                    <p class="circleText">Start </p>
+                </div>
+            </div>
+
+            <div class="block">
+                <div id="item_1" class="text-center card-body item"><span class="badge badge-info">Inbound Authentication Config</span>
+
+                </div>
+            </div>
+
+            <div class="block">
+
+                <div id="item_input" class="text-center card-body  itemin"><span class="badge badge-info">Local And OutBound Authentication Config</span>
+
+                </div>
+            </div>
+
+            <div class="block">
+                <div id="stop" class="item_start">
+                    <p class="circleText">Stop </p>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="block">
-        <div id="item_1" class="item"><span class="txt">Inbound Authentication Config</span>
-
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="commmon-modal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="modal-body" class="pre-scrollable modal-body">
+                <div id="simpleUseCase"></div>
+            </div>
         </div>
     </div>
-
-    <div class="block">
-
-        <div id="item_input" class="itemin"><span class="txt">Local And OutBound Authentication Config</span>
-
-        </div>
-    </div>
-
-    <div class="block">
-        <div id="stop" class="item_start">
-            <p class="circleText">Stop </p>
-        </div>
-    </div>
+</div>
 
 </body>
+<script src="{pathJS}/bootstrap.min.js"></script>
 <script>
+
+    var timer;
+    function decodeHtml(html) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
+    }
+
+    function buttonClick(elem,title, body){
+        $("#item_1").on("click", elem, function(){
+            showmodal(title, body);
+        });
+    }
+
+
+    function showmodal(title, body) {
+        // show Modal
+        clearInterval(timer);
+        $('#modal-title').text(title);
+        $("#simpleUseCase").simpleXML({
+            xmlString: decodeHtml(body),
+            collapsedText:"...",
+        });
+        $('#commmon-modal').modal('show');
+    }
+
+    function blinking(elm) {
+        timer = setInterval(blink, 10);
+        function blink() {
+            jQuery(elm).fadeOut(400, function() {
+                jQuery(elm).fadeIn(400);
+            });
+        }
+    }
+
+
+    function addSAMLSSOConfig(job,req,res){
+
+        const htmlString =`  <div class="card" style="margin: 20px">
+                               <div class="text-center card-header-pills">
+                                   <button disabled id="saml-req-btn"  class="btn btn-primary btn-xs ">SAML Request</button>
+                                   <div><b id="inbound-auth-name"></b></div>
+                                    <button disabled id="saml-res-btn" class="btn btn-primary btn-xs ">SAML Response</button>
+                                </div>
+                            </div>`;
+
+        var dom = document.createElement("div");
+        dom.innerHTML = htmlString.trim();
+        var inboundAuthName = dom.querySelector('#inbound-auth-name');
+        inboundAuthName.innerHTML=job;
+        if (!req.includes("SAML_REQUEST")){
+            var query='#saml-req-btn';
+            var samlRequestBtn = dom.querySelector(query);
+            samlRequestBtn.disabled=false;
+            buttonClick(query,`SAML Request`,req);
+            blinking(query)
+        }
+
+        if (!res.includes("SAML_RESPONSE")){
+            var query='#saml-res-btn';
+            var samlResponsetBtn = dom.querySelector(query);
+            samlResponsetBtn.disabled=false;
+            buttonClick(query,`SAML Response`,req);
+            blinking('#saml-res-btn')
+        }
+
+        return dom.innerHTML;
+    }
+
+
 
     $(document).ready(function () {
         const vscode = acquireVsCodeApi();
-        var filepath = 'myfilepath';
-        var text = `myXML`
+        var filepath = '{myfilepath}';
+        var text = `{myXML}`;
         xmlDoc = $.parseXML(text);
         $xml = $(xmlDoc);
         x = document.getElementById("item_1");
         y = document.getElementById("item_input");
+        var samlRequest= `{SAML_REQUEST}`;
+        var samlResponse= `{SAML_RESPONSE}`;
+
         $xml.find("InboundAuthenticationConfig").find("InboundAuthenticationRequestConfigs").find("InboundAuthenticationRequestConfig").each(function () {
 
             var $row = $(this),
                 name = $row.find("column1").text(),
                 job = $row.find("InboundAuthType").text();
-            x.innerHTML += ' <div class="block"><div id="item_1" class="inner"><span class="txt">' + job + '</span></div></div>'
+
+            if (job == "samlsso") {
+                x.innerHTML += addSAMLSSOConfig(job,samlRequest,samlResponse);
+            } else {
+                x.innerHTML += `                        <div class="card" style="margin: 20px">
+                           <div class="text-center card-header-pills">
+                               <div><b>` + job + `</b></div>
+                            </div>
+                        </div>`;
+            }
+
 
         });
 
         var executeStep = 0;
         $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationSteps").find("AuthenticationStep").each(function () {
-            executeStep +=1;
+            executeStep += 1;
             var $row = $(this),
                 name = $row.find("column1").text(),
                 job = $row.find("LocalAuthenticatorConfigs").find("Name").text();
-            y.innerHTML += '<div class="block"> <div id="item_1" class="inner"><span class="txt">' + job + '</span> </div></div>';
+            y.innerHTML += `                        <div class="card" style="margin: 20px">
+                           <div class="text-center card-header-pills">
+                               <div><b>` + job + `</b></div>
+                            </div>
+                        </div>`;
         });
         var code = $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationScript").text()
 
         if (code.length > 0) {
             z = document.getElementById("item_input");
-            z.innerHTML += ' <input type="button" value="script" id="openUndefine" >';
-        }else{
+            z.innerHTML += ' <input  class="btn btn-primary btn-sm" type="button" value="script" id="openUndefine" >';
+        } else {
             z = document.getElementById("item_input");
-            z.innerHTML += ' <input type="button" value="script" id="defaultScript" >';
+            z.innerHTML += ' <input  class="btn btn-primary btn-sm" type="button" value="script" id="defaultScript" >';
         }
+
 
         $('#openUndefine').click(function () {
             vscode.postMessage({
@@ -156,89 +204,82 @@
         $('#defaultScript').click(function () {
             vscode.postMessage({
                 command: 'defaultScriptFile',
-                data:executeStep
+                data: executeStep
             })
         });
 
 
         jsPlumb.ready(function () {
-            /*First Instance*/
-            var zeroInstance = jsPlumb.getInstance();
+                /*First Instance*/
+                var zeroInstance = jsPlumb.getInstance();
 
-            zeroInstance.importDefaults({
-                ConnectionsDetachable: false,
-                Connector: ["Straight", {
-                    curviness: 150
-                }
+                zeroInstance.importDefaults({
+                        ConnectionsDetachable: false,
+                        Connector: ["Straight", {
+                            curviness: 150
+                        }
 
-                ],
-                Anchors: ["BottomCenter", "TopCenter"]
+                        ],
+                        Anchors: ["BottomCenter", "TopCenter"]
+                    }
+                );
+
+                zeroInstance.connect({
+                        ConnectionsDetachable: false,
+                        source: "start",
+                        target: "item_1",
+                        scope: "someScope"
+                    }
+                );
+
+                var firstInstance = jsPlumb.getInstance();
+
+                firstInstance.importDefaults({
+                        ConnectionsDetachable: false,
+                        Connector: ["Straight", {
+                            curviness: 20,
+                            stub: 12
+                        }
+
+                        ],
+                        Anchors: ["BottomCenter", "TopCenter"]
+                    }
+                );
+
+
+                firstInstance.connect({
+                        source: "item_1",
+                        target: "item_input",
+                        scope: "someScope"
+                    }
+                );
+
+                /*Second Instance*/
+                var secondInstance = jsPlumb.getInstance();
+
+                secondInstance.importDefaults({
+                        ConnectionsDetachable: false,
+                        Connector: ["Straight", {
+                            curviness: 150
+                        }
+
+                        ],
+                        Anchors: ["BottomCenter", "TopCenter"]
+                    }
+                );
+
+                secondInstance.connect({
+                        source: "item_input",
+                        target: "stop",
+                        scope: "someScope"
+                    }
+                );
             }
-
-            );
-
-            zeroInstance.connect({
-                ConnectionsDetachable: false,
-                source: "start",
-                target: "item_1",
-                scope: "someScope"
-            }
-
-            );
-
-            var firstInstance = jsPlumb.getInstance();
-
-            firstInstance.importDefaults({
-                ConnectionsDetachable: false,
-                Connector: ["Straight", {
-                    curviness: 20,
-                    stub: 12
-                }
-
-                ],
-                Anchors: ["BottomCenter", "TopCenter"]
-            }
-
-            );
-
-
-            firstInstance.connect({
-                source: "item_1",
-                target: "item_input",
-                scope: "someScope"
-            }
-
-            );
-
-            /*Second Instance*/
-            var secondInstance = jsPlumb.getInstance();
-
-            secondInstance.importDefaults({
-                ConnectionsDetachable: false,
-                Connector: ["Straight", {
-                    curviness: 150
-                }
-
-                ],
-                Anchors: ["BottomCenter", "TopCenter"]
-            }
-
-            );
-
-            secondInstance.connect({
-                source: "item_input",
-                target: "stop",
-                scope: "someScope"
-            }
-
-            );
-        }
-
         );
         var xmlText = new XMLSerializer().serializeToString(text);
-        console.log(xmlText)
+        console.log(xmlText);
 
-    })
+    });
 
 </script>
 

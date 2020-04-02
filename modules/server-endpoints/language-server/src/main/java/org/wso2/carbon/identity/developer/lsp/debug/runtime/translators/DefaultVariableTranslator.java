@@ -23,6 +23,16 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
  */
 public class DefaultVariableTranslator implements VariableTranslator {
 
+    private DefaultVariableTranslator() {}
+
+    private static class DefaultVariableTranslatorHolder {
+        private static final DefaultVariableTranslator INSTANCE = new DefaultVariableTranslator();
+    }
+
+    public static DefaultVariableTranslator getInstance() {
+        return DefaultVariableTranslatorHolder.INSTANCE;
+    }
+
     @Override
     public Object translate(Object object, int variablesReference) {
 

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
+
 import java.util.Enumeration;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +30,24 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class HttpServletRequestTranslator implements VariableTranslator {
 
+    private HttpServletRequestTranslator() {}
+
+    private static class HttpServletRequestTranslatorHolder {
+        private static final HttpServletRequestTranslator INSTANCE = new HttpServletRequestTranslator();
+    }
+
+    public static HttpServletRequestTranslator getInstance() {
+        return HttpServletRequestTranslatorHolder.INSTANCE;
+    }
+
     @Override
     public Object translate(Object object, int variablesReference) {
         HashMap<String, Object> requestdetails = new HashMap<>();
         if (object != null && object instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) object;
-            requestdetails.put("cookies", httpServletRequest.getCookies());
-            requestdetails.put("headers", this.getRequestHeaders(httpServletRequest));
-            requestdetails.put("variablesReference", variablesReference);
+            requestdetails.put(DAPConstants.JSON_KEY_FOR_COOKIES, httpServletRequest.getCookies());
+            requestdetails.put(DAPConstants.JSON_KEY_FOR_HEADERS, this.getRequestHeaders(httpServletRequest));
+            requestdetails.put(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, variablesReference);
 
         }
         return requestdetails;

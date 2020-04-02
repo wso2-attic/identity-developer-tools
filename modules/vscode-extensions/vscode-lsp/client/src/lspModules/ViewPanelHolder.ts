@@ -16,27 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
+export class ViewPanelHolder {
 
-/**
- * Translator just pass the String arguments as it is.
- */
-public class StringPassTranslator implements VariableTranslator {
+    private panel;
+    private currentHtml;
 
-    private StringPassTranslator() {}
-
-    private static class StringPassTranslatorHolder {
-        private static final StringPassTranslator INSTANCE = new StringPassTranslator();
+    constructor(panel, currentHtml: String,) {
+        this.panel = panel;
+        this.currentHtml = currentHtml;
     }
 
-    public static StringPassTranslator getInstance() {
-        return StringPassTranslatorHolder.INSTANCE;
+    public getPanel() {
+        return this.panel;
     }
 
-
-    @Override
-    public Object translate(Object in, int variablesReference) {
-
-        return null;
+    public getCurrentHtml() {
+        return this.currentHtml;
     }
+
+    public setCurrentHtml(currentHtml){
+        this.currentHtml=currentHtml;
+    }
+
 }
