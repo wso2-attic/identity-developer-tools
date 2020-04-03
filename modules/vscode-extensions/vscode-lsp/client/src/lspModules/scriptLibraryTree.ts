@@ -5,13 +5,15 @@ const axios = require('axios');
 const keytar = require('keytar');
 const tempPath = require('os').tmpdir();
 import { FileHandler } from './fileHandler';
+import {PreviewManager} from "./PreviewManager";
 const fileHandler = new FileHandler();
 export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
-
-	constructor() {
+	private context;
+	constructor(context) {
+		this.context=context;
 	}
 
 	refresh(): void {
@@ -23,13 +25,13 @@ export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 	}
 
 	getChildren(): Thenable<Dependency[]> {
-		return Promise.resolve(this.getListOfItems());
+		return Promise.resolve(this.getListOfItems(this.context));
 	}
 
 	/**
 	 * Given the path to package.json, read all its dependencies and devDependencies.
 	 */
-	private async getListOfItems(): Promise<Dependency[]> {
+	private async getListOfItems(context): Promise<Dependency[]> {
 
 		let scriptLibraries = [];
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
@@ -60,73 +62,76 @@ export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 			// Once we get the response, extract the access token from
 			// the response body			
 			// Show the sucess message in the vscode.
-			vscode.window.showInformationMessage("Successfully retrieve the script libraries");
+			vscode.window.showInformationMessage("Successfully retrieved the script libraries");
 			// Create a node_modules folder in the temp directory.
 			if (!fs.existsSync(path.join(tempPath, 'node_modules'))) {
 				fs.mkdir(path.join(require('os').tmpdir(), 'node_modules/'), (err: any) => {
 					if (err) throw err;
 				});
 			}
-			for (let index = 0; index < response.data.scriptLibraries.length; index++) {
-				var scriptLibraryName= response.data.scriptLibraries[index].name;
-				var content;
-				await axios({
 
-					method: 'get',
-					url: url + `/t/${tenant}/api/server/v1/script-libraries/${scriptLibraryName}/content`,
-		
-					// Set the content type header, so that we get the response in JSOn
-					headers: {
-						Authorization: 'Bearer ' + acessToken,
-						accept: '*/*'
-		
-					}
-				}).then((response) => {
-					// Once we get the response, extract the access token from
-					// the response body			
-					// Show the sucess message in the vscode.
-					//vscode.window.showInformationMessage("Successfully retrieve the script libraries");
-					// Create a node_modules folder in the temp directory.
-					
-					content=response.data;			
-				}).catch((err) => {
-		
-					console.log(err);
-		
-					// Show the sucess message in the vscode.
-					vscode.window.showErrorMessage("Acess Token has expired.");
-				});
-				
-				if (fs.existsSync(path.join(tempPath, 'node_modules', scriptLibraryName))) {
-					var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
-					fs.writeFile(inputPath, content , function (err: any) {
-						if (err) throw err;
-					});
+			if (response.data.count>0){
+				for (let index = 0; index < response.data.scriptLibraries.length; index++) {
+					var scriptLibraryName= response.data.scriptLibraries[index].name;
+					var content;
+					await axios({
 	
-				} else {
-					fs.mkdirSync(path.join(tempPath, 'node_modules', scriptLibraryName), { recursive: true });
-					var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
-					fs.writeFile(inputPath, content , function (err: any) {
-						if (err) throw err;
+						method: 'get',
+						url: url + `/t/${tenant}/api/server/v1/script-libraries/${scriptLibraryName}/content`,
+			
+						// Set the content type header, so that we get the response in JSOn
+						headers: {
+							Authorization: 'Bearer ' + acessToken,
+							accept: '*/*'
+			
+						}
+					}).then((response) => {
+						// Once we get the response, extract the access token from
+						// the response body			
+						// Show the sucess message in the vscode.
+						//vscode.window.showInformationMessage("Successfully retrieve the script libraries");
+						// Create a node_modules folder in the temp directory.
+						
+						content=response.data;			
+					}).catch((err) => {
+			
+						console.log(err);
+			
+						// Show the sucess message in the vscode.
+						PreviewManager.getInstance().generateOAuthPreview(this.context);
+						vscode.window.showErrorMessage("Access Token has expired.");
 					});
-				}
-				scriptLibraries.push(new Dependency(scriptLibraryName,
-					response.data.scriptLibraries[index].description,
-					{
-						command: 'extension.scriptLibrariesFromTreeView',
-						title: 'Edit Script',
-						arguments: [scriptLibraryName]
-					}
 					
-				));
+					if (fs.existsSync(path.join(tempPath, 'node_modules', scriptLibraryName))) {
+						var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
+						fs.writeFile(inputPath, content , function (err: any) {
+							if (err) throw err;
+						});
+		
+					} else {
+						fs.mkdirSync(path.join(tempPath, 'node_modules', scriptLibraryName), { recursive: true });
+						var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
+						fs.writeFile(inputPath, content , function (err: any) {
+							if (err) throw err;
+						});
+					}
+					scriptLibraries.push(new Dependency(scriptLibraryName,
+						response.data.scriptLibraries[index].description,
+						{
+							command: 'extension.scriptLibrariesFromTreeView',
+							title: 'Edit Script',
+							arguments: [scriptLibraryName]
+						}
+						
+					));
+				}
 			}
 
 		}).catch((err) => {
-
-			console.log(err);
-
 			// Show the sucess message in the vscode.
-			vscode.window.showErrorMessage("Acess Token has expired.");
+			PreviewManager.getInstance().generateOAuthPreview(this.context);
+			vscode.window.showErrorMessage("Access Token has expired.");
+			console.log(err);
 		});
 
 		return scriptLibraries;

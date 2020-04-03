@@ -2,5 +2,8 @@
 	"editor.insertSpaces": false,
 	"tslint.enable": true,
 	"typescript.tsc.autoDetect": "off",
-	"typescript.preferences.quoteStyle": "single"
+	"typescript.preferences.quoteStyle": "single",
+	"IAM.URL": "https://localhost:9443",
+	"IAM.Tenant": "carbon.super",
+	"IAM.ServiceClientID": "9WSKiacuPwfCEOG18pCAegIv24Ya"
 }

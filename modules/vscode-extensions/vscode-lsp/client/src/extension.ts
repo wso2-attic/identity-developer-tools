@@ -88,7 +88,7 @@ export function activate(context: ExtensionContext) {
 	});
 
 	vscode.window.createTreeView('script-libraries', {
-		treeDataProvider: new ScriptLibraryTree()
+		treeDataProvider: new ScriptLibraryTree(context)
 	});
 	context.subscriptions.push(
 
@@ -148,7 +148,7 @@ export function activate(context: ExtensionContext) {
 		// Refresh the script libraries list.
 		vscode.commands.registerCommand('extension.refreshScripts', () => {
 			vscode.window.createTreeView('script-libraries', {
-				treeDataProvider: new ScriptLibraryTree()
+				treeDataProvider: new ScriptLibraryTree(context)
 			});
 		}),
 
