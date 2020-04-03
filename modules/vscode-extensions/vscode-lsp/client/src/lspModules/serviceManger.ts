@@ -4,14 +4,16 @@ import * as path from 'path';
 const axios = require('axios');
 import { FileHandler } from './fileHandler';
 import { Wso2OAuth } from './oAuthService';
+import {PreviewManager} from "./PreviewManager";
 const keytar = require('keytar');
 // Object of the FileHandler.
 const fileHandler = new FileHandler();
 
 export class ServiceManger {
+	private context;
 
 	constructor(context) {
-		var context = context;
+		this.context = context;
 	}
 	/**
 	 * getServicesList() to get the services using the apis.
@@ -48,9 +50,10 @@ export class ServiceManger {
 		}).catch((err) => {
 			// Do somthing
 			console.log(err);
-
+			vscode.window.showErrorMessage(err);
 			// Show the sucess message in the vscode.
-			vscode.window.showErrorMessage("Acess Token has expired.");
+			PreviewManager.getInstance().generateOAuthPreview(this.context);
+			vscode.window.showErrorMessage("Access Token has expired.");
 
 		});
 	}

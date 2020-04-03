@@ -42,8 +42,8 @@
 
 .item_start {
     height: auto;
-    width: 80px;
-    margin-left: 110px;
+    width: 100px;
+    margin-left: 100px;
     border-radius: 40px;
     border: 1px solid rgb(165, 165, 197);
     float: left;
@@ -83,8 +83,8 @@
 }
 
 .circleText {
-    margin-top: 20px;
-    margin-left: 20px
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .btn-group-xs > .btn, .btn-xs {

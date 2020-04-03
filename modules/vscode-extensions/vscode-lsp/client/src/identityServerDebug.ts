@@ -22,15 +22,15 @@ import {
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
-import { DebugProtocol } from 'vscode-debugprotocol';
-import { basename } from 'path';
-import { RemoteIdentityServerRuntime, RemoteBreakpoint } from './remoteIdentityServerRuntime';
+import {DebugProtocol} from 'vscode-debugprotocol';
+import {basename} from 'path';
+import {RemoteIdentityServerRuntime, RemoteBreakpoint} from './remoteIdentityServerRuntime';
 import * as rpc from 'vscode-ws-jsonrpc';
-import { NotificationType } from 'vscode-ws-jsonrpc';
+import {NotificationType} from 'vscode-ws-jsonrpc';
 import {PreviewManager} from "./lspModules/PreviewManager";
 
 var WebSocket = require('ws');
-const { Subject } = require('await-notify');
+const {Subject} = require('await-notify');
 const path = require('path');
 var format = require("string-template");
 
@@ -111,7 +111,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 
 		// We do not support REPL
 		response.body.supportsCompletionsRequest = false;
-		response.body.completionTriggerCharacters = [ ".", "[" ];
+		response.body.completionTriggerCharacters = [".", "["];
 
 		// make VS Code to send cancelRequests
 		response.body.supportsCancelRequest = true;
@@ -163,9 +163,9 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 
 		// set and verify breakpoint locations
 		const actualBreakpoints = clientLines.map(l => {
-			let { verified, line, id } = this._iamRemoteRuntime.setBreakPoint(path, this.convertClientLineToDebugger(l), args);
-			const bp = <DebugProtocol.Breakpoint> new Breakpoint(verified, this.convertDebuggerLineToClient(line));
-			bp.id= id;
+			let {verified, line, id} = this._iamRemoteRuntime.setBreakPoint(path, this.convertClientLineToDebugger(l), args);
+			const bp = <DebugProtocol.Breakpoint>new Breakpoint(verified, this.convertDebuggerLineToClient(line));
+			bp.id = id;
 			return bp;
 		});
 
@@ -245,42 +245,41 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
 		const variables: DebugProtocol.Variable[] = [];
-		if(this._iamRemoteRuntime != null) {
+		if (this._iamRemoteRuntime != null) {
 			// Create the remote variable request and await the response
 			var answer = this._iamRemoteRuntime.fetchVariables(response, args, request);
 			answer.then((remoteResponse) => {
-				remoteResponse.body.variables.forEach( (element) => {
+				remoteResponse.body.variables.forEach((element) => {
 
 
-					if (element.name=="SAMLRequest" && !element.value.includes("NO SAML Request Added") ){
+					if (element.name == "SAMLRequest" && !element.value.includes("NO SAML Request Added")) {
 						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
 						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
 						let panel = viewPanelHolder.getPanel();
-						let currentHtml= viewPanelHolder.getCurrentHtml();
+						let currentHtml = viewPanelHolder.getCurrentHtml();
 						let newHtml = format(currentHtml, {
 							SAML_REQUEST: this.escapeHtml(element.value),
-							SAML_RESPONSE:"{SAML_RESPONSE}"
-							
+							SAML_RESPONSE: "{SAML_RESPONSE}"
+
 						});
 						panel.webview.html = newHtml;
 						viewPanelHolder.setCurrentHtml(newHtml);
-					}
-					else if(element.name=="SAMLResponse"){
+					} else if (element.name == "SAMLResponse") {
 						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
 						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
 						let panel = viewPanelHolder.getPanel();
-						let currentHtml= viewPanelHolder.getCurrentHtml();
+						let currentHtml = viewPanelHolder.getCurrentHtml();
 						let newHtml = format(currentHtml, {
-							SAML_RESPONSE:this.escapeHtml(element.value)
+							SAML_RESPONSE: this.escapeHtml(element.value)
 
 						});
 						panel.webview.html = newHtml;
 						viewPanelHolder.setCurrentHtml(newHtml);
 					}
 
-					element.type=typeof(element.value);
-					element.variablesReference=args.variablesReference;
-					element.value=JSON.stringify(element.value);
+					element.type = typeof (element.value);
+					element.variablesReference = args.variablesReference;
+					element.value = JSON.stringify(element.value);
 					variables.push(element);
 
 
@@ -308,7 +307,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			response.body = {
 				variables: variables
 			};
-			
+
 			this.sendResponse(response);
 		}
 	}
@@ -318,7 +317,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
-	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
+	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments): void {
 		this._iamRemoteRuntime.continue(true);
 		this.sendResponse(response);
 	}
@@ -358,7 +357,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			if (id.startsWith("global_")) {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
-				response.body.accessTypes = [ "read" ];
+				response.body.accessTypes = ["read"];
 				response.body.canPersist = false;
 			}
 		}
@@ -415,10 +414,10 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 
 	/**
 	 * Sets up the event handlers for the DAP, which we are interested in to intercept.
-	 * 
-	 * @param remoteIdentityServerRuntime 
+	 *
+	 * @param remoteIdentityServerRuntime
 	 */
-	private setupEventHandlers(remoteIdentityServerRuntime :RemoteIdentityServerRuntime) : void{
+	private setupEventHandlers(remoteIdentityServerRuntime: RemoteIdentityServerRuntime): void {
 		remoteIdentityServerRuntime.on('stopOnEntry', () => {
 			this.sendEvent(new StoppedEvent('entry', IdentityServerDebugSession.THREAD_ID));
 		});
@@ -435,7 +434,10 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 			this.sendEvent(new StoppedEvent('exception', IdentityServerDebugSession.THREAD_ID));
 		});
 		remoteIdentityServerRuntime.on('breakpointValidated', (bp: RemoteBreakpoint) => {
-			this.sendEvent(new BreakpointEvent('changed', <DebugProtocol.Breakpoint>{ verified: bp.verified, id: bp.id }));
+			this.sendEvent(new BreakpointEvent('changed', <DebugProtocol.Breakpoint>{
+				verified: bp.verified,
+				id: bp.id
+			}));
 		});
 		remoteIdentityServerRuntime.on('output', (text, filePath, line, column) => {
 			const e: DebugProtocol.OutputEvent = new OutputEvent(`${text}\n`);

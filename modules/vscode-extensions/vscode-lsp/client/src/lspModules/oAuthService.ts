@@ -13,10 +13,12 @@ import {ScriptLibraryTree} from './scriptLibraryTree';
 export class Wso2OAuth {
 	public app: express.Express;
 	public server: Server;
+	public context;
 
-	constructor(public port: number) {
+	constructor(public port: number,context) {
 		this.app = express();
 		this.app.use(express.json(), express.urlencoded({ extended: false }));
+		this.context=context;
 	}
 
 	public async StartProcess() {
@@ -77,7 +79,7 @@ export class Wso2OAuth {
 
 					// To create the script libraries tree view.
 					vscode.window.createTreeView('script-libraries',{
-						treeDataProvider: new ScriptLibraryTree()			
+						treeDataProvider: new ScriptLibraryTree(this.context)
 					});
 					
 					// Show the sucess message in the vscode.

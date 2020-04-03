@@ -11,16 +11,10 @@ var format = require("string-template");
 const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_functional_lib_view";
 export class PreviewManager {
 
-
-
-
 	private static instance: PreviewManager;
 	private _previewManagers = new Map<string, ViewPanelHolder>();
 
-
 	private constructor() { }
-
-
 
 	public static getInstance(): PreviewManager {
 		if (!PreviewManager.instance) {
@@ -40,6 +34,7 @@ export class PreviewManager {
 	 */
 	public generateWebViewPanel(xmlFilePath, context) {
 		const previewManager = PreviewManager.getInstance();
+		const previewManagers = previewManager.getPreviewManagers();
 		var serviceName = String(fileHandler.extractFileName(xmlFilePath));
 		// Read the XML file and generate the web view panel.
 		fs.readFile(xmlFilePath, 'utf8', function (err: any, data: any) {
@@ -71,19 +66,17 @@ export class PreviewManager {
 			);
 			// Assign html code to the web view panel.
 			const htmlGenerated=previewManager.getWebviewContent(code, pathUri, xmlFilePath,pathCss,pathJS);
-
 			panel.webview.html = htmlGenerated;
 			panel.webview.onDidReceiveMessage(
 				message => {
-					fileHandler.handleButtonClick(message, xmlFilePath);
+						fileHandler.handleButtonClick(message, xmlFilePath);
 				},
 				undefined,
 				context.subscriptions
 			);
 			let key=fileHandler.extractFileName(xmlFilePath).replace('%20', ' ');
-
 			let viewPanelHolder= new ViewPanelHolder(panel,htmlGenerated);
-			previewManager.getPreviewManagers().set(key,viewPanelHolder);
+			previewManagers.set(key,viewPanelHolder);
 		});
 	}
 
@@ -149,7 +142,7 @@ export class PreviewManager {
 			async message => {
 				if (message.command == 'login') {
 					// To start the server.
-					new Wso2OAuth(8010).StartProcess();
+					new Wso2OAuth(8010, context).StartProcess();
 
 					// Set the url to extension configuration.
 					vscode.workspace.getConfiguration().update("IAM.URL", message.url);

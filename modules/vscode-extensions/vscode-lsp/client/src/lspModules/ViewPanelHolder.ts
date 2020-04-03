@@ -16,12 +16,16 @@
  * under the License.
  */
 
+/**
+ * This class is to hold the panel variable so that It can be acessed afte the panel variable is created.
+ * It holds the panel variable and the currrent html because current html can't be accessed after it is set to panel.
+ */
 export class ViewPanelHolder {
 
     private panel;
     private currentHtml;
 
-    constructor(panel, currentHtml: String,) {
+    constructor(panel, currentHtml: String, ) {
         this.panel = panel;
         this.currentHtml = currentHtml;
     }
@@ -34,8 +38,8 @@ export class ViewPanelHolder {
         return this.currentHtml;
     }
 
-    public setCurrentHtml(currentHtml){
-        this.currentHtml=currentHtml;
+    public setCurrentHtml(currentHtml) {
+        this.currentHtml = currentHtml;
     }
 
 }
