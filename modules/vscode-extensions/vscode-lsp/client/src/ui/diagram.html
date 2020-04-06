@@ -30,7 +30,7 @@
                             <b>Start </b>
                         </div>
                         <div class="text-center card-footer" style="background: transparent">
-                            <button disabled id="req-btn"  class="btn btn-primary btn-xs ">Request</button>
+                            <button disabled id="req-btn"  class="btn btn-secondary btn-xs ">Request</button>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                 <div id="stop" class="card item_start" >
                     <div class="text-center">
                         <div class="card-header" style="background: transparent">
-                            <button disabled id="res-btn" class="btn btn-primary btn-xs ">Response</button>
+                            <button disabled id="res-btn" class="btn btn-secondary btn-xs ">Response</button>
                         </div>
                         <div class="text-center card-footer" style="background: transparent">
                             <b>End</b>
@@ -140,6 +140,8 @@
             var query='#saml-req-btn';
             var samlRequestBtn = dom.querySelector(query);
             samlRequestBtn.disabled=false;
+            samlRequestBtn.classList.remove("btn-secondary");
+            samlRequestBtn.add("btn-primary");
             buttonClick(query,`SAML Request`,req);
             blinking(query)
         }
@@ -149,6 +151,8 @@
             var query='#saml-res-btn';
             var samlResponsetBtn = dom.querySelector(query);
             samlResponsetBtn.disabled=false;
+            samlResponsetBtn.classList.remove("btn-secondary");
+            samlResponsetBtn.add("btn-primary");
             buttonClick(query,`SAML Response`,req);
             blinking('#saml-res-btn')
         }
@@ -159,8 +163,12 @@
 
     function addConfig(req,res){
         if (!req.includes("SAML_REQUEST")){
+            var card = document.getElementById("samlsso-card");
+            card.classList.add("alert-primary");
             var reqBtn = document.getElementById("req-btn");
             reqBtn.disabled=false;
+            reqBtn.classList.remove("btn-secondary");
+            reqBtn.classList.add("btn-primary");
             var query='#req-btn';
             buttonClick(query,`SAML Request`,req);
             blinking(query)
@@ -168,8 +176,10 @@
 
         if (!res.includes("SAML_RESPONSE")){
             clearInterval(timer);
-            var reqBtn = document.getElementById("res-btn");
-            reqBtn.disabled=false;
+            var resBtn = document.getElementById("res-btn");
+            resBtn.disabled=false;
+            resBtn.classList.remove("btn-secondary");
+            resBtn.classList.add("btn-primary");
             var query='#res-btn';
             buttonClick(query,`SAML Response`,req);
             blinking(query)
@@ -193,14 +203,22 @@
             var $row = $(this),
                 name = $row.find("column1").text(),
                 job = $row.find("InboundAuthType").text();
-                x.innerHTML += `<div class="card" style="margin: 20px">
+
+
+            if (job == "samlsso") {
+                x.innerHTML += `<div class="card" id="samlsso-card" style="margin: 20px">
                            <div class="text-center card-header-pills">
                                <div><b>` + job + `</b></div>
                             </div>
                         </div>`;
 
-            if (job == "samlsso") {
                 addConfig(samlRequest,samlResponse);
+            } else {
+                x.innerHTML += `<div class="card" style="margin: 20px">
+                           <div class="text-center card-header-pills">
+                               <div><b>` + job + `</b></div>
+                            </div>
+                        </div>`;
             }
 
 
@@ -221,14 +239,10 @@
         var code = $xml.find("LocalAndOutBoundAuthenticationConfig").find("AuthenticationScript").text();
         if (samlRequest.includes("SAML_REQUEST")){
             if (code.length > 0) {
-                // z = document.getElementById("item_input");
-                // z.innerHTML += ' <input  class="btn btn-primary btn-sm" type="button" value="script" id="openUndefine" >';
                 vscode.postMessage({
                     command: 'scriptFile'
                 })
             } else {
-                // z = document.getElementById("item_input");
-                // z.innerHTML += ' <input  class="btn btn-primary btn-sm" type="button" value="script" id="defaultScript" >';
                 vscode.postMessage({
                     command: 'defaultScriptFile',
                     data: executeStep
@@ -303,8 +317,6 @@
                 );
             }
         );
-        var xmlText = new XMLSerializer().serializeToString(text);
-        console.log(xmlText);
 
     });
 

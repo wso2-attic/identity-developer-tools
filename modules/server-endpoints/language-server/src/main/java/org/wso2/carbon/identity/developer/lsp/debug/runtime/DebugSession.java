@@ -103,15 +103,6 @@ public class DebugSession {
      */
     public DebugProcessingResult processMethodEntry(MethodContext methodContext) {
 
-//        if (isHttpRequestEntry(methodContext)) {
-//            calledObjectStack.add(createHttpRequestDataObject(methodContext));
-//
-//        } else if (isJavascriptFunctionCall(methodContext)) {
-//            calledObjectStack.add(createJsFunctionCallObject(methodContext));
-//        } else if (isJavascriptFunctionExit(methodContext)) {
-//            calledObjectStack.remove(getCurrentJavascriptFunctionObject(calledObjectStack));
-//        }
-
         BreakpointInfo breakpointInfo = findAnyStoppableBreakpoint(methodContext);
         if (breakpointInfo != null) {
             if (breakpointInfo.getBreakpointLocations() != null && breakpointInfo.getBreakpointLocations().length > 0) {

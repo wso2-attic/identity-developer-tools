@@ -1,4 +1,4 @@
-package org.wso2.carbon.identity.parser;// Generated from /home/wathsara/IdeaProjects/ParserTesting/JavaScriptParser.g4 by ANTLR 4.7.2
+package org.wso2.carbon.identity.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

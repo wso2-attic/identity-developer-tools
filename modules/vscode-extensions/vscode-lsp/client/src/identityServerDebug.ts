@@ -25,11 +25,9 @@ import {
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {basename} from 'path';
 import {RemoteIdentityServerRuntime, RemoteBreakpoint} from './remoteIdentityServerRuntime';
-import * as rpc from 'vscode-ws-jsonrpc';
-import {NotificationType} from 'vscode-ws-jsonrpc';
 import {PreviewManager} from "./lspModules/PreviewManager";
+import {DebugConstants} from "./DebugConstants";
 
-var WebSocket = require('ws');
 const {Subject} = require('await-notify');
 const path = require('path');
 var format = require("string-template");
@@ -68,9 +66,6 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	private _configurationDone = new Subject();
 
 	private _cancelationTokens = new Map<number, boolean>();
-	private _isLongrunning = new Map<number, boolean>();
-
-	private messageConnection: rpc.MessageConnection;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -132,8 +127,8 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	 * Indicates that all breakpoints etc. have been sent to the DA and that the 'launch' can start.
 	 */
 	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
-		super.configurationDoneRequest(response, args);
 
+		super.configurationDoneRequest(response, args);
 		// notify the launchRequest that configuration has finished
 		this._configurationDone.notify();
 	}
@@ -212,9 +207,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 		const startFrame = typeof args.startFrame === 'number' ? args.startFrame : 0;
 		const maxLevels = typeof args.levels === 'number' ? args.levels : 1000;
 		const endFrame = startFrame + maxLevels;
-
 		const stk = this._iamRemoteRuntime.stack(startFrame, endFrame);
-
 		response.body = {
 			stackFrames: stk.frames.map(f => new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line))),
 			totalFrames: stk.count
@@ -234,6 +227,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	}
 
 	protected escapeHtml(unsafe) {
+
 		return unsafe
 			.replace(/&/g, "&amp;")
 			.replace(/</g, "&lt;")
@@ -252,19 +246,18 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 				remoteResponse.body.variables.forEach((element) => {
 
 
-					if (element.name == "SAMLRequest" && !element.value.includes("NO SAML Request Added")) {
+					if (element.name == DebugConstants.SAML_REQUEST && !element.value.includes("NO SAML Request Added")) {
 						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
 						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
 						let panel = viewPanelHolder.getPanel();
 						let currentHtml = viewPanelHolder.getCurrentHtml();
 						let newHtml = format(currentHtml, {
 							SAML_REQUEST: this.escapeHtml(element.value),
-							SAML_RESPONSE: "{SAML_RESPONSE}"
-
+							SAML_RESPONSE: "{"+DebugConstants.SAML_REQUEST+"}"
 						});
 						panel.webview.html = newHtml;
 						viewPanelHolder.setCurrentHtml(newHtml);
-					} else if (element.name == "SAMLResponse") {
+					} else if (element.name == DebugConstants.SAML_RESPONSE) {
 						let viewPanelHolderDictonary = PreviewManager.getInstance().getPreviewManagers();
 						let viewPanelHolder = viewPanelHolderDictonary.get(path.parse(this._iamRemoteRuntime.getSourceFile()).name);
 						let panel = viewPanelHolder.getPanel();
@@ -281,10 +274,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 					element.variablesReference = args.variablesReference;
 					element.value = JSON.stringify(element.value);
 					variables.push(element);
-
-
 				});
-
 
 				response.body = {
 					variables: variables
@@ -313,21 +303,25 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
+
 		this._iamRemoteRuntime.continue();
 		this.sendResponse(response);
 	}
 
 	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments): void {
+
 		this._iamRemoteRuntime.continue(true);
 		this.sendResponse(response);
 	}
 
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
+
 		this._iamRemoteRuntime.step();
 		this.sendResponse(response);
 	}
 
 	protected stepBackRequest(response: DebugProtocol.StepBackResponse, args: DebugProtocol.StepBackArguments): void {
+
 		this._iamRemoteRuntime.step(true);
 		this.sendResponse(response);
 	}
@@ -335,7 +329,6 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 
 		let reply: string | undefined = undefined;
-
 		response.body = {
 			result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
@@ -407,6 +400,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	}
 
 	protected cancelRequest(response: DebugProtocol.CancelResponse, args: DebugProtocol.CancelArguments) {
+
 		if (args.requestId) {
 			this._cancelationTokens.set(args.requestId, true);
 		}
@@ -418,6 +412,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	 * @param remoteIdentityServerRuntime
 	 */
 	private setupEventHandlers(remoteIdentityServerRuntime: RemoteIdentityServerRuntime): void {
+
 		remoteIdentityServerRuntime.on('stopOnEntry', () => {
 			this.sendEvent(new StoppedEvent('entry', IdentityServerDebugSession.THREAD_ID));
 		});
@@ -454,6 +449,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 	//---- helpers
 
 	private createSource(filePath: string): Source {
+
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
 	}
 }

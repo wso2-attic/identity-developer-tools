@@ -41,7 +41,6 @@ public class VariableTranslateRegistry {
     public VariableTranslateRegistry() {
 
         readConfig();
-
     }
 
     private void readConfig() {

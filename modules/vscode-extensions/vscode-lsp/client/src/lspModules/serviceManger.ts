@@ -13,12 +13,14 @@ export class ServiceManger {
 	private context;
 
 	constructor(context) {
+
 		this.context = context;
 	}
 	/**
 	 * getServicesList() to get the services using the apis.
 	 */
 	public async getServicesList() {
+
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
 		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
@@ -61,7 +63,8 @@ export class ServiceManger {
 	/**
 	 * createListOfServices() to create a list in command pallete.
 	 */
-	public async createListOfServices(servicesArray) {		
+	public async createListOfServices(servicesArray) {
+
 		var services = [];
 		try {
 			for (let index = 0; index < servicesArray.length; index++) {
@@ -88,6 +91,7 @@ export class ServiceManger {
 	 * getIDOfService() to get the id of the selected service.
 	 */
 	public getIDOfService(servicesArray,service) {
+
 		var serviceID;
 		for (let index = 0; index < servicesArray.length; index++) {
 			if(service==servicesArray[index].name){
@@ -100,7 +104,8 @@ export class ServiceManger {
 	/**
 	 * exportService() to export the xml of the service.
 	 */
-	public async exportService(serviceID , service) {		
+	public async exportService(serviceID , service) {
+
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
 		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;

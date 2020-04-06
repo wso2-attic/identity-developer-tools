@@ -16,13 +16,11 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
-
 
 /**
- * Interface to help build the SAMLEntryVariable.
+ * This class is to add the Static Config constants.
  */
-public interface SAMLEntryVariablePlan {
-     void setHttpServletRequest (Object httpServletRequest);
-     void setSAMLRequest (Object samlRequest);
+export class Config {
+
+    static readonly WEBSOCKET_END_POINT = 'wss://localhost:9443/lsp/debug';
 }

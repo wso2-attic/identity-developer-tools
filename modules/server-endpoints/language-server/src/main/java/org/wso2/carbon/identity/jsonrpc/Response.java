@@ -29,18 +29,7 @@ public abstract class Response {
      * The id of the request.
      */
     private String id;
-
     private final String jsonrpc = "2.0";
-
-    public String getTestResult() {
-        return testResult;
-    }
-
-    public void setTestResult(String testResult) {
-        this.testResult = testResult;
-    }
-
-    private String testResult;
 
     public String getId() {
 

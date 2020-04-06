@@ -26,20 +26,23 @@ export class ViewPanelHolder {
     private currentHtml;
 
     constructor(panel, currentHtml: String, ) {
+
         this.panel = panel;
         this.currentHtml = currentHtml;
     }
 
     public getPanel() {
+
         return this.panel;
     }
 
     public getCurrentHtml() {
+
         return this.currentHtml;
     }
 
     public setCurrentHtml(currentHtml) {
+
         this.currentHtml = currentHtml;
     }
-
 }

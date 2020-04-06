@@ -16,13 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
-
-
 /**
- * Interface to help build the SAMLEntryVariable.
+ * This class is to add the Static Debug related constants.
  */
-public interface SAMLEntryVariablePlan {
-     void setHttpServletRequest (Object httpServletRequest);
-     void setSAMLRequest (Object samlRequest);
+export class DebugConstants {
+
+    static readonly HTTP_SERVLET_REQUEST = "HttpServletRequest";
+    static readonly HTTP_SERVLET_RESPONSE = "HttpServletResponse";
+    static readonly SAML_REQUEST = "SAMLRequest";
+    static readonly SAML_RESPONSE = "SAMLResponse";
 }
+

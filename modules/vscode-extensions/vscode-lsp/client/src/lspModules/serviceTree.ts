@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import {PreviewManager} from "./PreviewManager";
 const axios = require('axios');
 const keytar = require('keytar');
 export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
-
-	constructor() {
+	private context;
+	constructor(context) {
+		this.context = context;
 	}
 
 	refresh(): void {
@@ -36,8 +38,6 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 		await secret.then((result) => {
 			acessToken = result; // Assign the value to acess toke.					
 		});
-		console.log("acess "+ acessToken);
-
 		// To bypass the self signed server error.
 		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 
@@ -74,7 +74,8 @@ export class ServiceTree implements vscode.TreeDataProvider<Dependency> {
 			console.log(err);
 
 			// Show the sucess message in the vscode.
-			vscode.window.showErrorMessage("Acess Token has expired.");
+			PreviewManager.getInstance().generateOAuthPreview(this.context);
+			vscode.window.showErrorMessage("Access Token has expired.");
 		});
 
 		return services;

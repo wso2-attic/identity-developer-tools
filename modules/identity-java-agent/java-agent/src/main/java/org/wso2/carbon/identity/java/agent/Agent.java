@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.java.agent;
 
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfigReader;
 import org.wso2.carbon.identity.java.agent.internal.InterceptingClassTransformer;
@@ -31,14 +34,14 @@ import java.util.List;
  */
 public class Agent {
 
+    private static Log log = LogFactory.getLog(Agent.class);
     public Agent() {
 
     }
 
     public static void premain(String agentArgs, Instrumentation instrumentation) throws InstantiationException {
 
-        System.out.println("Starting WSO2 Debugger Java Agent......");
-
+        log.info("Starting WSO2 Debugger Java Agent......");
         InterceptorConfigReader interceptorConfigReader = new InterceptorConfigReader();
         List<InterceptorConfig> configList = interceptorConfigReader.readConfig();
 
