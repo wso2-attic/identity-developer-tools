@@ -27,7 +27,6 @@ import org.wso2.carbon.identity.application.authentication.framework.JsFunctionR
 import org.wso2.carbon.identity.developer.lsp.LanguageException;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessor;
 import org.wso2.carbon.identity.developer.lsp.LanguageProcessorFactory;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSession;
 import org.wso2.carbon.identity.jsonrpc.JsonRPC;
 import org.wso2.carbon.identity.jsonrpc.Request;
 import org.wso2.carbon.identity.jsonrpc.Response;

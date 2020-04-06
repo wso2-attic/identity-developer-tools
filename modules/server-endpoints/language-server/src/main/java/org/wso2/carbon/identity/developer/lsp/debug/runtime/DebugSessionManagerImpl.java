@@ -52,14 +52,15 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private static Log log = LogFactory.getLog(DebugSessionManagerImpl.class);
     private Map<Session, DebugSession> activeDebugSessions = new HashMap<>();
     private InterceptionEngine interceptionEngine;
-    private  VariableTranslateRegistry variableTranslateRegistry = new VariableTranslateRegistry();
+    private VariableTranslateRegistry variableTranslateRegistry = new VariableTranslateRegistry();
 
     public void init() {
 
         interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
         if (interceptionEngine == null) {
             log.error(
-                    "Java Instrumentation needed for debug is not initialized. Debugging will not function correctly");
+                    "Java Instrumentation needed for debug is not initialized. " +
+                            "Debugging will not function correctly");
             return;
         }
 
@@ -97,7 +98,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             case "variables":
                 return readVariables(debugSession, (VariablesRequest) request);
         }
-        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "",
+                "", null);
         return response;
     }
 
@@ -229,7 +231,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
     private Response setBreakpoints(DebugSession debugSession, BreakpointRequest request) {
 
-        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "", "", null);
+        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "",
+                "", null);
 
         debugSession.setBreakpoints(request.getSourceName(), request.getBreakpoints());
         return response;
@@ -241,7 +244,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         ContinueResponse continueResponse = new ContinueResponse("continue", request.getId(), request.getId(),
                 true, "", "", null);
         continueResponse.setAllThreadsContinued(true);
-        return  continueResponse;
+        return continueResponse;
     }
 
     private void initializeListeners() {

@@ -20,6 +20,8 @@ import { EventEmitter } from 'events';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { readFileSync } from 'fs';
 import * as rpc from 'vscode-ws-jsonrpc';
+import * as vscode from "vscode";
+import {Config} from "./Config";
 
 const keytar = require('keytar');
 var WebSocket = require('ws');
@@ -40,7 +42,6 @@ export interface RemoteBreakpoint {
  */
 export class RemoteIdentityServerRuntime extends EventEmitter {
 
-
 	private  webSocket: WebSocket;
 	private messageConnection: rpc.MessageConnection;
 
@@ -54,24 +55,25 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	// maps from sourceFile to array of  breakpoints
 	private _breakPoints = new Map<string, RemoteBreakpoint[]>();
 
-
 	// since we want to send breakpoint events, we will assign an id to every event
 	// so that the frontend can match events with breakpoints.
 	private _breakpointId = 1;
 
 	private _breakAddresses = new Set<string>();
 
-
 	constructor() {
+
 		super();
 	}
 
 
 	public getSourceFile(){
+
 		return this._sourceFile;
 	}
 
 	public start(program: string, stopOnEntry: boolean) {
+
 		this.connectWebsocket();
 
 		this._currentLine = -1;
@@ -88,6 +90,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	}
 
 	public setBreakPoint(path: string, line: number, args: DebugProtocol.SetBreakpointsArguments) : RemoteBreakpoint {
+
 		const bp = <RemoteBreakpoint> { verified: false, line, id: this._breakpointId++ };
 		let bps = this._breakPoints.get(path);
 		if (!bps) {
@@ -111,6 +114,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * Clear all breakpoints for file.
 	 */
 	public clearBreakpoints(path: string): void {
+
 		if(this.messageConnection != null) {
 			var notification = new rpc.NotificationType("clearBreakpoints");
 			this.messageConnection.sendNotification(notification);
@@ -121,7 +125,6 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	public getBreakpoints(path: string, line: number): number[] {
 
 		const l = this._sourceLines[line];
-
 		let sawSpace = true;
 		const bps: number[] = [];
 		for (let i = 0; i < l.length; i++) {
@@ -145,6 +148,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * @param request
 	 */
 	public fetchVariables(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) :Thenable<DebugProtocol.VariablesResponse> {
+
 		var varaiablesRequest = new rpc.RequestType1<DebugProtocol.VariablesArguments,DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse,  DebugProtocol.Request>("variables");
 		var answer = this.messageConnection.sendRequest(varaiablesRequest,args);
 		return answer;
@@ -156,7 +160,6 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	public stack(startFrame: number, endFrame: number): any {
 
 		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
-
 		const frames = new Array<any>();
 		// every word of the current line becomes a stack frame.
 		for (let i = startFrame; i < Math.min(endFrame, words.length); i++) {
@@ -178,6 +181,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * Continue execution to the end/beginning.
 	 */
 	public continue(reverse = false) {
+
 		var notification = new rpc.NotificationType("continue");
 		this.messageConnection.sendNotification(notification);
 		this.run(reverse, undefined);
@@ -187,16 +191,19 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * Step to the next/previous non empty line.
 	 */
 	public step(reverse = false, event = 'stopOnStep') {
+
 		this.run(reverse, event);
 	}
 
 	private sendEvent(event: string, ... args: any[]) {
+
 		setImmediate(_ => {
 			this.emit(event, ...args);
 		});
 	}
 
 	private fireBreakpoint(ln: number) {
+
 		// send 'stopped' event
 		this._currentLine = ln;
 		this.sendEvent('stopOnBreakpoint');
@@ -207,6 +214,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	 * If stepEvent is specified only run a single step and emit the stepEvent.
 	 */
 	private run(reverse = false, stepEvent?: string) {
+
 		if (reverse) {
 			for (let ln = this._currentLine-1; ln >= 0; ln--) {
 				if (this.fireEventsForLine(ln, stepEvent)) {
@@ -230,6 +238,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	}
 
 	private verifyBreakpoints(path: string) : void {
+
 		let bps = this._breakPoints.get(path);
 		if (bps) {
 			this.loadSource(path);
@@ -263,7 +272,6 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 	private fireEventsForLine(ln: number, stepEvent?: string): boolean {
 
 		const line = this._sourceLines[ln].trim();
-
 		// if 'log(...)' found in source -> send argument to debug console
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
@@ -354,37 +362,37 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 			rejectUnauthorized: false
 		};
 
-		var webSocket = new WebSocket('wss://localhost:9443/lsp/debug',options);
+		var webSocket = new WebSocket(Config.WEBSOCKET_END_POINT,options);
 		this.webSocket = webSocket;
-		console.log("Listening.. " );
+		vscode.window.showInformationMessage("Debug Session Started..");
 		rpc.listen({
 			webSocket,
 			onConnection: (rpcConnection: rpc.MessageConnection) => {
-				console.log("connected+ " );
 				this.messageConnection = rpcConnection;
 				let breakpointNotification = new rpc.NotificationType<string, void>('breakpoint');
 				let connectedNotification = new rpc.NotificationType<string, void>('connected');
 				let continueNotification = new rpc.NotificationType<string, void>('continue');
 
 				rpcConnection.onNotification(breakpointNotification, (param: any) => {
-					console.log("got notificaiton breakpoint.. "+param );
+					console.log("Got notification Breakpoint.. ");
 					this.fireBreakpoint(param.line);
 				});
 				rpcConnection.onNotification(connectedNotification, (param: any) => {
-					console.log("got notificaiton Connected .. "+param );
+					console.log("Got notification Connected .. "+param );
 				});
 				rpcConnection.onNotification(continueNotification, (param: any) => {
-					console.log("got notificaiton continue.. ");
+					console.log("Got notification Continue.. ");
 				});
 				rpcConnection.onNotification( (param: any) => {
-					console.log("got notificaiton any .. "+param );;
+					console.log("Got notification any .. "+param );
 				});
 				rpcConnection.onRequest((param: any) => {
-					console.log("got Request.. "+param );
+					console.log("Got Request.. "+param );
 				});
 				rpcConnection.onError((param: any) => {
-					console.log("got Error.. "+param );
+					console.log("Got Error.. "+param );
 				});
+
 				rpcConnection.listen();
 			}
 		});

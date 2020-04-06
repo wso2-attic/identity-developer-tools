@@ -84,7 +84,7 @@ export function activate(context: ExtensionContext) {
 	};
 
 	vscode.window.createTreeView('service-providers', {
-		treeDataProvider: new ServiceTree()
+		treeDataProvider: new ServiceTree(context)
 	});
 
 	vscode.window.createTreeView('script-libraries', {
@@ -155,7 +155,7 @@ export function activate(context: ExtensionContext) {
 		// Refresh the service providers list.
 		vscode.commands.registerCommand('extension.refreshServices', () => {
 			vscode.window.createTreeView('service-providers', {
-				treeDataProvider: new ServiceTree()
+				treeDataProvider: new ServiceTree(context)
 			});
 		})
 	);
@@ -233,7 +233,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 				config.name = 'Launch';
 				config.request = 'launch';
 				config.program = '${file}';
-				config.outFiles = '${file}.out'
+				config.outFiles = '${file}.out';
 				config.stopOnEntry = true;
 			}
 		}

@@ -6,7 +6,7 @@ modules/server-endpoints/language-server/target
 
 #nodemodules
 node_modules
-
+identity-lsp-root-1.0.0.vsix
 #out
 out
 

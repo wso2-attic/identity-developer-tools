@@ -74,7 +74,7 @@ export class Wso2OAuth {
 
 					// To create the service providers tree view.
 					vscode.window.createTreeView('service-providers', {
-						treeDataProvider: new ServiceTree()
+						treeDataProvider: new ServiceTree(this.context)
 					});
 
 					// To create the script libraries tree view.
@@ -88,7 +88,6 @@ export class Wso2OAuth {
 				}).catch((err) => {
 					// Do somthing
 					console.log(err);
-
 					// Show the sucess message in the vscode.
 					vscode.window.showErrorMessage("Recheck Your ClientID and client Secret");
 
@@ -124,7 +123,8 @@ export class Wso2OAuth {
 						`);
 
 				// Close the server.		
-				this.server.close();				
+				this.server.close();
+				vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 
 			} catch (err) {
 				const error = new Error(err);

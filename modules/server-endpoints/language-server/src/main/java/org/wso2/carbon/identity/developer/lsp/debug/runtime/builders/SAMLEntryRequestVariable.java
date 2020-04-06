@@ -23,7 +23,7 @@ import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import java.util.HashMap;
 
 /**
- *  Variables Holds the necessary Variables for
+ *  Variables Holds the necessary Variables for SAML Entry Request.
  */
 public class SAMLEntryRequestVariable implements SAMLEntryVariablePlan {
 

@@ -12,19 +12,24 @@ export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
 	private context;
+
 	constructor(context) {
+
 		this.context=context;
 	}
 
 	refresh(): void {
+
 		this._onDidChangeTreeData.fire();
 	}
 
 	getTreeItem(element: Dependency): vscode.TreeItem {
+
 		return element;
 	}
 
 	getChildren(): Thenable<Dependency[]> {
+
 		return Promise.resolve(this.getListOfItems(this.context));
 	}
 
@@ -42,7 +47,6 @@ export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 		await secret.then((result) => {
 			acessToken = result; // Assign the value to acess toke.					
 		});
-		console.log("acess " + acessToken);
 
 		// To bypass the self signed server error.
 		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";

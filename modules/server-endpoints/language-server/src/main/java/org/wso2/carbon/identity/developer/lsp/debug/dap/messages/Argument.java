@@ -24,6 +24,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
  * @param <T>
  */
 public class Argument<T extends Object> {
+
     private Object value;
 
     public Argument(Object value) {

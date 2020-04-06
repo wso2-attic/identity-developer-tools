@@ -17,6 +17,7 @@ export class PreviewManager {
 	private constructor() { }
 
 	public static getInstance(): PreviewManager {
+
 		if (!PreviewManager.instance) {
 			PreviewManager.instance = new PreviewManager();
 		}
@@ -25,6 +26,7 @@ export class PreviewManager {
 	}
 
 	public getPreviewManagers(){
+
 		return this._previewManagers;
 	}
 
@@ -33,6 +35,7 @@ export class PreviewManager {
 	 * generateWebViewPanel() to generate the web View panel to render web view.
 	 */
 	public generateWebViewPanel(xmlFilePath, context) {
+
 		const previewManager = PreviewManager.getInstance();
 		const previewManagers = previewManager.getPreviewManagers();
 		var serviceName = String(fileHandler.extractFileName(xmlFilePath));
@@ -85,6 +88,7 @@ export class PreviewManager {
 	 * getWebviewContent() to generate the html of web view.
 	 */
 	public getWebviewContent(xmlCode, path, filepath,pathCss,pathJS) {
+
 		var htmlCode = fileHandler.getHTMLCode(path.fsPath);
 
 		let newHtml = format(htmlCode, {
@@ -103,6 +107,7 @@ export class PreviewManager {
 	 * getWebviewContent() to generate the html of oAuth web.
 	 */
 	public async generateOAuthPreview(context) {
+
 		var htmlFilePath = vscode.Uri.file(
 			path.join(context.extensionPath, 'client', 'src', 'ui', 'oAuth.html')
 		);
@@ -128,7 +133,6 @@ export class PreviewManager {
 		var secret = keytar.getPassword("clientSecret", "clientSecret");
 		await secret.then((result) => {
 			preClientSecret = result;
-			console.log("Pre client Secret: " + result); // result will be 'secret'
 		});
 
 		// Get the new code.
@@ -163,7 +167,7 @@ export class PreviewManager {
 							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID + "&scope=" + scope)
 					);
 				} else if (message.command == 'acess') {
-					// Set Acess Token to system key chain.					
+					// Set Acess Token to system key chain.
 					keytar.setPassword("acessToken", "acessToken", message.acessToken);
 					// Close the webview
 					await vscode.commands.executeCommand("workbench.action.closeActiveEditor");

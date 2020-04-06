@@ -14,6 +14,7 @@ export class FileHandler {
 	 * readXML() used to read the XML files code from the given file path
 	 */
 	public readXML(filePath: any): String {
+
 		return String(fs.readFileSync(filePath, 'utf8'));
 	}
 
@@ -21,6 +22,7 @@ export class FileHandler {
 	 * extractFileName() to extract the file name from the gven filepath.
 	 */
 	public extractFileName(filePath): String {
+
 		var parsed = url.parse(filePath);
 		var fileName = path.basename(parsed.pathname).replace(/\.[^/.]+$/, "");
 		return fileName;
@@ -30,6 +32,7 @@ export class FileHandler {
 	 * extractAdaptiveScript() to extract the adpative scripts from the xml.
 	 */
 	public extractAdaptiveScript(filePath) {
+
 		var xmlCode = this.readXML(filePath);
 		var ast = XmlReader.parseSync(String(xmlCode));
 		var adaptive = xmlQuery(ast).find('LocalAndOutBoundAuthenticationConfig')
@@ -41,17 +44,19 @@ export class FileHandler {
 	 * getHTMLCode() to read the html code from the file.
 	 */
 	public getHTMLCode(htmlFilePath) {
+
 		return fs.readFileSync(htmlFilePath, 'utf8');
 	}
 
 	/**
-	 * handleButtonClick() to Open available adaptiveScriptFile or 
+	 * handleButtonClick() to Open available adaptiveScriptFile or
 	 * create a new adaptive script file.
 	 */
 	public async handleButtonClick(message, xmlFilePath) {
+
 		// Get the name of the servce.
 		var serviceName = this.extractFileName(xmlFilePath).replace('%20', ' ');
-		// Handle the button click in web view.		
+		// Handle the button click in web view.
 		if (String(message.command) == "scriptFile") {
 			var adaptive = this.extractAdaptiveScript(xmlFilePath);
 			this.createOrOpenAdaptiveScript(adaptive, serviceName);
@@ -62,10 +67,11 @@ export class FileHandler {
 	}
 
 	/**
-	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or 
+	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or
 	 * create a new adaptive script file.
 	 */
 	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
+
 		// Automatically track and cleanup files at exit
 		temp.track();
 
@@ -88,6 +94,7 @@ export class FileHandler {
 	 * createDefaultAdaptiveScript() to create adaptive script when no scripts found.
 	 */
 	public createDefaultAdaptiveScript(executeSteps) {
+
 		var script = `var onLoginRequest = function (context) {\n` +
 			this.bindExecuteSteps(executeSteps)
 			+ `\n};`;
@@ -98,6 +105,7 @@ export class FileHandler {
 	 * bindExecuteSteps() to bind the executeStep method to the script.
 	 */
 	public bindExecuteSteps(executeSteps) {
+
 		var executeStep = ``;
 		for (let index = 1; index <= executeSteps; index++) {
 			if (index < executeSteps) {
@@ -113,6 +121,7 @@ export class FileHandler {
 	 * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
 	 */
 	public async syncServiceProviderWithAdaptiveScript() {
+
 		var parser = new xml2js.Parser({ explicitArray: false });
 		var xmlBuilder = new xml2js.Builder({ cdata: true });
 		const { activeTextEditor } = vscode.window;
@@ -128,26 +137,26 @@ export class FileHandler {
 		}
 		// Variable to assign the new xml.
 		var newXml;
-		// Get the adative Script code. 
+		// Get the adative Script code.
 		var newAdaptiveScriptCode = document.getText();
 		// Get the service name.
 		var serviceName = this.extractFileName(document.uri.fsPath).replace('%20', ' ');
-		// Path of the xml file of the service.	
+		// Path of the xml file of the service.
 		var xmlFile = path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]);
 		// Current code of the xml file.
 		var xml = this.readXML(xmlFile);
-		// Get the old adaptive script.	
+		// Get the old adaptive script.
 		var adaptiveScript = this.extractAdaptiveScript(xmlFile);
 		// Save the active adaptive script before sync.
 		document.save();
 
 		parser.parseString(xml, function (err, result) {
-			// Check whether AuthenticationScript node is Available.		
+			// Check whether AuthenticationScript node is Available.
 			if ('AuthenticationScript' in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
 				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode).
 					replace('AuthenticationScript enabled="true"', 'AuthenticationScript enabled="false"');
 			} else {
-				// Add the AuthenticationScript node to the xmlfile.			
+				// Add the AuthenticationScript node to the xmlfile.
 				result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = { $: { enabled: "false", language: "application/javascript" }, _: "//<enabled false>\n" + newAdaptiveScriptCode };
 				// change the xml to the new xml.
 				newXml = xmlBuilder.buildObject(result);
@@ -161,13 +170,14 @@ export class FileHandler {
 		// To update the service.
 		this.updateService(newXml);
 		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-			
+
 	}
 
 	/**
 	 * createXMLFile() to create the xml file with of the service.
 	 */
 	public async createXMLFile(xml, serviceName) {
+
 		var fileNames = []; // To keep the names of the file.
 		var files; // Array of available files in the directory
 		if (fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))) {
@@ -205,6 +215,7 @@ export class FileHandler {
 	 * getFilesFromDir() to return a list of files of the specified fileTypes in the provided dir.
 	*/
 	public getFilesFromDir(dir, fileTypes) {
+
 		var filesToReturn = [];
 		function walkDir(currentPath) {
 			var files = fs.readdirSync(currentPath);
@@ -225,20 +236,21 @@ export class FileHandler {
 	 * updateSerive() to update the service in the productIS.
 	 */
 	public async updateService(file) {
+
 		var url = vscode.workspace.getConfiguration().get('IAM.URL');
 		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
 		var acessToken;
 		// Get the acess token from the system key chain.
 		var secret = keytar.getPassword("acessToken", "acessToken");
 		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.					
+			acessToken = result; // Assign the value to acess toke.
 		});
 
 		// To bypass the self signed server error.
 		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 		var FormData = require('form-data');
 		var bodyFormData = new FormData();
-		bodyFormData.append('file', file); 
+		bodyFormData.append('file', file);
 		axios({
 
 			method: 'put',

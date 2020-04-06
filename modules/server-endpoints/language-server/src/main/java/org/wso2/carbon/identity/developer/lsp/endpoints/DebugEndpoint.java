@@ -24,7 +24,6 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
-import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSession;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManager;
 
 import java.io.IOException;
