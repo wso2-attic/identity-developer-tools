@@ -54,6 +54,5 @@ public class DCRClient {
         }
 
         return jsonData;
-
     }
 }

@@ -82,7 +82,7 @@ public class SpringBootArtifactBuilder implements ArtifactBuilder {
     }
 
     @Override
-    public Artifact build() throws BuilderException{
+    public Artifact build() throws BuilderException {
 
         Artifact artifact = new Artifact();
         ArtifactInfo artifactInfo = new ArtifactInfo();
@@ -97,9 +97,9 @@ public class SpringBootArtifactBuilder implements ArtifactBuilder {
             artifact.getData().add(getIndexHtmlPage());
             artifact.getData().add(getUserInfoHtmlPage());
             return artifact;
-        } catch (IOException e ) {
+        } catch (IOException e) {
             throw new BuilderException("Unable to get artifacts", e);
-        } catch (ClientException e){
+        } catch (ClientException e) {
             throw new BuilderException("Unable to get proper response from DCR endpoint ", e);
         }
     }
