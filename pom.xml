@@ -18,6 +18,7 @@
         <jinjava.version>2.5.3</jinjava.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <orbit.version.json-simple>1.1.wso2v1</orbit.version.json-simple>
     </properties>
 
     <dependencies>
@@ -31,7 +32,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -62,6 +63,13 @@
             <artifactId>jinjava</artifactId>
             <version>${jinjava.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -87,6 +95,7 @@
                             <filtering>true</filtering>
                         </resource>
                     </webResources>
+                    <warName>artifact-service</warName>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth2 Login </title>
+</head>
+
+<body>
+<h1>OAuth 2.0 Login with WSO2 Identity Server</h1>
+<div>
+    <div style="float:none">&nbsp;</div>
+    <div style="float:right">
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout"/>
+        </form>
+    </div>
+</div>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LOAuth 2.0 Login with Spring Security</title>
+</head>
+<body>
+<div>
+    You are successfully logged in as <span style="font-weight:bold" th:text="${userName}"></span>
+</div>
+<div>
+    <div>
+        <span>Username:</span> <span style="font-weight:bold" th:text="${userName}"></span>
+    </div>
+    <div>
+        <span>IdToken:</span>
+        <div>
+            <span style="font-weight:bold" th:text="${idtoken}"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>
