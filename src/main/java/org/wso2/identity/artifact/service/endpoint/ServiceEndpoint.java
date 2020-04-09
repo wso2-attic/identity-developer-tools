@@ -4,6 +4,7 @@ import org.wso2.identity.artifact.service.artifact.Artifact;
 import org.wso2.identity.artifact.service.artifact.ArtifactInfo;
 import org.wso2.identity.artifact.service.exception.ClientException;
 import org.wso2.identity.artifact.service.exception.ServiceException;
+import org.wso2.identity.artifact.service.model.ArtifactRequestData;
 import org.wso2.identity.artifact.service.model.Response;
 import org.wso2.identity.artifact.service.service.ArtifactService;
 
@@ -37,11 +38,11 @@ public class ServiceEndpoint {
     @Path("/artifact/{name}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response<Artifact> getArtifact(@PathParam("name") String name, CLIInput cliInput) {
+    public Response<Artifact> getArtifact(@PathParam("name") String name, ArtifactRequestData artifactRequestData) {
 
         try {
             ArtifactService artifactService = new ArtifactService();
-            return new Response<>(artifactService.getArtifact(name, servletContext, cliInput));
+            return new Response<>(artifactService.getArtifact(name, servletContext, artifactRequestData));
         } catch (ClientException ex) {
             return new Response<>(ex.getMessage());
         } catch (ServiceException e) {

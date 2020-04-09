@@ -2,19 +2,8 @@ package org.wso2.identity.artifact.service.artifact;
 
 public class ArtifactData {
 
-    private String type;
     private byte[] data;
-    private String path;
-
-    public String getType() {
-
-        return type;
-    }
-
-    public void setType(String type) {
-
-        this.type = type;
-    }
+    private ArtifactMetadata metadata;
 
     public byte[] getData() {
 
@@ -26,13 +15,13 @@ public class ArtifactData {
         this.data = data;
     }
 
-    public String getPath() {
+    public ArtifactMetadata getMetadata() {
 
-        return path;
+        return metadata;
     }
 
-    public void setPath(String path) {
+    public void setMetadata(ArtifactMetadata metadata) {
 
-        this.path = path;
+        this.metadata = metadata;
     }
 }

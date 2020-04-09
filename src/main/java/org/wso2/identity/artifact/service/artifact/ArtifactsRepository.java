@@ -1,7 +1,7 @@
 package org.wso2.identity.artifact.service.artifact;
 
-import org.wso2.identity.artifact.service.artifact.builder.spring.SpringBootArtifactBuilder;
-import org.wso2.identity.artifact.service.endpoint.CLIInput;
+import org.wso2.identity.artifact.service.artifact.builder.ArtifactBuilder;
+import org.wso2.identity.artifact.service.model.ArtifactRequestData;
 import org.wso2.identity.artifact.service.exception.BuilderException;
 import org.wso2.identity.artifact.service.exception.ClientException;
 
@@ -28,14 +28,11 @@ public class ArtifactsRepository {
         return instance;
     }
 
-    public Artifact findArtifact(String name, CLIInput cliInput) throws BuilderException, ClientException {
+    public Artifact findArtifact(String name, ArtifactRequestData artifactRequestData) throws BuilderException, ClientException {
 
-        switch (name) {
-            case "spring-boot":
-                return getSpringArtifacts(cliInput);
-            default:
-                throw new ClientException("Cannot find artifacts corresponding for technology: " + name);
-        }
+        ArtifactBuilder artifactBuilder = ArtifactRegistry.getBuilder(name, rootPath);
+        artifactBuilder.setArtifactRequestData(artifactRequestData);
+        return artifactBuilder.build();
     }
 
     public Set<String> getArtifactNames() {
@@ -43,11 +40,5 @@ public class ArtifactsRepository {
         return new HashSet<String>() {{
             add("spring-boot");
         }};
-    }
-
-    private Artifact getSpringArtifacts(CLIInput cliInput) throws BuilderException {
-
-        SpringBootArtifactBuilder springBootArtifactBuilder = new SpringBootArtifactBuilder(rootPath, cliInput);
-        return springBootArtifactBuilder.build();
     }
 }
