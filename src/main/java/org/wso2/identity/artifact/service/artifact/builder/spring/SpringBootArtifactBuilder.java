@@ -112,7 +112,7 @@ public class SpringBootArtifactBuilder implements ArtifactBuilder {
         String template = new String(Files.readAllBytes(path));
         Jinjava jinjava = new Jinjava();
         String renderedTemplate = jinjava.render(template, context);
-        return createArtifactData(renderedTemplate.getBytes(), PROPERTIES_FILE_PATH, "copy");
+        return createArtifactData(renderedTemplate.getBytes(), PROPERTIES_FILE_PATH, METADATA_COPY_OPERATION);
     }
 
     private ArtifactData createArtifactData(byte[] data, String path, String operation) {
