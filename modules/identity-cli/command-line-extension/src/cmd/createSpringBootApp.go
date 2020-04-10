@@ -43,6 +43,7 @@ func installSpringBootArtifacts(respBody []byte) {
 			return
 		}
 	}
+	fmt.Println("Successfully installed the artifacts and secured with OIDC using WSO2 IS..!")
 }
 
 func copyArtifacts(artifactData []byte, artifactMetadataPath, artifactMetadataOperation string) {

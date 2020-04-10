@@ -251,3 +251,22 @@ $ iamctl application
                                                          
 ? Select the option to move on: Get List
 ```
+**Create a client application by getting framework specific artifacts**
+```
+iamctl createclientapp
+```
+It gives the following output 
+example:-
+```
+~$ iamctl createclientapp
+  ___      _      __  __            ____   _____   _     
+ |_ _|    / \    |  \/  |          / ___| |_   _| | |    
+  | |    / _ \   | |\/| |  _____  | |       | |   | |    
+  | |   / ___ \  | |  | | |_____| | |___    | |   | |___ 
+ |___| /_/   \_\ |_|  |_|          \____|   |_|   |_____|
+                                                         
+? Enter your web app technology (Eg: spring-boot) : spring-boot
+? Enter the package name of the project (Eg: com.example.demo) : com.example.demo
+? Enter your OAuth application Name (Eg:TestApp) : Testapp
+```
+Now you have successfully installed the artifacts and secured with OIDC using WSO2 IS..
