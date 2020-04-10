@@ -35,7 +35,8 @@ func installSpringBootArtifacts(respBody []byte) {
 		artifactMetadataPath := response.ResponseData.Data[i].Metadata.Path
 		artifactMetadataOperation := response.ResponseData.Data[i].Metadata.Operation
 
-		if artifactMetadataOperation == "copy" {
+		var MetadataCopyOperation = "copy"
+		if artifactMetadataOperation == MetadataCopyOperation {
 			copyArtifacts(artifactData, artifactMetadataPath, artifactMetadataOperation)
 		}
 		if err != nil {
