@@ -37,7 +37,7 @@ func installSpringBootArtifacts(respBody []byte) {
 
 		var MetadataCopyOperation = "copy"
 		if artifactMetadataOperation == MetadataCopyOperation {
-			copyArtifacts(artifactData, artifactMetadataPath, artifactMetadataOperation)
+			copyArtifacts(artifactData, artifactMetadataPath)
 		}
 		if err != nil {
 			fmt.Println("Error while decoding OIDC registration artifact")
@@ -47,7 +47,8 @@ func installSpringBootArtifacts(respBody []byte) {
 	fmt.Println("Successfully installed the artifacts and secured with OIDC using WSO2 IS..!")
 }
 
-func copyArtifacts(artifactData []byte, artifactMetadataPath, artifactMetadataOperation string) {
+func copyArtifacts(artifactData []byte, artifactMetadataPath string) {
+
 	createFileIfNotExist(artifactMetadataPath)
 	writeFile(artifactMetadataPath, string(artifactData))
 }
