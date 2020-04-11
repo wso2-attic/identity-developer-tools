@@ -150,7 +150,7 @@
                     <appendAssemblyId>true</appendAssemblyId>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>org.wso2.carbon.identity.java.agent.Agent</Premain-Class>
+                            <Premain-Class>org.wso2.carbon.identity.java.agent.DebugAgent</Premain-Class>
                         </manifestEntries>
                     </archive>
 

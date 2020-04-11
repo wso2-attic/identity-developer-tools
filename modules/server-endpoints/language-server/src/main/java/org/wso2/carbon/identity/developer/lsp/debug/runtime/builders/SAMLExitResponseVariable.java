@@ -28,6 +28,11 @@ public class SAMLExitResponseVariable implements SAMLExitVariablePlan {
 
     HashMap<String, Object> variables = new HashMap<>();
 
+    /**
+     * This method is to get the variables after adding the objects.
+     *
+     * @return variables
+     */
     public HashMap<String, Object> getVariables() {
 
         return variables;

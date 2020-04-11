@@ -32,11 +32,21 @@ public class Event extends ProtocolMessage {
         this.event = event;
     }
 
+    /**
+     * Getter which gets the event.
+     *
+     * @return type of event.
+     */
     public String getEvent() {
 
         return event;
     }
 
+    /**
+     *  Sets the event.
+     *
+     * @param event Type of event.
+     */
     public void setEvent(String event) {
 
         this.event = event;

@@ -53,11 +53,11 @@
 				<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
 					<form>
 						<div class="col-12 col-md-12 mb-2 mb-md-0">
-							<input id="acesstoken" type="password" class="form-control form-control-lg"
+							<input id="accessToken" type="password" class="form-control form-control-lg"
 								placeholder="Enter your IS Access Token" required>
 						</div><br />
 						<div class="col-12 col-md-3 mx-auto">
-							<button id="acess" type="submit" class="btn btn-block btn-lg btn-primary">Submit</button>
+							<button id="access" type="submit" class="btn btn-block btn-lg btn-primary">Submit</button>
 						</div>
 					</form>
 				</div>
@@ -94,10 +94,10 @@
 		}
 		$(document).ready(function () {
 			const vscode = acquireVsCodeApi();
-			var url = `wso2isurl`;
-			var tenant = `wso2isTenant`;
-			var clientID = `wso2ISClientID`;
-			var clientSecret = `wso2ISClientSecret`;
+			var url = `{wso2isurl}`;
+			var tenant = `{wso2isTenant}`;
+			var clientID = `{wso2ISClientID}`;
+			var clientSecret = `{wso2ISClientSecret}`;
 			$('#url').val(url);
 			$('#tenant').val(tenant);
 			$('#clientID').val(clientID);
@@ -119,12 +119,12 @@
 				}
 			});
 
-			$('#acess').click(function () {
-				var acessToken = $('#acesstoken').val();
-				if (acessToken.length > 0) {
+			$('#access').click(function () {
+				var accessToken = $('#accessToken').val();
+				if (accessToken.length > 0) {
 					vscode.postMessage({
-						command: 'acess',
-						acessToken: acessToken,
+						command: 'access',
+						accessToken: accessToken,
 					});
 				}
 			});

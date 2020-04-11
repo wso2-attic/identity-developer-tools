@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesResponse;
@@ -31,6 +30,7 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.VariablesRespon
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.servlet.http.Cookie;
 
 /**
@@ -43,7 +43,7 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-        object.addProperty(DAPConstants.JSON_KEY_FOR_JSONRPC, DAPConstants.JSONRPC_VERSION);
+        object.addProperty(DAPConstants.JSON_KEY_FOR_JSONRPC, DAPConstants.JSON_RPC_VERSION);
         object.addProperty(DAPConstants.JSON_KEY_FOR_ID, response.getId());
         object.add(DAPConstants.JSON_KEY_FOR_RESULT, generateResultObject(response));
 
@@ -66,62 +66,67 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
     private JsonElement generateVariablesArray(VariablesResponse response) {
 
         JsonArray jsonArray = new JsonArray();
-        Argument<HashMap<String, Object>> body = response.getBody();
-        HashMap<String, Object> variables = body.getValue();
 
-        if (variables == null) {
-            return jsonArray;
-        }
+        if (response.getBody() != null) {
+            Argument<HashMap<String, Object>> body = response.getBody();
+            HashMap<String, Object> variables = body.getValue();
 
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
-            JsonObject arrayElement = new JsonObject();
-            arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_NAME, entry.getKey());
-            JsonObject valueObject = new JsonObject();
-
-            switch (entry.getKey()) {
-                case DAPConstants.HTTP_SERVLET_REQUEST:
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_OBJECT);
-                    HashMap<String, Object> requestdetails = (HashMap<String, Object>) entry.getValue();
-                    valueObject.add(DAPConstants.JSON_KEY_FOR_COOKIES, this.getCookies(requestdetails));
-                    valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(requestdetails));
-                    arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
-
-                    break;
-                case DAPConstants.HTTP_SERVLET_RESPONSE:
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_OBJECT);
-                    HashMap<String, Object> responsedetails = (HashMap<String, Object>) entry.getValue();
-                    valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(responsedetails));
-                    valueObject.addProperty(DAPConstants.JSON_KEY_FOR_STATUS, this.getResponseStatus(responsedetails));
-                    arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
-
-                    break;
-                case DAPConstants.SAML_REQUEST:
-                case DAPConstants.SAML_RESPONSE:
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_STRING);
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VALUE, (String) entry.getValue());
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
-
-                    break;
-                default:
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARAIBLE_TYPE_UNKNOWN);
-                    arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
-                    break;
+            if (variables == null) {
+                return jsonArray;
             }
-            jsonArray.add(arrayElement);
+
+            for (Map.Entry<String, Object> entry : variables.entrySet()) {
+                JsonObject arrayElement = new JsonObject();
+                arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_NAME, entry.getKey());
+                JsonObject valueObject = new JsonObject();
+
+                switch (entry.getKey()) {
+                    case DAPConstants.HTTP_SERVLET_REQUEST:
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARIABLE_TYPE_OBJECT);
+                        HashMap<String, Object> requestDetails = (HashMap<String, Object>) entry.getValue();
+                        valueObject.add(DAPConstants.JSON_KEY_FOR_COOKIES, this.getCookies(requestDetails));
+                        valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(requestDetails));
+                        arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                        break;
+                    case DAPConstants.HTTP_SERVLET_RESPONSE:
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARIABLE_TYPE_OBJECT);
+                        HashMap<String, Object> responseDetails = (HashMap<String, Object>) entry.getValue();
+                        valueObject.add(DAPConstants.JSON_KEY_FOR_HEADERS, this.getHeaders(responseDetails));
+                        valueObject.addProperty(DAPConstants.JSON_KEY_FOR_STATUS,
+                                this.getResponseStatus(responseDetails));
+                        arrayElement.add(DAPConstants.JSON_KEY_FOR_VALUE, valueObject);
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                        break;
+                    case DAPConstants.SAML_REQUEST:
+                    case DAPConstants.SAML_RESPONSE:
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARIABLE_TYPE_STRING);
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VALUE, (String) entry.getValue());
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+
+                        break;
+                    default:
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_TYPE, DAPConstants.VARIABLE_TYPE_UNKNOWN);
+                        arrayElement.addProperty(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE, 0);
+                        break;
+                }
+                jsonArray.add(arrayElement);
+            }
         }
+
         return jsonArray;
     }
 
-    private Integer getResponseStatus(HashMap<String, Object> responsedetails) {
+    private Integer getResponseStatus(HashMap<String, Object> responseDetails) {
 
-        return (Integer) responsedetails.get(DAPConstants.JSON_KEY_FOR_STATUS);
+        return (Integer) responseDetails.get(DAPConstants.JSON_KEY_FOR_STATUS);
     }
 
-    private JsonArray getCookies(HashMap<String, Object> requestdetails) {
+    private JsonArray getCookies(HashMap<String, Object> requestDetails) {
 
-        Object object = requestdetails.get(DAPConstants.JSON_KEY_FOR_COOKIES);
+        Object object = requestDetails.get(DAPConstants.JSON_KEY_FOR_COOKIES);
         JsonArray cookieJsonArray = new JsonArray();
         if (object != null) {
             Cookie[] cookies = (Cookie[]) object;

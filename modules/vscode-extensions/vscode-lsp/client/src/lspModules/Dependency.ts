@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,11 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.java.agent.host;
+import * as vscode from "vscode";
 
 /**
- * Contains the debug session information.
+ * Helper class for Tree View
  */
-class DebugSession {
+export class Dependency extends vscode.TreeItem {
+
+    constructor(
+        public readonly label: string,
+        public readonly task: string,
+        public readonly command: vscode.Command,
+    ) {
+        super(label);
+    }
+
+    public get tooltip(): string {
+        return `${this.label}`;
+    }
+
+    public get description(): string {
+        return this.task;
+    }
 
 }

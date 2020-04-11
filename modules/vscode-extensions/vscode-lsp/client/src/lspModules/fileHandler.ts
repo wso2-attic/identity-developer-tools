@@ -1,277 +1,305 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as url from 'url';
-import * as xmlQuery from 'xml-query';
-import * as XmlReader from 'xml-reader';
-import * as vscode from 'vscode';
-import * as xml2js from 'xml2js';
-import * as temp from 'temp';
-const axios = require('axios');
-const keytar = require('keytar');
+/*
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import * as fs from "fs";
+import * as path from "path";
+import * as temp from "temp";
+import * as url from "url";
+import * as vscode from "vscode";
+import * as xmlQuery from "xml-query";
+import * as XmlReader from "xml-reader";
+import * as xml2js from "xml2js";
+import {DebugConstants} from "../DebugConstants";
+
+import axios from "axios";
+import keytar = require("keytar");
+import {Config} from "../Config";
+
+/**
+ * This class helps to read and write the files when needed.
+ */
 export class FileHandler {
+    /**
+     * readXML() used to read the XML files code from the given file path
+     */
+    public readXML(filePath: any): string {
 
-	/**
-	 * readXML() used to read the XML files code from the given file path
-	 */
-	public readXML(filePath: any): String {
+        return String(fs.readFileSync(filePath, "utf8"));
+    }
 
-		return String(fs.readFileSync(filePath, 'utf8'));
-	}
+    /**
+     * extractFileName() to extract the file name from the gven filepath.
+     */
+    public extractFileName(filePath): string {
 
-	/**
-	 * extractFileName() to extract the file name from the gven filepath.
-	 */
-	public extractFileName(filePath): String {
+        const parsed = url.parse(filePath);
+        return path.basename(parsed.pathname).replace(/\.[^/.]+$/, "");
+    }
 
-		var parsed = url.parse(filePath);
-		var fileName = path.basename(parsed.pathname).replace(/\.[^/.]+$/, "");
-		return fileName;
-	}
+    /**
+     * extractAdaptiveScript() to extract the adpative scripts from the xml.
+     */
+    public extractAdaptiveScript(filePath) {
 
-	/**
-	 * extractAdaptiveScript() to extract the adpative scripts from the xml.
-	 */
-	public extractAdaptiveScript(filePath) {
+        const xmlCode = this.readXML(filePath);
+        const ast = XmlReader.parseSync(String(xmlCode));
+        return xmlQuery(ast).find(DebugConstants.LOCAL_AND_OUTBOUND_AUTHENTICATION_CONFIG)
+            .find(DebugConstants.AUTHENTICATION_SCRIPTS).text();
+    }
 
-		var xmlCode = this.readXML(filePath);
-		var ast = XmlReader.parseSync(String(xmlCode));
-		var adaptive = xmlQuery(ast).find('LocalAndOutBoundAuthenticationConfig')
-			.find("AuthenticationScript").text();
-		return adaptive;
-	}
+    /**
+     * getHTMLCode() to read the html code from the file.
+     */
+    public getHTMLCode(htmlFilePath) {
 
-	/**
-	 * getHTMLCode() to read the html code from the file.
-	 */
-	public getHTMLCode(htmlFilePath) {
+        return fs.readFileSync(htmlFilePath, "utf8");
+    }
 
-		return fs.readFileSync(htmlFilePath, 'utf8');
-	}
+    /**
+     * handleButtonClick() to Open available adaptiveScriptFile or
+     * create a new adaptive script file.
+     */
+    public async handleButtonClick(message, xmlFilePath) {
 
-	/**
-	 * handleButtonClick() to Open available adaptiveScriptFile or
-	 * create a new adaptive script file.
-	 */
-	public async handleButtonClick(message, xmlFilePath) {
+        // Get the name of the service.
+        const serviceName = this.extractFileName(xmlFilePath).replace("%20", " ");
+        // Handle the button click in web view.
+        if (String(message.command) === DebugConstants.SCRIPT_FILE) {
+            const adaptive = this.extractAdaptiveScript(xmlFilePath);
+            this.createOrOpenAdaptiveScript(adaptive, serviceName);
+        } else if (String(message.command) === DebugConstants.DEFAULT_SCRIPT_FILE) {
+            const adaptiveScript = this.createDefaultAdaptiveScript(message.data);
+            this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
+        }
+    }
 
-		// Get the name of the servce.
-		var serviceName = this.extractFileName(xmlFilePath).replace('%20', ' ');
-		// Handle the button click in web view.
-		if (String(message.command) == "scriptFile") {
-			var adaptive = this.extractAdaptiveScript(xmlFilePath);
-			this.createOrOpenAdaptiveScript(adaptive, serviceName);
-		} else if (String(message.command) == "defaultScriptFile") {
-			var adaptiveScript = this.createDefaultAdaptiveScript(message.data);
-			this.createOrOpenAdaptiveScript(adaptiveScript, serviceName);
-		}
-	}
+    /**
+     * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or
+     * create a new adaptive script file.
+     */
+    public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
 
-	/**
-	 * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or
-	 * create a new adaptive script file.
-	 */
-	public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
+        // Automatically track and cleanup files at exit
+        temp.track();
 
-		// Automatically track and cleanup files at exit
-		temp.track();
+        // Create a temp file.
+        temp.mkdir(DebugConstants.ADAPTIVE_SCRIPT, (err, dirPath) => {
+            if (err) {
+                throw err;
+            }
+            const inputPath = path.join(dirPath, serviceName + ".authjs");
+            fs.writeFile(inputPath, adaptiveScript, (error) => {
+                if (error) {
+                    throw error;
+                }
+                process.chdir(dirPath);
+                vscode.workspace.openTextDocument(inputPath).then((document) => {
+                    vscode.window.showTextDocument(document, 2, false);
+                });
+            });
+        });
 
-		// Create a temp file.
-		temp.mkdir('adaptiveScript', function (err, dirPath) {
-			if (err) throw err;
-			var inputPath = path.join(dirPath, serviceName + '.authjs');
-			fs.writeFile(inputPath, adaptiveScript, function (err) {
-				if (err) throw err;
-				process.chdir(dirPath);
-				vscode.workspace.openTextDocument(inputPath).then(document => {
-					vscode.window.showTextDocument(document, 2, false);
-				});
-			});
-		});
+    }
 
-	}
+    /**
+     * createDefaultAdaptiveScript() to create adaptive script when no scripts found.
+     */
+    public createDefaultAdaptiveScript(executeSteps) {
 
-	/**
-	 * createDefaultAdaptiveScript() to create adaptive script when no scripts found.
-	 */
-	public createDefaultAdaptiveScript(executeSteps) {
+        return `var onLoginRequest = function (context) {\n` +
+            this.bindExecuteSteps(executeSteps)
+            + `\n};`;
+    }
 
-		var script = `var onLoginRequest = function (context) {\n` +
-			this.bindExecuteSteps(executeSteps)
-			+ `\n};`;
-		return script;
-	}
+    /**
+     * bindExecuteSteps() to bind the executeStep method to the script.
+     */
+    public bindExecuteSteps(executeSteps) {
 
-	/**
-	 * bindExecuteSteps() to bind the executeStep method to the script.
-	 */
-	public bindExecuteSteps(executeSteps) {
+        let executeStep = ``;
+        for (let index = 1; index <= executeSteps; index++) {
+            if (index < executeSteps) {
+                executeStep = executeStep + `\texecuteStep(` + index + `);\n`;
+            } else {
+                executeStep = executeStep + `\texecuteStep(` + index + `);`;
+            }
+        }
+        return executeStep;
+    }
 
-		var executeStep = ``;
-		for (let index = 1; index <= executeSteps; index++) {
-			if (index < executeSteps) {
-				executeStep = executeStep + `\texecuteStep(` + index + `);\n`;
-			} else {
-				executeStep = executeStep + `\texecuteStep(` + index + `);`;
-			}
-		}
-		return executeStep;
-	}
+    /**
+     * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
+     */
+    public async syncServiceProviderWithAdaptiveScript() {
 
-	/**
-	 * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
-	 */
-	public async syncServiceProviderWithAdaptiveScript() {
+        const parser = new xml2js.Parser({explicitArray: false});
+        const xmlBuilder = new xml2js.Builder({cdata: true});
+        const {activeTextEditor} = vscode.window;
+        const {document} = activeTextEditor;
+        const fileNames = []; // Array of file names.
+        let files;
+        if (fs.existsSync(path.join(vscode.workspace.rootPath, "IAM", "Apps"))) {
+            files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, "IAM", "Apps"), [".authxml"]);
+            files.forEach((file) => {
+                // Add files names to array.
+                fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
+            });
+        }
+        // Variable to assign the new xml.
+        let newXml;
+        // Get the adaptive Script code.
+        const newAdaptiveScriptCode = document.getText();
+        // Get the service name.
+        const serviceName = this.extractFileName(document.uri.fsPath).replace("%20", " ");
+        // Path of the xml file of the service.
+        const xmlFile = path.join(vscode.workspace.rootPath, "IAM", "Apps", files[fileNames.indexOf(serviceName)]);
+        // Current code of the xml file.
+        const xml = this.readXML(xmlFile);
+        // Get the old adaptive script.
+        const adaptiveScript = this.extractAdaptiveScript(xmlFile);
+        // Save the active adaptive script before sync.
+        document.save();
 
-		var parser = new xml2js.Parser({ explicitArray: false });
-		var xmlBuilder = new xml2js.Builder({ cdata: true });
-		const { activeTextEditor } = vscode.window;
-		const { document } = activeTextEditor;
-		var fileNames = []; // Array of file names.
-		var files;
-		if (fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))) {
-			files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
-			files.forEach(file => {
-				// Add files names to array.
-				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
-			});
-		}
-		// Variable to assign the new xml.
-		var newXml;
-		// Get the adative Script code.
-		var newAdaptiveScriptCode = document.getText();
-		// Get the service name.
-		var serviceName = this.extractFileName(document.uri.fsPath).replace('%20', ' ');
-		// Path of the xml file of the service.
-		var xmlFile = path.join(vscode.workspace.rootPath, 'IAM', 'Apps', files[fileNames.indexOf(serviceName)]);
-		// Current code of the xml file.
-		var xml = this.readXML(xmlFile);
-		// Get the old adaptive script.
-		var adaptiveScript = this.extractAdaptiveScript(xmlFile);
-		// Save the active adaptive script before sync.
-		document.save();
+        parser.parseString(xml, (err, result) => {
+            // Check whether AuthenticationScript node is Available.
+            if (DebugConstants.AUTHENTICATION_SCRIPTS in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
+                newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode)
+                    .replace(DebugConstants.AUTHENTICATION_SCRIPT_TRUE, DebugConstants.AUTHENTICATION_SCRIPT_FALSE);
+            } else {
+                // Add the AuthenticationScript node to the xml file.
+                result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = {
+                    $: {enabled: "false", language: "application/javascript"}, _: `//<enabled false>
+${newAdaptiveScriptCode}`,
+                };
+                // change the xml to the new xml.
+                newXml = xmlBuilder.buildObject(result);
+            }
+        });
+        // To write the new data to the xml file.
+        fs.writeFile(xmlFile, newXml, (err) => {
+            if (err) {
+                throw err;
+            }
+            vscode.window.showInformationMessage(DebugConstants.MESSAGE_FILE_SAVED_SUCCESS);
+        });
+        // To update the service.
+        this.updateService(newXml);
+        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 
-		parser.parseString(xml, function (err, result) {
-			// Check whether AuthenticationScript node is Available.
-			if ('AuthenticationScript' in result.ServiceProvider.LocalAndOutBoundAuthenticationConfig) {
-				newXml = xml.replace(adaptiveScript, newAdaptiveScriptCode).
-					replace('AuthenticationScript enabled="true"', 'AuthenticationScript enabled="false"');
-			} else {
-				// Add the AuthenticationScript node to the xmlfile.
-				result.ServiceProvider.LocalAndOutBoundAuthenticationConfig.AuthenticationScript = { $: { enabled: "false", language: "application/javascript" }, _: "//<enabled false>\n" + newAdaptiveScriptCode };
-				// change the xml to the new xml.
-				newXml = xmlBuilder.buildObject(result);
-			}
-		});
-		// To write the new data to the xml file.
-		fs.writeFile(xmlFile, newXml, (err) => {
-			if (err) throw err;
-			vscode.window.showInformationMessage('The file has been saved!');
-		});
-		// To update the service.
-		this.updateService(newXml);
-		await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+    }
 
-	}
+    /**
+     * createXMLFile() to create the xml file with of the service.
+     */
+    public async createXMLFile(xml, serviceName) {
 
-	/**
-	 * createXMLFile() to create the xml file with of the service.
-	 */
-	public async createXMLFile(xml, serviceName) {
+        const fileNames = []; // To keep the names of the file.
+        let files; // Array of available files in the directory
+        if (fs.existsSync(path.join(vscode.workspace.rootPath, "IAM", "Apps"))) {
+            files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, "IAM", "Apps"), [".authxml"]);
+            files.forEach((file) => {
+                fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
+            });
+        } else {
+            fs.mkdirSync(path.join(vscode.workspace.rootPath, "IAM", "Apps"), {recursive: true});
+        }
+        // Check whether the file already exsists.
+        if (fileNames.includes(serviceName)) {
+            const file = vscode.Uri.parse("file:" + path.join(vscode.workspace.rootPath, "IAM", "Apps",
+                files[fileNames.indexOf(serviceName)]));
 
-		var fileNames = []; // To keep the names of the file.
-		var files; // Array of available files in the directory
-		if (fs.existsSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'))) {
-			files = this.getFilesFromDir(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), [".authxml"]);
-			files.forEach(file => {
-				fileNames.push(path.basename(file).replace(/\.[^/.]+$/, ""));
-			});
-		} else {
-			fs.mkdirSync(path.join(vscode.workspace.rootPath, 'IAM', 'Apps'), { recursive: true });
-		}
-		// Check whether the file already exsists.
-		if (fileNames.includes(serviceName)) {
-			var file = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps',
-				files[fileNames.indexOf(serviceName)]));
+            // Open the file.
+            vscode.workspace.openTextDocument(file).then(async (document) => {
+                vscode.window.showTextDocument(document, 1, false);
+            });
+        } else {
+            // Uri of the untitled file.
+            const newFile = vscode.Uri.parse("file:" + path.join(vscode.workspace.rootPath, "IAM", "Apps",
+                serviceName + ".authxml"));
+            await fs.writeFile(path.join(vscode.workspace.rootPath, "IAM", "Apps", serviceName + ".authxml"),
+                xml, (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            // Open the file.
+            vscode.workspace.openTextDocument(newFile).then(async (document) => {
+                vscode.window.showTextDocument(document, 1, false);
+            });
+            return;
+        }
+    }
 
-			// Open the file.
-			vscode.workspace.openTextDocument(file).then(async document => {
-				vscode.window.showTextDocument(document, 1, false);
-			});
-		} else {
-			// Uri of the untitled file.
-			var newFile = vscode.Uri.parse('file:' + path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'));
-			await fs.writeFile(path.join(vscode.workspace.rootPath, 'IAM', 'Apps', serviceName + '.authxml'), xml, (err) => {
-				if (err) throw err;
-			});
-			// Open the file.
-			vscode.workspace.openTextDocument(newFile).then(async document => {
-				vscode.window.showTextDocument(document, 1, false);
-			});
-			return;
-		}
-	}
+    /**
+     * getFilesFromDir() to return a list of files of the specified fileTypes in the provided dir.
+     */
+    public getFilesFromDir(dir, fileTypes) {
 
-	/**
-	 * getFilesFromDir() to return a list of files of the specified fileTypes in the provided dir.
-	*/
-	public getFilesFromDir(dir, fileTypes) {
+        const filesToReturn = [];
 
-		var filesToReturn = [];
-		function walkDir(currentPath) {
-			var files = fs.readdirSync(currentPath);
-			for (var i in files) {
-				var curFile = path.join(currentPath, files[i]);
-				if (fs.statSync(curFile).isFile() && fileTypes.indexOf(path.extname(curFile)) != -1) {
-					filesToReturn.push(curFile.replace(dir, ''));
-				} else if (fs.statSync(curFile).isDirectory()) {
-					walkDir(curFile);
-				}
-			}
-		}
-		walkDir(dir);
-		return filesToReturn;
-	}
+        function walkDir(currentPath) {
+            const files = fs.readdirSync(currentPath);
+            for (const i in files) {
+                const curFile = path.join(currentPath, files[i]);
+                if (fs.statSync(curFile).isFile() && fileTypes.indexOf(path.extname(curFile)) !== -1) {
+                    filesToReturn.push(curFile.replace(dir, ""));
+                } else if (fs.statSync(curFile).isDirectory()) {
+                    walkDir(curFile);
+                }
+            }
+        }
 
-	/**
-	 * updateSerive() to update the service in the productIS.
-	 */
-	public async updateService(file) {
+        walkDir(dir);
+        return filesToReturn;
+    }
 
-		var url = vscode.workspace.getConfiguration().get('IAM.URL');
-		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
-		var acessToken;
-		// Get the acess token from the system key chain.
-		var secret = keytar.getPassword("acessToken", "acessToken");
-		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.
-		});
+    /**
+     * updateService() to update the service in the productIS.
+     */
+    public async updateService(file) {
 
-		// To bypass the self signed server error.
-		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
-		var FormData = require('form-data');
-		var bodyFormData = new FormData();
-		bodyFormData.append('file', file);
-		axios({
+        const iamUrl = vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL);
+        const tenant = vscode.workspace.getConfiguration().get(DebugConstants.IAM_TENANT);
+        let accessToken;
+        // Get the access token from the system key chain.
+        const secret = keytar.getPassword(DebugConstants.ACCESS_TOKEN, DebugConstants.ACCESS_TOKEN);
+        await secret.then((result) => {
+            accessToken = result; // Assign the value to access token.
+        });
 
-			method: 'put',
-			url: url + `/t/${tenant}/api/server/v1/applications/import`,
-			data: bodyFormData,
-			// Set the content type header, so that we get the response in JSOn
-			headers: {
-				Authorization: 'Bearer ' + acessToken,
-				'Content-Type': 'multipart/form-data'
+        // To bypass the self signed server error.
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        const FormData = require("form-data");
+        const bodyFormData = new FormData();
+        bodyFormData.append("file", file);
 
-			}
-		}).then(async (response) => {
-			vscode.window.showInformationMessage("Sucessfully Imported");
-
-		}).catch((err) => {
-			// Do somthing
-			console.log(err);
-
-			// Show the sucess message in the vscode.
-			vscode.window.showErrorMessage("Error..");
-
-		});
-	}
+        axios({
+            data: bodyFormData,
+            headers: {
+                "Authorization": "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+            },
+            method: "put",
+            url: Config.PATH_APPLICATION_IMPORT(iamUrl, tenant),
+        }).then(async (response) => {
+            vscode.window.showInformationMessage(DebugConstants.MESSAGE_SERVICE_IMPORT_SUCCESS);
+        }).catch((err) => {
+            vscode.window.showErrorMessage(DebugConstants.MESSAGE_ACCESS_TOKEN_EXPIRED);
+        });
+    }
 }

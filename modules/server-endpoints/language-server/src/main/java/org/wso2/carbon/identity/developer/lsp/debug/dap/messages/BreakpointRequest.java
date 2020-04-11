@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 import java.util.List;
 
 /**
- * Breakpoint request.
+ * This class will help to add Breakpoint request from the Extension.
  */
 public class BreakpointRequest extends Request {
 
@@ -39,71 +39,145 @@ public class BreakpointRequest extends Request {
         super(type, seq, command, arguments);
     }
 
+    /**
+     * Gets the sourceName.
+     *
+     * @return sourceName
+     */
     public String getSourceName() {
 
         return sourceName;
     }
 
+    /**
+     * Sets the sourceName.
+     *
+     * @param sourceName the name of the Source.
+     */
     public void setSourceName(String sourceName) {
 
         this.sourceName = sourceName;
     }
 
+    /**
+     * Gets the sourcePath.
+     *
+     * @return sourcePath
+     */
     public String getSourcePath() {
 
         return sourcePath;
     }
 
+    /**
+     * Sets the sourcePath.
+     *
+     * @param sourcePath the path of the source.
+     */
     public void setSourcePath(String sourcePath) {
 
         this.sourcePath = sourcePath;
     }
 
+    /**
+     * Gets the sourceReference.
+     *
+     * @return sourceReference
+     */
     public int getSourceReference() {
 
         return sourceReference;
     }
 
+    /**
+     * Sets the sourceReference.
+     *
+     * @param sourceReference The reference to the source. This is the same as source.sourceReference. This is
+     *                        provided for backward compatibility since old backends do not understand the 'source'
+     *                        attribute.
+     */
     public void setSourceReference(int sourceReference) {
 
         this.sourceReference = sourceReference;
     }
 
+    /**
+     * Gets the adapterData.
+     *
+     * @return adapterData
+     */
     public Object getAdapterData() {
 
         return adapterData;
     }
 
+    /**
+     * Sets the adapterData.
+     *
+     * @param adapterData Optional data that a debug adapter might want to loop through the client. The client should
+     *                   leave the data intact and persist it across sessions. The client should not interpret the data.
+     */
     public void setAdapterData(Object adapterData) {
 
         this.adapterData = adapterData;
     }
 
+    /**
+     * Gets the lines.
+     *
+     * @return lines
+     */
     public int[] getLines() {
 
         return lines;
     }
 
+    /**
+     * Sets the lines.
+     *
+     * @param lines The code locations of the breakpoints.
+     */
     public void setLines(int[] lines) {
 
         this.lines = lines;
     }
 
+    /**
+     * Gets the breakpoints.
+     *
+     * @return breakpoints
+     */
     public int[] getBreakpoints() {
 
         return breakpoints;
     }
 
+    /**
+     * Sets the breakpoints.
+     *
+     * @param breakpoints Information about the breakpoints.
+     */
     public void setBreakpoints(int[] breakpoints) {
 
         this.breakpoints = breakpoints;
     }
 
+    /**
+     * Gets whether sourceModified .
+     *
+     * @return sourceModified
+     */
     public boolean isSourceModified() {
 
         return sourceModified;
     }
 
+    /**
+     * Sets whether sourceModified.
+     *
+     * @param sourceModified A value of true indicates that the underlying source has been modified which results in
+     *                       new breakpoint locations.
+     */
     public void setSourceModified(boolean sourceModified) {
 
         this.sourceModified = sourceModified;

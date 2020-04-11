@@ -1,164 +1,145 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-const axios = require('axios');
-const keytar = require('keytar');
-const tempPath = require('os').tmpdir();
-import { FileHandler } from './fileHandler';
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import {DebugConstants} from "../DebugConstants";
+import {Dependency} from "./Dependency";
 import {PreviewManager} from "./PreviewManager";
-const fileHandler = new FileHandler();
+
+import axios from "axios";
+import keytar = require("keytar");
+import os = require("os");
+import {Config} from "../Config";
+import {ExtensionConstants} from "../ExtensionConstants";
+
+const tempPath = os.tmpdir();
+
+/**
+ * Class responsible for Getting Script Library for Tree View.
+ */
 export class ScriptLibraryTree implements vscode.TreeDataProvider<Dependency> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
-	private context;
+    public onDidChangeTreeDataHelper: vscode.EventEmitter<Dependency | undefined> =
+        new vscode.EventEmitter<Dependency | undefined>();
+    public readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this.onDidChangeTreeDataHelper.event;
 
-	constructor(context) {
+    private readonly context;
 
-		this.context=context;
-	}
+    constructor(context) {
 
-	refresh(): void {
+        this.context = context;
+    }
 
-		this._onDidChangeTreeData.fire();
-	}
+    public refresh(): void {
 
-	getTreeItem(element: Dependency): vscode.TreeItem {
+        this.onDidChangeTreeDataHelper.fire();
+    }
 
-		return element;
-	}
+    public getTreeItem(element: Dependency): vscode.TreeItem {
 
-	getChildren(): Thenable<Dependency[]> {
+        return element;
+    }
 
-		return Promise.resolve(this.getListOfItems(this.context));
-	}
+    public getChildren(): Thenable<Dependency[]> {
 
-	/**
-	 * Given the path to package.json, read all its dependencies and devDependencies.
-	 */
-	private async getListOfItems(context): Promise<Dependency[]> {
+        return Promise.resolve(this.getListOfItems(this.context));
+    }
 
-		let scriptLibraries = [];
-		var url = vscode.workspace.getConfiguration().get('IAM.URL');
-		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
-		var acessToken;
-		// Get the acess token from the system key chain.
-		var secret = keytar.getPassword("acessToken", "acessToken");
-		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.					
-		});
+    /**
+     * Given the path to package.json, read all its dependencies and devDependencies.
+     */
+    private async getListOfItems(context): Promise<Dependency[]> {
 
-		// To bypass the self signed server error.
-		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+        const scriptLibraries = [];
+        const url = vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL);
+        const tenant = vscode.workspace.getConfiguration().get(DebugConstants.IAM_TENANT);
+        let accessToken;
+        // Get the access token from the system key chain.
+        const secret = keytar.getPassword(DebugConstants.ACCESS_TOKEN, DebugConstants.ACCESS_TOKEN);
+        await secret.then((result) => {
+            accessToken = result; // Assign the value to access token.
+        });
 
-		await axios({
+        // To bypass the self signed server error.
+        process.env[ExtensionConstants.NODE_TLS_REJECT_UNAUTHORIZED] = "0";
 
-			method: 'get',
-			url: url + `/t/${tenant}/api/server/v1/script-libraries`,
+        await axios({
+            headers: {
+                Authorization: "Bearer " + accessToken,
+                accept: "*/*",
 
-			// Set the content type header, so that we get the response in JSOn
-			headers: {
-				Authorization: 'Bearer ' + acessToken,
-				accept: '*/*'
+            },
+            method: "get",
+            url: Config.PATH_GET_ALL_SCRIPT_LIBRARY(url, tenant),
+        }).then(async (response) => {
+            // Once we get the response, extract the access token from
+            // the response body
+            // Show the sucess message in the vscode.
+            vscode.window.showInformationMessage(DebugConstants.MESSAGE_SCRIPTS_IMPORT_SUCCESS);
+            // Create a node_modules folder in the temp directory.
+            if (!fs.existsSync(path.join(tempPath, "node_modules"))) {
+                fs.mkdir(path.join(require("os").tmpdir(), "node_modules/"), (err: any) => {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            }
 
-			}
-		}).then(async (response) => {
-			// Once we get the response, extract the access token from
-			// the response body			
-			// Show the sucess message in the vscode.
-			vscode.window.showInformationMessage("Successfully retrieved the script libraries");
-			// Create a node_modules folder in the temp directory.
-			if (!fs.existsSync(path.join(tempPath, 'node_modules'))) {
-				fs.mkdir(path.join(require('os').tmpdir(), 'node_modules/'), (err: any) => {
-					if (err) throw err;
-				});
-			}
+            if (response.data.count > 0) {
+                for (const application of response.data.applications) {
+                    const scriptLibraryName = application.name;
+                    let content;
 
-			if (response.data.count>0){
-				for (let index = 0; index < response.data.scriptLibraries.length; index++) {
-					var scriptLibraryName= response.data.scriptLibraries[index].name;
-					var content;
-					await axios({
-	
-						method: 'get',
-						url: url + `/t/${tenant}/api/server/v1/script-libraries/${scriptLibraryName}/content`,
-			
-						// Set the content type header, so that we get the response in JSOn
-						headers: {
-							Authorization: 'Bearer ' + acessToken,
-							accept: '*/*'
-			
-						}
-					}).then((response) => {
-						// Once we get the response, extract the access token from
-						// the response body			
-						// Show the sucess message in the vscode.
-						//vscode.window.showInformationMessage("Successfully retrieve the script libraries");
-						// Create a node_modules folder in the temp directory.
-						
-						content=response.data;			
-					}).catch((err) => {
-			
-						console.log(err);
-			
-						// Show the sucess message in the vscode.
-						PreviewManager.getInstance().generateOAuthPreview(this.context);
-						vscode.window.showErrorMessage("Access Token has expired.");
-					});
-					
-					if (fs.existsSync(path.join(tempPath, 'node_modules', scriptLibraryName))) {
-						var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
-						fs.writeFile(inputPath, content , function (err: any) {
-							if (err) throw err;
-						});
-		
-					} else {
-						fs.mkdirSync(path.join(tempPath, 'node_modules', scriptLibraryName), { recursive: true });
-						var inputPath = path.join(tempPath, 'node_modules', scriptLibraryName, 'index.js');
-						fs.writeFile(inputPath, content , function (err: any) {
-							if (err) throw err;
-						});
-					}
-					scriptLibraries.push(new Dependency(scriptLibraryName,
-						response.data.scriptLibraries[index].description,
-						{
-							command: 'extension.scriptLibrariesFromTreeView',
-							title: 'Edit Script',
-							arguments: [scriptLibraryName]
-						}
-						
-					));
-				}
-			}
+                    await axios({
 
-		}).catch((err) => {
-			// Show the sucess message in the vscode.
-			PreviewManager.getInstance().generateOAuthPreview(this.context);
-			vscode.window.showErrorMessage("Access Token has expired.");
-			console.log(err);
-		});
+                        method: "get",
+                        url: Config.PATH_GET_SCRIPT_LIBRARY_BY_NAME(url, tenant, scriptLibraryName),
 
-		return scriptLibraries;
+                        // Set the content type header, so that we get the response in JSOn
+                        headers: {
+                            Authorization: "Bearer " + accessToken,
+                            accept: "*/*",
+                        },
+                    }).then(async (responseVal) => {
+                        content = responseVal.data;
+                    })
+                        .catch((err) => {
+                            PreviewManager.getInstance().generateOAuthPreview(this.context);
+                            vscode.window.showErrorMessage(DebugConstants.MESSAGE_ACCESS_TOKEN_EXPIRED);
+                        });
 
-	}		
-}
+                    if (fs.existsSync(path.join(tempPath, "node_modules", scriptLibraryName))) {
+                        const inputPath = path.join(tempPath, "node_modules", scriptLibraryName, "index.js");
+                        fs.writeFile(inputPath, content, (err: any) => {
+                            if (err) {
+                                throw err;
+                            }
+                        });
 
-export class Dependency extends vscode.TreeItem {
+                    } else {
+                        fs.mkdirSync(path.join(tempPath, "node_modules", scriptLibraryName), {recursive: true});
+                        const inputPath = path.join(tempPath, "node_modules", scriptLibraryName, "index.js");
+                        fs.writeFile(inputPath, content, (err: any) => {
+                            if (err) {
+                                throw err;
+                            }
+                        });
+                    }
+                    scriptLibraries.push(new Dependency(scriptLibraryName,
+                        application.description,
+                        {
+                            arguments: [scriptLibraryName],
+                            command: "extension.scriptLibrariesFromTreeView",
+                            title: "Edit Script",
+                        },
+                    ));
+                }
+            }
+        }).catch((err) => {
+            PreviewManager.getInstance().generateOAuthPreview(this.context);
+            vscode.window.showErrorMessage(DebugConstants.MESSAGE_ACCESS_TOKEN_EXPIRED);
+        });
 
-	constructor(
-		public readonly label: string,
-		public readonly task: string,
-		public readonly command: vscode.Command
-	) {
-		super(label);
-	}
+        return scriptLibraries;
 
-	get tooltip(): string {
-		return `${this.label}`;
-	}
-
-	get description(): string {
-		return this.task;
-	}
-
+    }
 }

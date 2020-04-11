@@ -36,6 +36,11 @@ public class HttpServletRequestTranslator implements VariableTranslator {
         private static final HttpServletRequestTranslator INSTANCE = new HttpServletRequestTranslator();
     }
 
+    /**
+     * This static method allow to get the instance of the HttpServletRequestTranslator.
+     *
+     * @return
+     */
     public static HttpServletRequestTranslator getInstance() {
         return HttpServletRequestTranslatorHolder.INSTANCE;
     }

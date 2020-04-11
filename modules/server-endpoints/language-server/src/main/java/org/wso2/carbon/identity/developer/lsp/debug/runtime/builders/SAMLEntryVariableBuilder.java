@@ -31,7 +31,9 @@ public class SAMLEntryVariableBuilder implements VariableBuilder {
     private SAMLEntryRequestVariable samlEntryRequestVariable;
     private VariableTranslateRegistry variableTranslateRegistry;
 
+
     public SAMLEntryVariableBuilder(VariableTranslateRegistry variableTranslateRegistry) {
+
         this.variableTranslateRegistry = variableTranslateRegistry;
         this.samlEntryRequestVariable = new SAMLEntryRequestVariable();
     }
@@ -43,8 +45,6 @@ public class SAMLEntryVariableBuilder implements VariableBuilder {
                 variablesReference));
         this.samlEntryRequestVariable.setSAMLRequest(variableTranslateRegistry.translateSAMLRequest(arguments[0],
                 variablesReference));
-        return new Argument<Map<String, Object>>(samlEntryRequestVariable.getVariables());
+        return new Argument<>(samlEntryRequestVariable.getVariables());
     }
-
-
 }

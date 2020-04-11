@@ -39,19 +39,35 @@ public class DebugSession {
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
     private MethodContext currentMethodContext;
     private List<Object> calledObjectStack = new ArrayList<>();
-    private Object waitObject = new Object();
+    private final Object waitObject = new Object();
     private static final long MAX_THREAD_SUSPEND_TIME_MILLIS = 5000;
 
+    /**
+     * This is the getter which gets the  Websocket session.
+     *
+     * @return
+     */
     public Session getSession() {
 
         return session;
     }
 
+    /**
+     * This is the setter which sets the  Websocket session.
+     *
+     * @param session
+     */
     public void setSession(Session session) {
 
         this.session = session;
     }
 
+    /**
+     * This is the setter which adds breakpointInfo.
+     *
+     * @param resource
+     * @param breakpoints
+     */
     public void setBreakpoints(String resource, int[] breakpoints) {
 
         BreakpointInfo breakpointInfo = breakpointInfoMap.get(resource);
@@ -63,6 +79,12 @@ public class DebugSession {
         breakpointInfo.setBreakpoints(breakpoints);
     }
 
+    /**
+     * This is the getter which gets Breakpoint Info.
+     *
+     * @param source
+     * @return
+     */
     public BreakpointInfo getBreakpointInfo(String source) {
 
         BreakpointInfo result = breakpointInfoMap.get(source);
@@ -86,11 +108,21 @@ public class DebugSession {
         return result;
     }
 
+    /**
+     * Gets the currentMethodContext.
+     *
+     * @return
+     */
     public MethodContext getCurrentMethodContext() {
 
         return currentMethodContext;
     }
 
+    /**
+     * Sets the currentMethodContext.
+     *
+     * @param currentMethodContext
+     */
     public void setCurrentMethodContext(MethodContext currentMethodContext) {
 
         this.currentMethodContext = currentMethodContext;
@@ -114,6 +146,12 @@ public class DebugSession {
         return null;
     }
 
+    /**
+     * This method is to get the breakpointInfoMap.
+     *
+     * @param methodContext
+     * @return
+     */
     private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
         if (breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
             return null;
@@ -121,7 +159,9 @@ public class DebugSession {
         return breakpointInfoMap.values().stream().findFirst().get();
     }
 
-
+    /**
+     * This method is to suspend the current Thread.
+     */
     public void suspendCurrentThread() {
         try {
             synchronized (this.waitObject) {
@@ -134,52 +174,23 @@ public class DebugSession {
         }
     }
 
+    /**
+     * This method is to get the  Websocket session ID.
+     *
+     * @return
+     */
     private String getSessionInfo() {
 
         return session.getId();
     }
 
+    /**
+     * This method is to resume the current Thread.
+     */
     public void resumeSuspendedThread() {
         synchronized (this.waitObject) {
             this.waitObject.notify();
         }
     }
 
-
-    private int getCurrentJavascriptFunctionObject(List<Object> calledObjectStack) {
-
-        return 0;
-    }
-
-    private boolean isJavascriptFunctionExit(MethodContext methodContext) {
-
-        return false;
-
-    }
-
-    private Object createJsFunctionCallObject(MethodContext methodContext) {
-
-        return null;
-    }
-
-    private boolean isJavascriptFunctionCall(MethodContext methodContext) {
-
-        return false;
-    }
-
-    private Object createHttpRequestDataObject(MethodContext methodContext) {
-
-        return null;
-    }
-
-    private boolean isHttpRequestEntry(MethodContext methodContext) {
-
-        if (("org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-                "/impl/DefaultRequestCoordinator").equals(
-                methodContext.getClassName())) {
-            return "handle".equals(
-                    methodContext.getMethodName());
-        }
-        return false;
-    }
 }

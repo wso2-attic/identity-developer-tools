@@ -29,6 +29,11 @@ public class StringPassTranslator implements VariableTranslator {
         private static final StringPassTranslator INSTANCE = new StringPassTranslator();
     }
 
+    /**
+     * This static method allow to get the instance of the StringPassTranslator.
+     *
+     * @return
+     */
     public static StringPassTranslator getInstance() {
         return StringPassTranslatorHolder.INSTANCE;
     }
@@ -37,6 +42,6 @@ public class StringPassTranslator implements VariableTranslator {
     @Override
     public Object translate(Object in, int variablesReference) {
 
-        return null;
+        return in;
     }
 }
