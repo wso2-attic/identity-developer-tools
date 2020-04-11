@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.serializer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.StoppedEvent;
 
 /**
@@ -29,10 +30,9 @@ public class StoppedEventSerializer extends EventSerializer<StoppedEvent> {
 
     @Override
     protected JsonElement formatParams(StoppedEvent event) {
-
         JsonObject object = new JsonObject();
-        object.addProperty("line", event.getLine());
-        object.addProperty("source", event.getResourceName());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_LINE, event.getLine());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_SOURCE, event.getResourceName());
         return object;
     }
 }

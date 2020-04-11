@@ -28,35 +28,46 @@ public class InterceptorConfig {
     private String className;
     private List<MethodInfoConfig> methodInfoConfigs = new ArrayList<>();
 
-
+    /**
+     * This method is to get the Class Name.
+     *
+     * @return className
+     */
     public String getClassName() {
 
         return className;
     }
 
+    /**
+     * This method is to set the Class Name.
+     *
+     * @param className the Class name of the Config.
+     */
     public void setClassName(String className) {
 
         this.className = className;
     }
 
+    /**
+     * This method is to add the Method Configs .
+     *
+     * @param methodName the method name of the Config.
+     * @param signature the method signature of the Config.
+     * @param insertBefore whether to intercept at start of the method body.
+     * @param insertAfter whether to intercept at end of the method body.
+     */
     public void addMethodConfigs(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
         methodInfoConfigs.add(new MethodInfoConfig(methodName, signature, insertBefore, insertAfter));
     }
 
+    /**
+     * This method is to get Method Info Configs.
+     *
+     * @return methodInfoConfigs
+     */
     public List<MethodInfoConfig> getMethodInfoConfigs() {
 
         return methodInfoConfigs;
-    }
-
-    public boolean hasMethodSignature(String methodName, String signature) {
-
-        for (MethodInfoConfig methodInfoConfig: methodInfoConfigs) {
-            if (methodInfoConfig.getMethodName().equals(methodName) && methodInfoConfig.getSignature()
-                    .equals(signature)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

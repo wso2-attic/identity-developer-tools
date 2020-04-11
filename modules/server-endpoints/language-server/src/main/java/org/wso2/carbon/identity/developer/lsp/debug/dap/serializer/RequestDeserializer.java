@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
@@ -47,37 +48,14 @@ import java.util.List;
 public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private static final Log log = LogFactory.getLog(RequestDeserializer.class);
-
-    private static final String LOCAL_NAME_SEQ = "seq";
-    private static final String LOCAL_NAME_ID = "id";
-    private static final String LOCAL_NAME_TYPE = "type";
-    private static final String LOCAL_NAME_COMMAND = "command";
-    private static final String LOCAL_NAME_CONTINUE = "continue";
-    private static final String LOCAL_NAME_ARGUMENTS = "arguments";
-    private static final String LOCAL_NAME_MESSAGE = "message";
-    private static final String LOCAL_NAME_EVENT = "event";
-    private static final String LOCAL_NAME_PARAMS = "params";
-    private static final String LOCAL_NAME_METHOD = "method";
-    private static final String LOCAL_NAME_SETBREAKPOINT = "setBreakpoint";
-    private static final String LOCAL_NAME_VARIABLES = "variables";
-    private static final String LOCAL_NAME_LINES = "lines";
-    private static final String LOCAL_NAME_SOURCE = "source";
-    private static final String LOCAL_NAME_NAME = "name";
-    private static final String LOCAL_NAME_PATH = "path";
-    private static final String LOCAL_NAME_LINE = "line";
-    private static final String LOCAL_NAME_BREAKPOINTS = "breakpoints";
-    private static final String LOCAL_NAME_SOURCEMODIFIED = "sourceModified";
-    private static final String LOCAL_NAME_BODY = "body";
-    private static final String LOCAL_NAME_UNKNOWN = "unknown";
-    private static final String LOCAL_NAME_VARIABLES_REFERENCE = "variablesReference";
-
+    
     public ProtocolMessage deserialize(JsonElement jsonElement, Type type,
                                        JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
 
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-        JsonElement seqElement = jsonObject.get(LOCAL_NAME_SEQ);
+        JsonElement seqElement = jsonObject.get(DAPConstants.JSON_KEY_FOR_SEQ);
         if (seqElement != null) {
             long seq = seqElement.getAsLong();
             return createEventRequest(jsonObject, seq);
@@ -88,64 +66,64 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private Request createMessageRequest(JsonObject jsonObject) {
 
-        String method = getAsString(jsonObject, LOCAL_NAME_METHOD);
+        String method = getAsString(jsonObject, DAPConstants.JSON_KEY_FOR_METHOD);
 
-        JsonElement idElement = jsonObject.get(LOCAL_NAME_ID);
+        JsonElement idElement = jsonObject.get(DAPConstants.JSON_KEY_FOR_ID);
         long id = idElement != null ? idElement.getAsLong() : 0;
 
-        switch (method) {
-            case LOCAL_NAME_CONTINUE:
-                return constructContinueRequest(LOCAL_NAME_CONTINUE, id, jsonObject);
-            case LOCAL_NAME_SETBREAKPOINT:
-                return constructSetBreakpointRequest(LOCAL_NAME_SETBREAKPOINT, jsonObject);
-            case LOCAL_NAME_VARIABLES:
-                return constructVariablesRequest(LOCAL_NAME_SETBREAKPOINT, id, jsonObject);
+        if (method != null) {
+            switch (method) {
+                case DAPConstants.JSON_KEY_FOR_CONTINUE:
+                    return constructContinueRequest(DAPConstants.JSON_KEY_FOR_CONTINUE, id, jsonObject);
+                case DAPConstants.JSON_KEY_FOR_SET_BREAKPOINT:
+                    return constructSetBreakpointRequest(DAPConstants.JSON_KEY_FOR_SET_BREAKPOINT, jsonObject);
+                case DAPConstants.JSON_KEY_FOR_VARIABLES:
+                    return constructVariablesRequest(DAPConstants.JSON_KEY_FOR_SET_BREAKPOINT, id, jsonObject);
+            }
         }
 
-        return new UnknownRequest(LOCAL_NAME_UNKNOWN, id, method, null);
+        return new UnknownRequest(DAPConstants.JSON_KEY_FOR_UNKNOWN, id, method, null);
     }
 
     private Request constructContinueRequest(String method, long id, JsonObject jsonObject) {
 
-        ContinueRequest request = new ContinueRequest(LOCAL_NAME_MESSAGE, id, method, null);
-        return request;
+        return new ContinueRequest(DAPConstants.JSON_KEY_FOR_MESSAGE, id, method, null);
     }
 
     private VariablesRequest constructVariablesRequest(String method, long id, JsonObject jsonObject) {
 
-        JsonElement paramElement = jsonObject.get(LOCAL_NAME_PARAMS);
+        JsonElement paramElement = jsonObject.get(DAPConstants.JSON_KEY_FOR_PARAMS);
         if (paramElement == null) {
             log.error("Set breakpoint request received without params");
-            return (VariablesRequest) (Request) new UnknownRequest(LOCAL_NAME_UNKNOWN, 0, method, null);
+            return (VariablesRequest) (Request) new UnknownRequest(DAPConstants.JSON_KEY_FOR_UNKNOWN, 0, method, null);
         }
         // get the arguments from the request
         JsonObject paramsObject = paramElement.getAsJsonObject();
-        JsonElement variablesReference = paramsObject.get(LOCAL_NAME_VARIABLES_REFERENCE);
+        JsonElement variablesReference = paramsObject.get(DAPConstants.JSON_KEY_FOR_VARIABLE_REFERENCE);
         Argument argument = new Argument(variablesReference);
         List<Argument> arguments = new ArrayList<>();
         arguments.add(argument);
-
-        VariablesRequest request = new VariablesRequest(LOCAL_NAME_MESSAGE, id, LOCAL_NAME_VARIABLES, arguments);
-        return request;
+        return new VariablesRequest(DAPConstants.JSON_KEY_FOR_MESSAGE, id,
+                DAPConstants.JSON_KEY_FOR_VARIABLES, arguments);
     }
 
     private Request constructSetBreakpointRequest(String method, JsonObject jsonObject) {
 
-        JsonElement paramElement = jsonObject.get(LOCAL_NAME_PARAMS);
+        JsonElement paramElement = jsonObject.get(DAPConstants.JSON_KEY_FOR_PARAMS);
         if (paramElement == null) {
             log.error("Set breakpoint request received without params");
-            return new UnknownRequest(LOCAL_NAME_UNKNOWN, 0, method, null);
+            return new UnknownRequest(DAPConstants.JSON_KEY_FOR_UNKNOWN, 0, method, null);
         }
         JsonObject paramsObject = paramElement.getAsJsonObject();
 
-        JsonElement linesElement = paramsObject.get(LOCAL_NAME_LINES);
-        JsonObject sourceElement = (JsonObject) paramsObject.get(LOCAL_NAME_SOURCE);
-        JsonElement nameElement = sourceElement.get(LOCAL_NAME_NAME);
-        JsonElement pathElement = sourceElement.get(LOCAL_NAME_PATH);
-        JsonElement breakpointsElements = paramsObject.get(LOCAL_NAME_BREAKPOINTS);
-        JsonElement sourceModifiedElement = paramsObject.get(LOCAL_NAME_SOURCEMODIFIED);
+        JsonElement linesElement = paramsObject.get(DAPConstants.JSON_KEY_FOR_LINES);
+        JsonObject sourceElement = (JsonObject) paramsObject.get(DAPConstants.JSON_KEY_FOR_SOURCE);
+        JsonElement nameElement = sourceElement.get(DAPConstants.JSON_KEY_FOR_NAME);
+        JsonElement pathElement = sourceElement.get(DAPConstants.JSON_KEY_FOR_PATH);
+        JsonElement breakpointsElements = paramsObject.get(DAPConstants.JSON_KEY_FOR_BREAKPOINTS);
+        JsonElement sourceModifiedElement = paramsObject.get(DAPConstants.JSON_KEY_FOR_SOURCE_MODIFIED);
 
-        BreakpointRequest request = new BreakpointRequest(0, LOCAL_NAME_MESSAGE, method, null);
+        BreakpointRequest request = new BreakpointRequest(0, DAPConstants.JSON_KEY_FOR_MESSAGE, method, null);
 
         JsonArray linesArray = linesElement.getAsJsonArray();
         int[] lines = new int[linesArray.size()];
@@ -164,7 +142,7 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
             JsonArray jsonArray = breakpointsElements.getAsJsonArray();
             int[] breakpointsArray = new int[jsonArray.size()];
             for (int i = 0; i < breakpointsArray.length; i++) {
-                breakpointsArray[i] = jsonArray.get(i).getAsJsonObject().get(LOCAL_NAME_LINE).getAsInt();
+                breakpointsArray[i] = jsonArray.get(i).getAsJsonObject().get(DAPConstants.JSON_KEY_FOR_LINE).getAsInt();
             }
             request.setBreakpoints(breakpointsArray);
         }
@@ -174,13 +152,13 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private ProtocolMessage createEventRequest(JsonObject jsonObject, long seqId) {
 
-        JsonObject paramsObject = jsonObject.get(LOCAL_NAME_PARAMS).getAsJsonObject();
+        JsonObject paramsObject = jsonObject.get(DAPConstants.JSON_KEY_FOR_PARAMS).getAsJsonObject();
 
-        String msgType = getAsString(paramsObject, LOCAL_NAME_TYPE);
-        String command = getAsString(paramsObject, LOCAL_NAME_COMMAND);
+        String msgType = getAsString(paramsObject, DAPConstants.JSON_KEY_FOR_TYPE);
+        String command = getAsString(paramsObject, DAPConstants.JSON_KEY_FOR_COMMAND);
 
         switch (msgType) {
-            case LOCAL_NAME_EVENT:
+            case DAPConstants.JSON_KEY_FOR_EVENT:
                 return constructEventRequest(seqId, paramsObject);
         }
         return new Request(msgType, seqId, command, null);
@@ -188,9 +166,9 @@ public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private ProtocolMessage constructEventRequest(long seq, JsonObject paramsObject) {
 
-        String event = getAsString(paramsObject, LOCAL_NAME_EVENT);
+        String event = getAsString(paramsObject, DAPConstants.JSON_KEY_FOR_EVENT);
 
-        return new EventRequest(LOCAL_NAME_EVENT, event);
+        return new EventRequest(DAPConstants.JSON_KEY_FOR_EVENT, event);
     }
 
     private String getAsString(JsonObject jsonObject, String key) {

@@ -22,21 +22,11 @@ package org.wso2.carbon.identity.java.agent.config;
  * Configuration for method and method signature.
  */
 public class MethodInfoConfig {
+
     private String methodName;
     private String signature;
     private boolean insertBefore;
     private boolean insertAfter;
-
-    public boolean isInsertAfter() {
-
-        return insertAfter;
-    }
-
-
-    public boolean isInsertBefore() {
-
-        return insertBefore;
-    }
 
     public MethodInfoConfig(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
@@ -46,16 +36,53 @@ public class MethodInfoConfig {
         this.insertAfter = insertAfter;
     }
 
+    /**
+     * This method is to when intercepting check whether to insert after.
+     *
+     * @return
+     */
+    public boolean isInsertAfter() {
+
+        return insertAfter;
+    }
+
+    /**
+     * This method is to when intercepting check whether to insert before.
+     *
+     * @return
+     */
+    public boolean isInsertBefore() {
+
+        return insertBefore;
+    }
+
+    /**
+     * This method is to get the Method Name from the Config.
+     *
+     * @return
+     */
     public String getMethodName() {
 
         return methodName;
     }
 
+    /**
+     * This method is to get the Method Signature from the Config.
+     *
+     * @return
+     */
     public String getSignature() {
 
         return signature;
     }
 
+    /**
+     *This method is to Verify the Method with the Class loaded and the Method in the config.
+     *
+     * @param methodName
+     * @param signature
+     * @return
+     */
     public boolean verifyMethod(String methodName, String signature) {
 
         return (this.methodName.equals(methodName) && this.signature.equals(signature));

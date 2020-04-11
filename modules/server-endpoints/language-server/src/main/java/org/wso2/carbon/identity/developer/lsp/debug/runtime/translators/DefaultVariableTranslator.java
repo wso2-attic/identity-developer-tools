@@ -29,6 +29,11 @@ public class DefaultVariableTranslator implements VariableTranslator {
         private static final DefaultVariableTranslator INSTANCE = new DefaultVariableTranslator();
     }
 
+    /**
+     * This static method allow to get the instance of the DefaultVariableTranslator.
+     *
+     * @return
+     */
     public static DefaultVariableTranslator getInstance() {
         return DefaultVariableTranslatorHolder.INSTANCE;
     }

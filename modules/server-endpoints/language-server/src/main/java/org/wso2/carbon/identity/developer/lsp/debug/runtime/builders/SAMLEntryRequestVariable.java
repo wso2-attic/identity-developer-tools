@@ -31,6 +31,7 @@ public class SAMLEntryRequestVariable implements SAMLEntryVariablePlan {
 
     @Override
     public void setHttpServletRequest(Object httpServletRequest) {
+
         this.variables.put(DAPConstants.HTTP_SERVLET_REQUEST, httpServletRequest);
     }
 
@@ -40,6 +41,11 @@ public class SAMLEntryRequestVariable implements SAMLEntryVariablePlan {
         this.variables.put(DAPConstants.SAML_REQUEST, samlRequest);
     }
 
+    /**
+     * This method is to get the variables after adding the objects.
+     *
+     * @return variables
+     */
     public HashMap<String, Object> getVariables() {
 
         return variables;

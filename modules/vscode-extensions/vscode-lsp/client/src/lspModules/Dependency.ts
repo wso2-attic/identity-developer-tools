@@ -16,25 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
-
+import * as vscode from "vscode";
 
 /**
- * Interface to help build the SAMLEntryVariable.
+ * Helper class for Tree View
  */
-public interface SAMLEntryVariablePlan {
+export class Dependency extends vscode.TreeItem {
 
-     /**
-      * This method is add httpServletRequest to variables list  After the argument is proceeded.
-      *
-      * @param httpServletRequest the HttpServletRequest object, known as "request" in a JSP page.
-      */
-     void setHttpServletRequest (Object httpServletRequest);
+    constructor(
+        public readonly label: string,
+        public readonly task: string,
+        public readonly command: vscode.Command,
+    ) {
+        super(label);
+    }
 
-     /**
-      * This method is add samlRequest to variables list  After the argument is proceeded.
-      *
-      * @param samlRequest the SAML Request string.
-      */
-     void setSAMLRequest (Object samlRequest);
+    public get tooltip(): string {
+        return `${this.label}`;
+    }
+
+    public get description(): string {
+        return this.task;
+    }
+
 }

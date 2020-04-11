@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueResponse;
@@ -44,7 +43,6 @@ import java.io.StringWriter;
 public class JsonDap {
 
     private Gson gson;
-    private JsonParser jsonParser;
 
     /**
      * Init needs to be called before calling any serialization logic.
@@ -65,7 +63,7 @@ public class JsonDap {
      *
      * @param json The JSON string
      * @return The decoded request
-     * @throws JsonParseException when ther is an error while parsing the request
+     * @throws JsonParseException when there is an error while parsing the request
      */
     public Request decode(String json) throws JsonParseException {
 
@@ -79,7 +77,7 @@ public class JsonDap {
     /**
      * Encodes the response to string format.
      *
-     * @param response
+     * @param response the encoded message.
      * @return
      */
     public String encode(ProtocolMessage response) throws JsonDapSerializeException {
@@ -92,8 +90,8 @@ public class JsonDap {
             jsonWriter.setLenient(true);
             Streams.write(jsonElement, jsonWriter);
             return stringWriter.toString();
-        } catch (IOException var3) {
-            throw new JsonDapSerializeException(var3);
+        } catch (IOException ex) {
+            throw new JsonDapSerializeException(ex);
         }
     }
 }

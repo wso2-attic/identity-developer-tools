@@ -1,0 +1,27 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "forin": false,
+        "no-bitwise": true,
+        "no-var-keyword": true,
+        "eol-last": "error",
+        "quotes": ["warn", "double"],
+        "max-len": ["warn", { "code": 120 }],
+        "sort-keys": ["warn", "asc"],
+        "comma-dangle": ["warn", "never"],
+        "sort-imports": ["warn", {
+            "ignoreCase": true,
+            "ignoreDeclarationSort": false,
+            "ignoreMemberSort": false,
+            "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+        }],
+        "sort-keys": ["warn", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}],
+        "object-curly-spacing": ["warn", "always"],
+        "no-console": "warn"
+    },
+    "rulesDirectory": []
+}

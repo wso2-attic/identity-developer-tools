@@ -18,27 +18,30 @@
 
 package org.wso2.carbon.identity.java.agent;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfigReader;
 import org.wso2.carbon.identity.java.agent.internal.InterceptingClassTransformer;
 
 import java.lang.instrument.Instrumentation;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
- * Java Agent to intercept the given Java Classes.
- * and add the relevant methods.
+ * Java Agent to intercept the given Java Classes and add the relevant methods.
  */
-public class Agent {
+public class DebugAgent {
 
-    private static Log log = LogFactory.getLog(Agent.class);
-    public Agent() {
+    private static final Logger log = Logger.getLogger(DebugAgent.class.getName());
 
-    }
-
+    /**
+     * As soon as the JVM initializes, This  method will be called.
+     * Configs for intercepting will be read and added to Transformer so that Transformer will intercept when the
+     * corresponding Java Class and Method is loaded.
+     *
+     * @param agentArgs the list of agent arguments
+     * @param instrumentation the instrumentation object
+     * @throws InstantiationException Exception If an error has occurred.
+     */
     public static void premain(String agentArgs, Instrumentation instrumentation) throws InstantiationException {
 
         log.info("Starting WSO2 Debugger Java Agent......");

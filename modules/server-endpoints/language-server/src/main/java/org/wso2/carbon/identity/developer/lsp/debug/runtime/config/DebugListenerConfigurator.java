@@ -36,6 +36,11 @@ public class DebugListenerConfigurator {
         this.sessionManager = sessionManager;
     }
 
+    /**
+     * This method will help to add the filters(Listeners) to the InterceptionEngine.
+     *
+     * @param interceptionEngine the engine which is responsible for firing the event.
+     */
     public void configure(InterceptionEngine interceptionEngine) {
 
          MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(

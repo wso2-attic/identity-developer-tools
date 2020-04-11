@@ -27,16 +27,27 @@ public class Argument<T extends Object> {
 
     private Object value;
 
+
     public Argument(Object value) {
 
         this.value = value;
     }
 
+    /**
+     * This method is to get the arguments.
+     *
+     * @return argument value
+     */
     public T getValue() {
 
         return (T) value;
     }
 
+    /**
+     *This method is to set the arguments.
+     *
+     * @param value the argument
+     */
     public void setValue(T value) {
 
         this.value = value;

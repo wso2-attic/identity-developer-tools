@@ -31,11 +31,21 @@ public class Message extends ProtocolMessage {
         this.id = id;
     }
 
+    /**
+     * Getter which gets the id.
+     *
+     * @return id
+     */
     public long getId() {
 
         return id;
     }
 
+    /**
+     * Setter which sets the id.
+     *
+     * @param seq Sequence number of the corresponding request.
+     */
     public void setId(long seq) {
 
         this.id = seq;

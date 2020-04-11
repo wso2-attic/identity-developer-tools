@@ -76,12 +76,6 @@
             <artifactId>powermock-module-testng-common</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -102,7 +96,7 @@
                     <appendAssemblyId>true</appendAssemblyId>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>org.wso2.carbon.identity.java.agent.Agent</Premain-Class>
+                            <Premain-Class>org.wso2.carbon.identity.java.agent.DebugAgent</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>

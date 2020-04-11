@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Instrumentation comntext for a method.
+ * This class contain all the Instrumentation context details for a Method.
  */
 public class MethodContext {
 
@@ -43,56 +43,111 @@ public class MethodContext {
         this.methodSignature = methodSignature;
     }
 
+    /**
+     * This method is to get the Instrumented Thread.
+     *
+     * @return
+     */
     public Thread getInstrumentedThread() {
 
         return instrumentedThread;
     }
 
+    /**
+     * This method is to get the Instrumented Object.
+     *
+     * @return
+     */
     public Object getInstrumentedObject() {
 
         return instrumentedObject;
     }
 
+    /**
+     * This method is to get the Method Stack.
+     *
+     * @return
+     */
     public Object getMethodStack() {
 
         return methodStack;
     }
 
+    /**
+     * This method is to get the Method Name.
+     *
+     * @return
+     */
     public String getMethodName() {
 
         return methodName;
     }
 
+    /**
+     * This method is to get the Method Signature.
+     *
+     * @return
+     */
     public String getMethodSignature() {
 
         return methodSignature;
     }
 
+    /**
+     * This method is to get the Argument Values.
+     *
+     * @return
+     */
     public Object[] getArgumentValues() {
 
         return argumentValues;
     }
 
+    /**
+     * This method is to set the Argument Values.
+     *
+     * @param argumentValues
+     */
     public void setArgumentValues(Object[] argumentValues) {
 
         this.argumentValues = argumentValues;
     }
 
+    /**
+     * This method is to get the Argument Types.
+     *
+     * @return
+     */
     public Class[] getArgumentTypes() {
 
         return argumentTypes;
     }
 
+    /**
+     * This method is to set the Argument Types.
+     *
+     * @param argumentTypes
+     */
     public void setArgumentTypes(Class[] argumentTypes) {
 
         this.argumentTypes = argumentTypes;
     }
 
+    /**
+     * This method is to add the data frame to dataStack.
+     *
+     * @param dataFrame
+     */
     public void pushData(Map<String, Object> dataFrame) {
 
         dataStack.addFirst(dataFrame);
     }
 
+    /**
+     * This method is to remove the first data frame  to dataStack.
+     *
+     * @return
+     */
     public Map<String, Object> popData() {
 
         if (dataStack.isEmpty()) {
@@ -101,11 +156,21 @@ public class MethodContext {
         return dataStack.removeFirst();
     }
 
+    /**
+     * This method is to set Class Name.
+     *
+     * @param className
+     */
     public void setClassName(String className) {
 
         this.className = className;
     }
 
+    /**
+     * This method is to get Class Name.
+     *
+     * @return
+     */
     public String getClassName() {
 
         return className;

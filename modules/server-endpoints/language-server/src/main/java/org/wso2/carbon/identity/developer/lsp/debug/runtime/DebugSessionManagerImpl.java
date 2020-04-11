@@ -18,8 +18,10 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.BreakpointRequest;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ContinueRequest;
@@ -42,6 +44,7 @@ import org.wso2.carbon.identity.java.agent.host.MethodContext;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.websocket.Session;
 
 /**
@@ -58,25 +61,29 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
         interceptionEngine = AgentHelper.getInstance().getInterceptionEngine();
         if (interceptionEngine == null) {
-            log.error(
-                    "Java Instrumentation needed for debug is not initialized. " +
-                            "Debugging will not function correctly");
+            log.error("Java Instrumentation needed for debug is not initialized. "
+                    + "Debugging will not function correctly");
             return;
         }
 
         initializeListeners();
     }
 
+    @Override
     public DebugSession getDebugSession(Session session) {
 
         return activeDebugSessions.get(session);
     }
 
+    /**
+     * This method is to remove the listener when the destroy is called.
+     */
     public void destroy() {
 
         interceptionEngine.removeListener(this);
     }
 
+    @Override
     public void addSession(Session session) {
 
         activeDebugSessions.put(session, createSession(session));
@@ -91,38 +98,43 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
             return null;
         }
         switch (request.getCommand()) {
-            case "continue":
+            case DAPConstants.DEBUG_CONTINUE:
                 return setContinue(debugSession, (ContinueRequest) request);
-            case "setBreakpoint":
+            case DAPConstants.DEBUG_SET_BREAKPOINT:
                 return setBreakpoints(debugSession, (BreakpointRequest) request);
-            case "variables":
+            case DAPConstants.DEBUG_VARIABLES:
                 return readVariables(debugSession, (VariablesRequest) request);
+            default:
+                return new Response(request.getType(), request.getId(), request.getId(), true,
+                        StringUtils.EMPTY, StringUtils.EMPTY, null);
         }
-        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "",
-                "", null);
-        return response;
     }
 
+    /**
+     * This method is to read variables from the variable Request.
+     * Current Implementation doesn't consider what is inside VariablesRequest & take the current method context and
+     * Build the variable using the Corresponding Builders and the Translators.
+     *
+     * @param debugSession the variable Holds the details of the debug session.
+     * @param request      the request from the debugger extension.
+     * @return response  according to the method context.
+     */
     private Response readVariables(DebugSession debugSession, VariablesRequest request) {
 
         MethodContext methodContext = debugSession.getCurrentMethodContext();
-        if (methodContext == null) {
+        if (methodContext == null || variableTranslateRegistry.getVariablesBuilder(methodContext) == null) {
             HashMap<String, Object> variables = new HashMap<>();
-            Argument<Map<String, Object>> variablesArgument = new Argument<Map<String, Object>>(variables);
-            VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(),
-                    request.getId(), true, request.getCommand(),
-                    request.getCommand(), variablesArgument);
-            return variablesResponse;
+            Argument<Map<String, Object>> variablesArgument = new Argument<>(variables);
+            return new VariablesResponse(request.getType(), request.getId(),
+                    request.getId(), true, request.getCommand(), request.getCommand(), variablesArgument);
         }
 
         VariableBuilder variableBuilder = variableTranslateRegistry.getVariablesBuilder(methodContext);
-        Argument<Map<String, Object>> variablesArgument = variableBuilder.build(methodContext.getArgumentValues(),
-                request.getVariablesReference());
+        Argument<Map<String, Object>> variablesArgument = variableBuilder
+                .build(methodContext.getArgumentValues(), request.getVariablesReference());
 
-        VariablesResponse variablesResponse = new VariablesResponse(request.getType(), request.getId(), request.getId(),
-                true, request.getCommand(),
-                request.getCommand(), variablesArgument);
-        return variablesResponse;
+        return new VariablesResponse(request.getType(), request.getId(), request.getId(),
+                true, request.getCommand(), request.getCommand(), variablesArgument);
     }
 
     @Override
@@ -155,8 +167,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
         }
     }
 
-    private StoppedEvent handleMethodEntry(MethodContext methodContext,
-                                           DebugSession debugSession) {
+    private StoppedEvent handleMethodEntry(MethodContext methodContext, DebugSession debugSession) {
 
         DebugProcessingResult result = debugSession.processMethodEntry(methodContext);
         if (result == null) {
@@ -175,10 +186,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private StoppedEvent createStoppedEvent(MethodContext methodContext, DebugSession debugSession,
                                             DebugProcessingResult result) {
 
-        StoppedEvent stoppedEvent = new StoppedEvent("breakpoint", "breakpoint",
-                result.getBreakpointInfo().getBreakpointLocations()[0],
-                result.getBreakpointInfo().getResourceName());
-        return stoppedEvent;
+        return new StoppedEvent(DAPConstants.DEBUG_BREAKPOINT, DAPConstants.DEBUG_BREAKPOINT,
+                result.getBreakpointInfo().getBreakpointLocations()[0], result.getBreakpointInfo().getResourceName());
     }
 
     private void sendRequestToClient(Session websocketSession, ProtocolMessage message) {
@@ -197,9 +206,7 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Map.Entry<Session, DebugSession> findInterestedDebugSession(MethodContext methodContext) {
 
         //For not, just return the first entry. We need to have a better filter later.
-
-        if (!methodContext.getClassName().equals(
-                "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet")) {
+        if (!methodContext.getClassName().equals("org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet")) {
             return null;
         }
         if (!activeDebugSessions.isEmpty()) {
@@ -213,8 +220,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     /**
      * Creates a new debug session associated with current session.
      *
-     * @param session
-     * @return
+     * @param session the websocket session.
+     * @return debugSession
      */
     private DebugSession createSession(Session session) {
 
@@ -231,8 +238,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
 
     private Response setBreakpoints(DebugSession debugSession, BreakpointRequest request) {
 
-        Response response = new Response(request.getType(), request.getId(), request.getId(), true, "",
-                "", null);
+        Response response = new Response(request.getType(), request.getId(), request.getId(), true,
+                StringUtils.EMPTY, StringUtils.EMPTY, null);
 
         debugSession.setBreakpoints(request.getSourceName(), request.getBreakpoints());
         return response;
@@ -241,8 +248,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     private Response setContinue(DebugSession debugSession, ContinueRequest request) {
 
         debugSession.resumeSuspendedThread();
-        ContinueResponse continueResponse = new ContinueResponse("continue", request.getId(), request.getId(),
-                true, "", "", null);
+        ContinueResponse continueResponse = new ContinueResponse(DAPConstants.DEBUG_CONTINUE, request.getId(),
+                request.getId(), true, StringUtils.EMPTY, StringUtils.EMPTY, null);
         continueResponse.setAllThreadsContinued(true);
         return continueResponse;
     }

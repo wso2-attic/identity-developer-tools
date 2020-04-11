@@ -38,11 +38,22 @@ public class VariablesRequest extends Request {
         }
     }
 
+    /**
+     * Gets the variablesReference.
+     *
+     * @return  variablesReference
+     */
     public int getVariablesReference() {
 
         return variablesReference;
     }
 
+    /**
+     * Sets the variablesReference.
+     *
+     * @param variablesReference Reference to the Variable container if the data breakpoint is requested for a child
+     *                           of the container.
+     */
     public void setVariablesReference(int variablesReference) {
 
         this.variablesReference = variablesReference;

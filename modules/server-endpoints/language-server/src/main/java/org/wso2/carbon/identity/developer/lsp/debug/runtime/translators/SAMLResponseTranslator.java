@@ -36,6 +36,11 @@ public class SAMLResponseTranslator implements VariableTranslator {
         private static final SAMLResponseTranslator INSTANCE = new SAMLResponseTranslator();
     }
 
+    /**
+     * This static method allow to get the instance of the SAMLResponseTranslator.
+     *
+     * @return
+     */
     public static SAMLResponseTranslator getInstance() {
         return SAMLResponseTranslatorHolder.INSTANCE;
     }
