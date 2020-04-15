@@ -27,7 +27,6 @@ public class Argument<T extends Object> {
 
     private Object value;
 
-
     public Argument(Object value) {
 
         this.value = value;
@@ -44,7 +43,7 @@ public class Argument<T extends Object> {
     }
 
     /**
-     *This method is to set the arguments.
+     * This method is to set the arguments.
      *
      * @param value the argument
      */

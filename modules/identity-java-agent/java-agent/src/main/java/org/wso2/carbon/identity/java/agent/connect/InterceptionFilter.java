@@ -26,5 +26,10 @@ import org.wso2.carbon.identity.java.agent.host.MethodContext;
  */
 public interface InterceptionFilter {
 
+    /**
+     * @param type          the type of the event.
+     * @param methodContext Instrumentation context details for a Method.
+     * @return whether to intercept or not.
+     */
     boolean shouldIntercept(InterceptionEventType type, MethodContext methodContext);
 }

@@ -37,9 +37,9 @@ public class AgentHelper {
     /**
      * This method helps to get the AgentHelper instance without instantiating.
      *
-     * @return
+     * @return the Agent Helper instance.
      */
-    public static AgentHelper getInstance () {
+    public static AgentHelper getInstance() {
 
         return instance;
     }
@@ -47,7 +47,7 @@ public class AgentHelper {
     /**
      * This method is to get the InterceptionEngine.
      *
-     * @return
+     * @return the engine which handles firing the event to listener.
      */
     public InterceptionEngine getInterceptionEngine() {
 

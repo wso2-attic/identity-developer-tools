@@ -17,20 +17,30 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {basename} from "path";
-import path = require("path");
-import format = require("string-template");
 import {
-    Breakpoint, BreakpointEvent,
+    Breakpoint,
+    BreakpointEvent,
     Handles,
-    InitializedEvent, logger, Logger, LoggingDebugSession, OutputEvent,
-    Scope, Source, StackFrame, StoppedEvent, TerminatedEvent, Thread,
+    InitializedEvent,
+    logger,
+    Logger,
+    LoggingDebugSession,
+    OutputEvent,
+    Scope,
+    Source,
+    StackFrame,
+    StoppedEvent,
+    TerminatedEvent,
+    Thread,
 } from "vscode-debugadapter";
 import {DebugProtocol} from "vscode-debugprotocol";
 import {DebugConstants} from "./DebugConstants";
 import {PreviewManager} from "./lspModules/PreviewManager";
 import {IRemoteBreakpoint, RemoteIdentityServerRuntime} from "./remoteIdentityServerRuntime";
+import path = require("path");
+import format = require("string-template");
 
-const { Subject } = require("await-notify");
+const {Subject} = require("await-notify");
 
 function timeout(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

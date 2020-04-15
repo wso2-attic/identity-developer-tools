@@ -30,27 +30,31 @@ public class SAMLResponseTranslator implements VariableTranslator {
 
     private static Log log = LogFactory.getLog(SAMLResponseTranslator.class);
 
-    private SAMLResponseTranslator() {}
+    private SAMLResponseTranslator() {
+
+    }
 
     private static class SAMLResponseTranslatorHolder {
+
         private static final SAMLResponseTranslator INSTANCE = new SAMLResponseTranslator();
     }
 
     /**
      * This static method allow to get the instance of the SAMLResponseTranslator.
      *
-     * @return
+     * @return the SAMLResponseTranslatorHolder instance.
      */
     public static SAMLResponseTranslator getInstance() {
+
         return SAMLResponseTranslatorHolder.INSTANCE;
     }
 
-
     @Override
     public Object translate(Object object, int variablesReference) {
+
         if (object != null) {
             try {
-                return  new String(Base64.getDecoder().decode((String) object));
+                return new String(Base64.getDecoder().decode((String) object));
             } catch (IllegalArgumentException e) {
                 log.error("Error when decoding the SAML Response.", e);
                 return object;

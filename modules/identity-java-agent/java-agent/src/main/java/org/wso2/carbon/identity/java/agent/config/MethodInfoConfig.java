@@ -39,7 +39,7 @@ public class MethodInfoConfig {
     /**
      * This method is to when intercepting check whether to insert after.
      *
-     * @return
+     * @return whether to intercept at end of the method body.
      */
     public boolean isInsertAfter() {
 
@@ -49,7 +49,7 @@ public class MethodInfoConfig {
     /**
      * This method is to when intercepting check whether to insert before.
      *
-     * @return
+     * @return whether to intercept at start of the method body.
      */
     public boolean isInsertBefore() {
 
@@ -59,7 +59,7 @@ public class MethodInfoConfig {
     /**
      * This method is to get the Method Name from the Config.
      *
-     * @return
+     * @return the method name of the Config.
      */
     public String getMethodName() {
 
@@ -69,7 +69,7 @@ public class MethodInfoConfig {
     /**
      * This method is to get the Method Signature from the Config.
      *
-     * @return
+     * @return the method signature of the Config.
      */
     public String getSignature() {
 
@@ -77,11 +77,11 @@ public class MethodInfoConfig {
     }
 
     /**
-     *This method is to Verify the Method with the Class loaded and the Method in the config.
+     * This method is to Verify the Method with the Class loaded and the Method in the config.
      *
-     * @param methodName
-     * @param signature
-     * @return
+     * @param methodName the method name of the Config.
+     * @param signature  the method signature of the Config.
+     * @return whether to verify or not.
      */
     public boolean verifyMethod(String methodName, String signature) {
 

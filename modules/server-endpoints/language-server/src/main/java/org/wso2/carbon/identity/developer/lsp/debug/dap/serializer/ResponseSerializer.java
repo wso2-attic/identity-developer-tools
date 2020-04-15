@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
 
 /**
  * Success Response Serializer.
+ *
  * @param <T>
  */
 public class ResponseSerializer<T extends Response> implements JsonSerializer<T> {

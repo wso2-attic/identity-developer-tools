@@ -25,13 +25,14 @@ import java.util.List;
  * Debug interceptor configuration.
  */
 public class InterceptorConfig {
+
     private String className;
     private List<MethodInfoConfig> methodInfoConfigs = new ArrayList<>();
 
     /**
      * This method is to get the Class Name.
      *
-     * @return className
+     * @return name of the Intercepting Class
      */
     public String getClassName() {
 
@@ -51,10 +52,10 @@ public class InterceptorConfig {
     /**
      * This method is to add the Method Configs .
      *
-     * @param methodName the method name of the Config.
-     * @param signature the method signature of the Config.
+     * @param methodName   the method name of the Config.
+     * @param signature    the method signature of the Config.
      * @param insertBefore whether to intercept at start of the method body.
-     * @param insertAfter whether to intercept at end of the method body.
+     * @param insertAfter  whether to intercept at end of the method body.
      */
     public void addMethodConfigs(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
@@ -64,7 +65,7 @@ public class InterceptorConfig {
     /**
      * This method is to get Method Info Configs.
      *
-     * @return methodInfoConfigs
+     * @return methodInfoConfigs for a class list of configs.
      */
     public List<MethodInfoConfig> getMethodInfoConfigs() {
 

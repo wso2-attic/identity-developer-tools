@@ -40,7 +40,7 @@ export class ViewPanelHolder {
     }
 
     /**
-     * This is a getter to get the currentHtml.
+     * Gets the currentHtml.
      */
     public getCurrentHtml() {
 
@@ -48,7 +48,7 @@ export class ViewPanelHolder {
     }
 
     /**
-     * This is a setter to set the currentHtml.
+     * Sets the currentHtml.
      *
      * @param currentHtml
      */

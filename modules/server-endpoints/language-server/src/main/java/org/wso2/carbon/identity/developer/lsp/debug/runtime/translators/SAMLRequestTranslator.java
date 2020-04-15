@@ -33,18 +33,22 @@ public class SAMLRequestTranslator implements VariableTranslator {
 
     private static Log log = LogFactory.getLog(SAMLRequestTranslator.class);
 
-    private SAMLRequestTranslator() {}
+    private SAMLRequestTranslator() {
+
+    }
 
     private static class SAMLRequestTranslatorHolder {
+
         private static final SAMLRequestTranslator INSTANCE = new SAMLRequestTranslator();
     }
 
     /**
      * This static method allow to get the instance of the SAMLRequestTranslator.
      *
-     * @return
+     * @return the SAMLRequestTranslatorHolder instance.
      */
     public static SAMLRequestTranslator getInstance() {
+
         return SAMLRequestTranslatorHolder.INSTANCE;
     }
 

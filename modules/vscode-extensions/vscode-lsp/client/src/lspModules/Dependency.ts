@@ -19,7 +19,8 @@
 import * as vscode from "vscode";
 
 /**
- * Helper class for Tree View
+ * Helper class for Tree View.
+ * Implemented to return UI representation (TreeItem) of the elements that gets displayed in vi.
  */
 export class Dependency extends vscode.TreeItem {
 
@@ -31,10 +32,16 @@ export class Dependency extends vscode.TreeItem {
         super(label);
     }
 
+    /**
+     * Get the label of the tag.
+     */
     public get tooltip(): string {
         return `${this.label}`;
     }
 
+    /**
+     * Get the description of the tag.
+     */
     public get description(): string {
         return this.task;
     }

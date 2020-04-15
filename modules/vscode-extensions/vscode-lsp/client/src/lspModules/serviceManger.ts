@@ -56,7 +56,7 @@ export class ServiceManger {
     }
 
     /**
-     * createListOfServices() to create a list in command pallete.
+     * createListOfServices() to create a list in command pallet.
      */
     public async createListOfServices(servicesArray) {
 

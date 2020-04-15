@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.java.agent.internal;
 
 /**
- * ClassInterceptor. #TODO Don't know the purpose.
+ * Interface for the Class Interceptor.
  */
 public interface ClassInterceptor {
 

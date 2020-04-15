@@ -25,7 +25,6 @@ public class Event extends ProtocolMessage {
 
     private String event;
 
-
     public Event(String type, String event) {
 
         super(type);
@@ -43,9 +42,9 @@ public class Event extends ProtocolMessage {
     }
 
     /**
-     *  Sets the event.
+     * Sets the event.
      *
-     * @param event Type of event.
+     * @param event type of event.
      */
     public void setEvent(String event) {
 

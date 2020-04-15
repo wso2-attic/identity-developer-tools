@@ -41,7 +41,7 @@ public class VariablesRequest extends Request {
     /**
      * Gets the variablesReference.
      *
-     * @return  variablesReference
+     * @return the Reference to the Variable container.
      */
     public int getVariablesReference() {
 

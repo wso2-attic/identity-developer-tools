@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.websocket.Session;
 
 /**
@@ -33,6 +34,7 @@ import javax.websocket.Session;
  * Contains the information about the breakpoints.
  */
 public class DebugSession {
+
     private static final Log log = LogFactory.getLog(DebugSession.class);
 
     private Session session;
@@ -45,7 +47,7 @@ public class DebugSession {
     /**
      * This is the getter which gets the  Websocket session.
      *
-     * @return
+     * @return the websocket session initiated.
      */
     public Session getSession() {
 
@@ -55,7 +57,7 @@ public class DebugSession {
     /**
      * This is the setter which sets the  Websocket session.
      *
-     * @param session
+     * @param session the websocket session initiated.
      */
     public void setSession(Session session) {
 
@@ -65,8 +67,8 @@ public class DebugSession {
     /**
      * This is the setter which adds breakpointInfo.
      *
-     * @param resource
-     * @param breakpoints
+     * @param resource    the name of the resource.
+     * @param breakpoints the information about the breakpoints.
      */
     public void setBreakpoints(String resource, int[] breakpoints) {
 
@@ -80,10 +82,10 @@ public class DebugSession {
     }
 
     /**
-     * This is the getter which gets Breakpoint Info.
+     * Gets Breakpoint Info.
      *
-     * @param source
-     * @return
+     * @param source the name of the source.
+     * @return the information about the breakpoints.
      */
     public BreakpointInfo getBreakpointInfo(String source) {
 
@@ -94,7 +96,7 @@ public class DebugSession {
     /**
      * This is temporary method, needs to be removed once created correct breakpoint identification logic.
      *
-     * @return
+     * @return the BreakpointInfo from the breakpointInfoMap.
      */
     @Deprecated
     public BreakpointInfo[] getBreakpointInfos() {
@@ -111,7 +113,7 @@ public class DebugSession {
     /**
      * Gets the currentMethodContext.
      *
-     * @return
+     * @return the currently instrumented method context.
      */
     public MethodContext getCurrentMethodContext() {
 
@@ -121,7 +123,7 @@ public class DebugSession {
     /**
      * Sets the currentMethodContext.
      *
-     * @param currentMethodContext
+     * @param currentMethodContext the currently instrumented method context.
      */
     public void setCurrentMethodContext(MethodContext currentMethodContext) {
 
@@ -129,9 +131,8 @@ public class DebugSession {
     }
 
     /**
-     * Processes the method entry event.
-     *
-     * @param methodContext
+     * @param methodContext instrumented method details.
+     * @return the DebugProcessingResult if breakpointInfo else null .
      */
     public DebugProcessingResult processMethodEntry(MethodContext methodContext) {
 
@@ -149,10 +150,11 @@ public class DebugSession {
     /**
      * This method is to get the breakpointInfoMap.
      *
-     * @param methodContext
-     * @return
+     * @param methodContext the instrumented method details.
+     * @return the information about the break point.
      */
     private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
+
         if (breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
             return null;
         }
@@ -163,6 +165,7 @@ public class DebugSession {
      * This method is to suspend the current Thread.
      */
     public void suspendCurrentThread() {
+
         try {
             synchronized (this.waitObject) {
                 this.waitObject.wait(MAX_THREAD_SUSPEND_TIME_MILLIS);
@@ -177,7 +180,7 @@ public class DebugSession {
     /**
      * This method is to get the  Websocket session ID.
      *
-     * @return
+     * @return the id of the session.
      */
     private String getSessionInfo() {
 
@@ -188,6 +191,7 @@ public class DebugSession {
      * This method is to resume the current Thread.
      */
     public void resumeSuspendedThread() {
+
         synchronized (this.waitObject) {
             this.waitObject.notify();
         }

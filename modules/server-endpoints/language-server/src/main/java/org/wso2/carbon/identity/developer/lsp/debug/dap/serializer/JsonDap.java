@@ -78,7 +78,7 @@ public class JsonDap {
      * Encodes the response to string format.
      *
      * @param response the encoded message.
-     * @return
+     * @return encoded string if the response message has corresponding Adapter other wise IOException.
      */
     public String encode(ProtocolMessage response) throws JsonDapSerializeException {
 

@@ -64,7 +64,7 @@ public class Response extends Message {
     /**
      * Gets whether success.
      *
-     * @return  is success
+     * @return is success
      */
     public boolean isSuccess() {
 
@@ -87,7 +87,7 @@ public class Response extends Message {
     /**
      * Gets the command.
      *
-     * @return command
+     * @return the command requested.
      */
     public String getCommand() {
 
@@ -107,7 +107,7 @@ public class Response extends Message {
     /**
      * Gets the message.
      *
-     * @return
+     * @return the response message.
      */
     public String getMessage() {
 
@@ -115,7 +115,7 @@ public class Response extends Message {
     }
 
     /**
-     *  Sets the message.
+     * Sets the message.
      *
      * @param message Contains the raw error in short form if 'success' is false.
      *                This raw error might be interpreted by the frontend and is not shown in the UI.
@@ -132,7 +132,7 @@ public class Response extends Message {
     /**
      * Gets the body.
      *
-      * @return body
+     * @return result if success is true and optional error details if success is false.
      */
     public Argument getBody() {
 

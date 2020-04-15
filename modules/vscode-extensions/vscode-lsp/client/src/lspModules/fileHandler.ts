@@ -27,8 +27,8 @@ import * as xml2js from "xml2js";
 import {DebugConstants} from "../DebugConstants";
 
 import axios from "axios";
-import keytar = require("keytar");
 import {Config} from "../Config";
+import keytar = require("keytar");
 
 /**
  * This class helps to read and write the files when needed.

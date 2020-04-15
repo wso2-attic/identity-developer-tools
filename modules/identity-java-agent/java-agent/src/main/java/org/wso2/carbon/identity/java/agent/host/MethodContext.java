@@ -46,7 +46,7 @@ public class MethodContext {
     /**
      * This method is to get the Instrumented Thread.
      *
-     * @return
+     * @return the instrumented thread.
      */
     public Thread getInstrumentedThread() {
 
@@ -56,7 +56,7 @@ public class MethodContext {
     /**
      * This method is to get the Instrumented Object.
      *
-     * @return
+     * @return the instrumented object.
      */
     public Object getInstrumentedObject() {
 
@@ -66,7 +66,7 @@ public class MethodContext {
     /**
      * This method is to get the Method Stack.
      *
-     * @return
+     * @return the instrumented method stack.
      */
     public Object getMethodStack() {
 
@@ -76,7 +76,7 @@ public class MethodContext {
     /**
      * This method is to get the Method Name.
      *
-     * @return
+     * @return the instrumented method name.
      */
     public String getMethodName() {
 
@@ -86,7 +86,7 @@ public class MethodContext {
     /**
      * This method is to get the Method Signature.
      *
-     * @return
+     * @return the instrumented method signature.
      */
     public String getMethodSignature() {
 
@@ -96,7 +96,7 @@ public class MethodContext {
     /**
      * This method is to get the Argument Values.
      *
-     * @return
+     * @return the instrumented method  argument values.
      */
     public Object[] getArgumentValues() {
 
@@ -106,7 +106,7 @@ public class MethodContext {
     /**
      * This method is to set the Argument Values.
      *
-     * @param argumentValues
+     * @param argumentValues the arguments (values) of the method.
      */
     public void setArgumentValues(Object[] argumentValues) {
 
@@ -116,7 +116,7 @@ public class MethodContext {
     /**
      * This method is to get the Argument Types.
      *
-     * @return
+     * @return data types of all the arguments for the method.
      */
     public Class[] getArgumentTypes() {
 
@@ -126,7 +126,7 @@ public class MethodContext {
     /**
      * This method is to set the Argument Types.
      *
-     * @param argumentTypes
+     * @param argumentTypes data types of all the arguments for the method.
      */
     public void setArgumentTypes(Class[] argumentTypes) {
 
@@ -136,7 +136,7 @@ public class MethodContext {
     /**
      * This method is to add the data frame to dataStack.
      *
-     * @param dataFrame
+     * @param dataFrame pushed data frame.
      */
     public void pushData(Map<String, Object> dataFrame) {
 
@@ -146,7 +146,7 @@ public class MethodContext {
     /**
      * This method is to remove the first data frame  to dataStack.
      *
-     * @return
+     * @return lastly added element in the stack.
      */
     public Map<String, Object> popData() {
 
@@ -159,7 +159,7 @@ public class MethodContext {
     /**
      * This method is to set Class Name.
      *
-     * @param className
+     * @param className the instrumented class name.
      */
     public void setClassName(String className) {
 
@@ -169,7 +169,7 @@ public class MethodContext {
     /**
      * This method is to get Class Name.
      *
-     * @return
+     * @return the instrumented class name.
      */
     public String getClassName() {
 

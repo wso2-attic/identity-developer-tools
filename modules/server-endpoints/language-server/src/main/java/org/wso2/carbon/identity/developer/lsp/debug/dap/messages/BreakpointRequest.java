@@ -42,7 +42,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourceName.
      *
-     * @return sourceName
+     * @return the name of the Source.
      */
     public String getSourceName() {
 
@@ -62,7 +62,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourcePath.
      *
-     * @return sourcePath
+     * @return the path of the source.
      */
     public String getSourcePath() {
 
@@ -82,7 +82,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourceReference.
      *
-     * @return sourceReference
+     * @return the reference to the source.
      */
     public int getSourceReference() {
 
@@ -104,7 +104,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the adapterData.
      *
-     * @return adapterData
+     * @return optional data that a debug adapter might want to loop through the client.
      */
     public Object getAdapterData() {
 
@@ -115,7 +115,7 @@ public class BreakpointRequest extends Request {
      * Sets the adapterData.
      *
      * @param adapterData Optional data that a debug adapter might want to loop through the client. The client should
-     *                   leave the data intact and persist it across sessions. The client should not interpret the data.
+     *                    leave the data intact and persist it across sessions. The client should not interpret the data.
      */
     public void setAdapterData(Object adapterData) {
 
@@ -125,7 +125,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the lines.
      *
-     * @return lines
+     * @return the code locations of the breakpoints.
      */
     public int[] getLines() {
 
@@ -135,7 +135,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the lines.
      *
-     * @param lines The code locations of the breakpoints.
+     * @param lines the code locations of the breakpoints.
      */
     public void setLines(int[] lines) {
 
@@ -145,7 +145,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the breakpoints.
      *
-     * @return breakpoints
+     * @return the information about the breakpoints.
      */
     public int[] getBreakpoints() {
 
@@ -155,7 +155,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the breakpoints.
      *
-     * @param breakpoints Information about the breakpoints.
+     * @param breakpoints information about the breakpoints.
      */
     public void setBreakpoints(int[] breakpoints) {
 
@@ -165,7 +165,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets whether sourceModified .
      *
-     * @return sourceModified
+     * @return whether sourceModified.
      */
     public boolean isSourceModified() {
 

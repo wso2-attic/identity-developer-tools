@@ -29,8 +29,8 @@ public interface EventPublisher {
     /**
      * Publishes an event.
      *
-     * @param type
-     * @param context
+     * @param type    the type of the event.
+     * @param context the currently instrumented method context.
      */
     void fireEvent(InterceptionEventType type, MethodContext context);
 }

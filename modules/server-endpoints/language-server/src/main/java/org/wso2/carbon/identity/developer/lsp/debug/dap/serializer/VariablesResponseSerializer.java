@@ -47,7 +47,6 @@ public class VariablesResponseSerializer implements JsonSerializer<VariablesResp
         object.addProperty(DAPConstants.JSON_KEY_FOR_ID, response.getId());
         object.add(DAPConstants.JSON_KEY_FOR_RESULT, generateResultObject(response));
 
-
         return object;
     }
 

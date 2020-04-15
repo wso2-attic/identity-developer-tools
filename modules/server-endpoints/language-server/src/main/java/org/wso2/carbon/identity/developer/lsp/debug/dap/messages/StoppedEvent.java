@@ -37,7 +37,7 @@ public class StoppedEvent extends Event {
     /**
      * Gets the line.
      *
-     * @return line
+     * @return the source name of the breakpoints.
      */
     public int getLine() {
 

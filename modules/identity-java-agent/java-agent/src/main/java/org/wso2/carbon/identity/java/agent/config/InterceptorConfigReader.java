@@ -18,9 +18,7 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
-
 import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -40,9 +38,6 @@ public class InterceptorConfigReader {
         ArrayList<InterceptorConfig> result = new ArrayList<>();
 
         InterceptorConfig samlFilterConfig = new InterceptorConfig();
-        /**
-         * Add the Java DOC for the Strings.
-         */
         samlFilterConfig.setClassName(
                 "org/wso2/carbon/identity/sso/saml/servlet/SAMLSSOProviderServlet");
 

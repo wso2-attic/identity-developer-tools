@@ -43,7 +43,7 @@ public class DebugProcessingResult {
     /**
      * Gets the breakpoint Info.
      *
-     * @return
+     * @return the breakpoint information.
      */
     public BreakpointInfo getBreakpointInfo() {
 
@@ -53,7 +53,7 @@ public class DebugProcessingResult {
     /**
      * Sets the breakpoint Info.
      *
-     * @param breakpointInfo
+     * @param breakpointInfo the breakpoint information.
      */
     public void setBreakpointInfo(BreakpointInfo breakpointInfo) {
 
@@ -63,7 +63,7 @@ public class DebugProcessingResult {
     /**
      * Gets the Instruction Type.
      *
-     * @return
+     * @return the type of the instruction Eg:  STOP, CONTINUE.
      */
     public InstructionType getInstructionType() {
 

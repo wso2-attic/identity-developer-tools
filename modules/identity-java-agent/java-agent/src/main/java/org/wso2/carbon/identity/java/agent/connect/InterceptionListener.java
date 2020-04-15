@@ -31,8 +31,8 @@ public interface InterceptionListener {
      * Handles the event.
      * Implementor may block the thread or handle it asynchronously.
      *
-     * @param type
-     * @param methodContext
+     * @param type          the type of the event.
+     * @param methodContext instrumentation context details for a Method.
      */
     void handleEvent(InterceptionEventType type, MethodContext methodContext);
 }

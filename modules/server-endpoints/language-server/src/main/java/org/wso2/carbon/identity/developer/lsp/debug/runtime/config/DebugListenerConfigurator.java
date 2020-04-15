@@ -43,11 +43,10 @@ public class DebugListenerConfigurator {
      */
     public void configure(InterceptionEngine interceptionEngine) {
 
-         MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
-                 DAPConstants.SAML_ENTRY_CLASS,
-                 DAPConstants.SAML_ENTRY_METHOD,
+        MethodEntryInterceptionFilter samlEntryFilter = new MethodEntryInterceptionFilter(
+                DAPConstants.SAML_ENTRY_CLASS,
+                DAPConstants.SAML_ENTRY_METHOD,
                 DAPConstants.SAML_ENTRY_SIGNATURE);
-
 
         MethodEntryInterceptionFilter samlExitFilter = new MethodEntryInterceptionFilter(
                 DAPConstants.SAML_EXIT_CLASS,
@@ -56,6 +55,5 @@ public class DebugListenerConfigurator {
 
         interceptionEngine.addListener(samlExitFilter, this.sessionManager);
         interceptionEngine.addListener(samlEntryFilter, this.sessionManager);
-
     }
 }

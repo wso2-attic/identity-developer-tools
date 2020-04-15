@@ -80,8 +80,6 @@ public class DAPConstants {
     public static final String JSON_KEY_FOR_UNKNOWN = "unknown";
     public static final String JSON_KEY_FOR_REQ_SEQ = "request_seq";
 
-
-
     public static final String VARIABLE_TYPE_STRING = "String";
     public static final String VARIABLE_TYPE_OBJECT = "Object";
     public static final String VARIABLE_TYPE_UNKNOWN = "Unknown";

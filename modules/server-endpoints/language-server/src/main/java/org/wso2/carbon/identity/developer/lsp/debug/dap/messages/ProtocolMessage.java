@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
 /**
  * Generic protocol message for Debug protocol.
- *
  */
 public class ProtocolMessage {
 
@@ -42,7 +41,7 @@ public class ProtocolMessage {
     }
 
     /**
-     *  Setter which sets the type.
+     * Setter which sets the type.
      *
      * @param type Message type.  Values can be 'request', 'response', 'event', etc.
      */

@@ -31,7 +31,6 @@ public class SAMLEntryVariableBuilder implements VariableBuilder {
     private SAMLEntryRequestVariable samlEntryRequestVariable;
     private VariableTranslateRegistry variableTranslateRegistry;
 
-
     public SAMLEntryVariableBuilder(VariableTranslateRegistry variableTranslateRegistry) {
 
         this.variableTranslateRegistry = variableTranslateRegistry;

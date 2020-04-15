@@ -19,10 +19,11 @@
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
+
 import java.util.HashMap;
 
 /**
- *  Variables Holds the necessary Variables for.
+ * Variables Holds the necessary Variables for.
  */
 public class SAMLExitResponseVariable implements SAMLExitVariablePlan {
 
@@ -31,7 +32,7 @@ public class SAMLExitResponseVariable implements SAMLExitVariablePlan {
     /**
      * This method is to get the variables after adding the objects.
      *
-     * @return variables
+     * @return the list of variables as a key value pair.
      */
     public HashMap<String, Object> getVariables() {
 
@@ -40,11 +41,13 @@ public class SAMLExitResponseVariable implements SAMLExitVariablePlan {
 
     @Override
     public void setHttpServletResponse(Object httpServletResponse) {
+
         variables.put(DAPConstants.HTTP_SERVLET_RESPONSE, httpServletResponse);
     }
 
     @Override
     public void setSAMLResponse(Object samlResponse) {
+
         variables.put(DAPConstants.SAML_RESPONSE, samlResponse);
     }
 }

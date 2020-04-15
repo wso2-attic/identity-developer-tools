@@ -18,20 +18,12 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import {
-    ExtensionContext,
-    workspace,
-} from "vscode";
-import {
-    LanguageClient,
-    LanguageClientOptions,
-    ServerOptions,
-    TransportKind,
-} from "vscode-languageclient";
+import {ExtensionContext, workspace} from "vscode";
+import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind,} from "vscode-languageclient";
 import {Config} from "./Config";
 import {ExtensionConstants} from "./ExtensionConstants";
 import {FileHandler} from "./lspModules/fileHandler";
-import { IdentityServerDebugAdapterDescriptorFactory } from "./lspModules/IdentityServerDebugAdapterDescriptorFactory";
+import {IdentityServerDebugAdapterDescriptorFactory} from "./lspModules/IdentityServerDebugAdapterDescriptorFactory";
 import {MockConfigurationProvider} from "./lspModules/MockConfigurationProvider";
 import {PreviewManager} from "./lspModules/PreviewManager";
 import {ScriptLibraryTree} from "./lspModules/scriptLibraryTree";

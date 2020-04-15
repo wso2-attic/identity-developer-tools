@@ -26,6 +26,7 @@ import javassist.scopedpool.ScopedClassPoolFactoryImpl;
 import javassist.scopedpool.ScopedClassPoolRepositoryImpl;
 import org.wso2.carbon.identity.java.agent.config.InterceptorConfig;
 import org.wso2.carbon.identity.java.agent.config.MethodInfoConfig;
+
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -45,7 +46,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
      * We use JUL as this is an java agent which should not depend on any other framework than java.
      */
     private static final Logger log = Logger.getLogger(InterceptingClassTransformer.class.getName());
-    public static final String METHOD_LISTENER_TEMPLATE =   "org.wso2.carbon.identity.java.agent.internal." +
+    public static final String METHOD_LISTENER_TEMPLATE = "org.wso2.carbon.identity.java.agent.internal." +
             "MethodEntryListener.methodEntered(\"%s\", \"%s\",\"%s\", $sig, $args );";
 
     private final Map<String, InterceptorConfig> interceptorMap = new HashMap<>();
@@ -70,15 +71,14 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
      * We check our config with classes and intercept only when the Corresponding Class Name, Method Name, Method
      * Signature matches.
      *
-     *  @implSpec The default implementation returns null.
-     *
-     * @param loader The defining loader of the class to be transformed, may be {@code null} if the bootstrap loader.
-     * @param className The name of the class in the internal form of fully qualified class.
+     * @param loader              The defining loader of the class to be transformed, may be {@code null} if the bootstrap loader.
+     * @param className           The name of the class in the internal form of fully qualified class.
      * @param classBeingRedefined if this is triggered by a redefine or re transform, the class being redefined.
-     * @param protectionDomain the protection domain of the class being defined or redefined.
-     * @param classfileBuffer  the input byte buffer in class file format - Have to be instrumented.
+     * @param protectionDomain    the protection domain of the class being defined or redefined.
+     * @param classfileBuffer     the input byte buffer in class file format - Have to be instrumented.
      * @return
      * @throws IllegalClassFormatException
+     * @implSpec The default implementation returns null.
      */
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
@@ -119,7 +119,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
                     byteCode = ctClass.toBytecode();
                 }
 
-              ctClass.detach();
+                ctClass.detach();
             } catch (Throwable ex) {
                 log.log(Level.SEVERE, "Error in transforming the class: " + className, ex);
             }
@@ -130,8 +130,8 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This Method is to Check whether the Agent should intercept or not.
      *
-     * @param className
-     * @return
+     * @param className the name of the class in the internal form of fully qualified class.
+     * @return whether to intercept or not.
      */
     private boolean shouldIntercept(String className) {
 
@@ -141,8 +141,8 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This method is to get the InterceptorConfig using Class name.
      *
-     * @param className
-     * @return
+     * @param className the name of the class in the internal form of fully qualified class.
+     * @return the Interceptor config corresponding to the class name.
      */
     private InterceptorConfig getInterceptorConfig(String className) {
 
@@ -152,7 +152,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This method is to add the InterceptorConfig.
      *
-     * @param interceptorConfig
+     * @param interceptorConfig the interceptor config corresponding to the class name.
      */
     public void addConfig(InterceptorConfig interceptorConfig) {
 

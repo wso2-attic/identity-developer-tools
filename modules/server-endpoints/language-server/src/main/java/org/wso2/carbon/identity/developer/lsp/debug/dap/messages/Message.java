@@ -34,7 +34,7 @@ public class Message extends ProtocolMessage {
     /**
      * Getter which gets the id.
      *
-     * @return id
+     * @return the id of the message.
      */
     public long getId() {
 

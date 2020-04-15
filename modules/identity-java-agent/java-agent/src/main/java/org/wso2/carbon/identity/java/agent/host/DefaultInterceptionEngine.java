@@ -44,8 +44,6 @@ public class DefaultInterceptionEngine implements InterceptionEngine, EventPubli
                 break;
             }
         }
-
-
     }
 
     @Override
@@ -58,7 +56,7 @@ public class DefaultInterceptionEngine implements InterceptionEngine, EventPubli
     public void removeListener(InterceptionListener listener) {
 
         MethodEntryInterceptionFilter key = null;
-        for (Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry: filters.entrySet()) {
+        for (Map.Entry<MethodEntryInterceptionFilter, InterceptionListener> entry : filters.entrySet()) {
             if (entry.getValue() == listener) {
                 key = entry.getKey();
             }

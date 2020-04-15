@@ -30,6 +30,7 @@ public class StoppedEventSerializer extends EventSerializer<StoppedEvent> {
 
     @Override
     protected JsonElement formatParams(StoppedEvent event) {
+
         JsonObject object = new JsonObject();
         object.addProperty(DAPConstants.JSON_KEY_FOR_LINE, event.getLine());
         object.addProperty(DAPConstants.JSON_KEY_FOR_SOURCE, event.getResourceName());

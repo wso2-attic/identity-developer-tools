@@ -41,14 +41,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 /**
  * Deserialize the JSON RPC Request.
  */
 public class RequestDeserializer implements JsonDeserializer<ProtocolMessage> {
 
     private static final Log log = LogFactory.getLog(RequestDeserializer.class);
-    
+
     public ProtocolMessage deserialize(JsonElement jsonElement, Type type,
                                        JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {

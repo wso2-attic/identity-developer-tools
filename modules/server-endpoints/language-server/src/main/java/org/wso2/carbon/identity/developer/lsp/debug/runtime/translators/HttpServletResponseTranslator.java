@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
 import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,18 +30,22 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttpServletResponseTranslator implements VariableTranslator {
 
-    private HttpServletResponseTranslator() {}
+    private HttpServletResponseTranslator() {
+
+    }
 
     private static class HttpServletResponseTranslatorHolder {
+
         private static final HttpServletResponseTranslator INSTANCE = new HttpServletResponseTranslator();
     }
 
     /**
      * This static method allow to get the instance of the HttpServletResponseTranslator.
      *
-     * @return
+     * @return the HttpServletResponseTranslatorHolder instance.
      */
     public static HttpServletResponseTranslator getInstance() {
+
         return HttpServletResponseTranslatorHolder.INSTANCE;
     }
 

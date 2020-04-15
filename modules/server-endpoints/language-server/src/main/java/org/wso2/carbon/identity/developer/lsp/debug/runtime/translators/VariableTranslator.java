@@ -25,9 +25,10 @@ public interface VariableTranslator {
 
     /**
      * This method allow to translate the variable from the argument.
+     *
      * @param in
      * @param variablesReference
-     * @return
+     * @return the translated object.
      */
     Object translate(Object in, int variablesReference);
 }

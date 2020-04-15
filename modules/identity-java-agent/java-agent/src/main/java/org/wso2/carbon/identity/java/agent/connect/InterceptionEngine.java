@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.java.agent.connect;
 
 /**
  * Interception engine which will be used by other components to listen to execution.
- *
  */
 public interface InterceptionEngine {
 
@@ -28,15 +27,15 @@ public interface InterceptionEngine {
      * Adds an interception listener to the engine.
      * The listener is fired if the filter is applied.
      *
-     * @param filter
-     * @param listener
+     * @param filter   filter for method entry.
+     * @param listener which is interested in the event.
      */
     void addListener(MethodEntryInterceptionFilter filter, InterceptionListener listener);
 
     /**
      * Removed the listener from the engine.
      *
-     * @param listener
+     * @param listener which is interested in the event.
      */
     void removeListener(InterceptionListener listener);
 }

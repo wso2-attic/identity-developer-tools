@@ -23,7 +23,6 @@ import {DebugProtocol} from "vscode-debugprotocol";
 import * as rpc from "vscode-ws-jsonrpc";
 import {Config} from "./Config";
 import {DebugConstants} from "./DebugConstants";
-
 import keytar = require("keytar");
 import WebSocket = require("ws");
 
@@ -78,8 +77,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
     /**
      * Start executing the given program.
      *
-     * @param program
-     * @param stopOnEntry
+     * @param program the name of the program debugging.
+     * @param stopOnEntry whether to stop on the entry.
      */
     public start(program: string, stopOnEntry: boolean) {
 
@@ -101,9 +100,9 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
     /**
      * Method to set the break points.
      *
-     * @param path
-     * @param line
-     * @param args
+     * @param path Logical full path to the module.
+     * @param line Start line of range to search possible breakpoint locations in.
+     * @param args List of arguments. The first argument is the command to run.
      */
     public setBreakPoint(path: string, line: number, args: DebugProtocol.SetBreakpointsArguments): IRemoteBreakpoint {
 
@@ -126,7 +125,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 
     /**
      * Clear all breakpoints for file.
-     * @param path
+     * @param path Logical full path to the module.
      */
     public clearBreakpoints(path: string): void {
 
@@ -140,8 +139,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
     /**
      * Method to get the break points.
      *
-     * @param path
-     * @param line
+     * @param path Logical full path to the module.
+     * @param line Start line of range to search possible breakpoint locations in.
      */
     public getBreakpoints(path: string, line: number): number[] {
 
@@ -164,20 +163,20 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 
     /**
      * Creates the variable request and returns the promise which can be used to perform the results on the request
-     * @param response
-     * @param args
-     * @param request
+     * @param response Response for fetch Variables request.
+     * @param args List of arguments. The first argument is the command to run.
+     * @param request for fetch Variables.
      */
     public fetchVariables(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments,
                           request?: DebugProtocol.Request): Thenable<DebugProtocol.VariablesResponse> {
 
-        const varaiablesRequest = new rpc.RequestType1<DebugProtocol.VariablesArguments,
+        const variablesRequest = new rpc.RequestType1<DebugProtocol.VariablesArguments,
             DebugProtocol.VariablesResponse, DebugProtocol.ErrorResponse, DebugProtocol.Request>("variables");
-        return this.messageConnection.sendRequest(varaiablesRequest, args);
+        return this.messageConnection.sendRequest(variablesRequest, args);
     }
 
     /**
-     * Returns a fake 'stacktrace' where every 'stackframe' is a word from the current line.
+     * Returns a fake 'stacktrace' where every 'stack frame' is a word from the current line.
      */
     public stack(startFrame: number, endFrame: number): any {
 
@@ -220,7 +219,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
     /**
      * Set data breakpoint.
      *
-     * @param address
+     * @param address The address of the first byte of data returned.
      */
     public setDataBreakpoint(address: string): boolean {
         if (address) {

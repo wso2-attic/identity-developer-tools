@@ -24,7 +24,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 public interface SAMLExitVariablePlan {
 
     /**
-     *This method is to add httpServletResponse to variables list  After the argument is proceeded.
+     * This method is to add httpServletResponse to variables list  After the argument is proceeded.
      *
      * @param httpServletResponse the HttpServletResponse object, known as "response" in a JSP page.
      */
