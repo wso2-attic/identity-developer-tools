@@ -63,7 +63,7 @@ public class JsonDap {
      *
      * @param json The JSON string
      * @return The decoded request
-     * @throws JsonParseException when there is an error while parsing the request
+     * @throws JsonParseException When there is an error while parsing the request
      */
     public Request decode(String json) throws JsonParseException {
 
@@ -77,8 +77,8 @@ public class JsonDap {
     /**
      * Encodes the response to string format.
      *
-     * @param response the encoded message.
-     * @return encoded string if the response message has corresponding Adapter other wise IOException.
+     * @param response The encoded message.
+     * @return Encoded string if the response message has corresponding Adapter other wise IOException.
      */
     public String encode(ProtocolMessage response) throws JsonDapSerializeException {
 

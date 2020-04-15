@@ -42,7 +42,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourceName.
      *
-     * @return the name of the Source.
+     * @return The name of the Source.
      */
     public String getSourceName() {
 
@@ -52,7 +52,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the sourceName.
      *
-     * @param sourceName the name of the Source.
+     * @param sourceName The name of the Source.
      */
     public void setSourceName(String sourceName) {
 
@@ -62,7 +62,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourcePath.
      *
-     * @return the path of the source.
+     * @return The path of the source.
      */
     public String getSourcePath() {
 
@@ -72,7 +72,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the sourcePath.
      *
-     * @param sourcePath the path of the source.
+     * @param sourcePath The path of the source.
      */
     public void setSourcePath(String sourcePath) {
 
@@ -82,7 +82,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the sourceReference.
      *
-     * @return the reference to the source.
+     * @return The reference to the source.
      */
     public int getSourceReference() {
 
@@ -104,7 +104,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the adapterData.
      *
-     * @return optional data that a debug adapter might want to loop through the client.
+     * @return Optional data that a debug adapter might want to loop through the client.
      */
     public Object getAdapterData() {
 
@@ -115,7 +115,8 @@ public class BreakpointRequest extends Request {
      * Sets the adapterData.
      *
      * @param adapterData Optional data that a debug adapter might want to loop through the client. The client should
-     *                    leave the data intact and persist it across sessions. The client should not interpret the data.
+     *                    leave the data intact and persist it across sessions. The client should not interpret the
+     *                    data.
      */
     public void setAdapterData(Object adapterData) {
 
@@ -125,7 +126,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the lines.
      *
-     * @return the code locations of the breakpoints.
+     * @return The code locations of the breakpoints.
      */
     public int[] getLines() {
 
@@ -135,7 +136,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the lines.
      *
-     * @param lines the code locations of the breakpoints.
+     * @param lines The code locations of the breakpoints.
      */
     public void setLines(int[] lines) {
 
@@ -145,7 +146,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets the breakpoints.
      *
-     * @return the information about the breakpoints.
+     * @return The Information about the breakpoints.
      */
     public int[] getBreakpoints() {
 
@@ -155,7 +156,7 @@ public class BreakpointRequest extends Request {
     /**
      * Sets the breakpoints.
      *
-     * @param breakpoints information about the breakpoints.
+     * @param breakpoints Information about the breakpoints.
      */
     public void setBreakpoints(int[] breakpoints) {
 
@@ -165,7 +166,7 @@ public class BreakpointRequest extends Request {
     /**
      * Gets whether sourceModified .
      *
-     * @return whether sourceModified.
+     * @return Whether source is modified.
      */
     public boolean isSourceModified() {
 

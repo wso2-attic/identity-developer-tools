@@ -33,7 +33,7 @@ public class ProtocolMessage {
     /**
      * Getter which gets the type.
      *
-     * @return type
+     * @return Message type.  Values can be 'request', 'response', 'event', etc.
      */
     public String getType() {
 

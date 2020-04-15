@@ -26,14 +26,14 @@ public interface SAMLExitVariablePlan {
     /**
      * This method is to add httpServletResponse to variables list  After the argument is proceeded.
      *
-     * @param httpServletResponse the HttpServletResponse object, known as "response" in a JSP page.
+     * @param httpServletResponse The HttpServletResponse object, known as "response" in a JSP page.
      */
     void setHttpServletResponse(Object httpServletResponse);
 
     /**
-     * This method is to add samlResponse to variables list  After the argument is proceeded.
+     * This method is to add SAML Response to variables list  After the argument is proceeded.
      *
-     * @param samlResponse the SAML Response string.
+     * @param samlResponse The SAML Response string.
      */
     void setSAMLResponse(Object samlResponse);
 }

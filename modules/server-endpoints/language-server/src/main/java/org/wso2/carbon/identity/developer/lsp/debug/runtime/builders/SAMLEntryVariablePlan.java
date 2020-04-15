@@ -26,14 +26,14 @@ public interface SAMLEntryVariablePlan {
     /**
      * This method is add httpServletRequest to variables list  After the argument is proceeded.
      *
-     * @param httpServletRequest the HttpServletRequest object, known as "request" in a JSP page.
+     * @param httpServletRequest The HttpServletRequest object, known as "request" in a JSP page.
      */
     void setHttpServletRequest(Object httpServletRequest);
 
     /**
-     * This method is add samlRequest to variables list  After the argument is proceeded.
+     * This method is add SAML Request to variables list  After the argument is proceeded.
      *
-     * @param samlRequest the SAML Request string.
+     * @param samlRequest The SAML Request string.
      */
     void setSAMLRequest(Object samlRequest);
 }

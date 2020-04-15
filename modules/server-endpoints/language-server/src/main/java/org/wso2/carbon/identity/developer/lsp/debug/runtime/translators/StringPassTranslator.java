@@ -35,7 +35,7 @@ public class StringPassTranslator implements VariableTranslator {
     /**
      * This static method allow to get the instance of the StringPassTranslator.
      *
-     * @return pass the same string.
+     * @return Pass the same string.
      */
     public static StringPassTranslator getInstance() {
 

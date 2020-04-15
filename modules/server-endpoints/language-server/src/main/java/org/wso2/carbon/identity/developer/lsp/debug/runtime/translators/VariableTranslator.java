@@ -26,9 +26,9 @@ public interface VariableTranslator {
     /**
      * This method allow to translate the variable from the argument.
      *
-     * @param in
-     * @param variablesReference
-     * @return the translated object.
+     * @param object The Request or Response Variables to be translated.
+     * @param variablesReference  Reference to the Variable container.
+     * @return The translated object.
      */
-    Object translate(Object in, int variablesReference);
+    Object translate(Object object, int variablesReference);
 }

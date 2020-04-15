@@ -31,7 +31,7 @@ public class InterceptorConfigReader {
      * As per the documentation have to pass the Method signature in binary format.
      * use this link https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html to add the binary format.
      *
-     * @return result which carry the configuration.
+     * @return Result which carry the configuration.
      */
     public List<InterceptorConfig> readConfig() {
 

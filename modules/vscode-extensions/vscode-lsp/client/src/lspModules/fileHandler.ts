@@ -35,7 +35,7 @@ import keytar = require("keytar");
  */
 export class FileHandler {
     /**
-     * readXML() used to read the XML files code from the given file path
+     * Read the XML files code from the given file path
      */
     public readXML(filePath: any): string {
 
@@ -43,7 +43,7 @@ export class FileHandler {
     }
 
     /**
-     * extractFileName() to extract the file name from the gven filepath.
+     * Extract the file name from the gven filepath.
      */
     public extractFileName(filePath): string {
 
@@ -52,7 +52,7 @@ export class FileHandler {
     }
 
     /**
-     * extractAdaptiveScript() to extract the adpative scripts from the xml.
+     * Extract the adpative scripts from the xml.
      */
     public extractAdaptiveScript(filePath) {
 
@@ -63,7 +63,7 @@ export class FileHandler {
     }
 
     /**
-     * getHTMLCode() to read the html code from the file.
+     * Read the html code from the file.
      */
     public getHTMLCode(htmlFilePath) {
 
@@ -71,8 +71,7 @@ export class FileHandler {
     }
 
     /**
-     * handleButtonClick() to Open available adaptiveScriptFile or
-     * create a new adaptive script file.
+     * Open available adaptiveScriptFile or create a new adaptive script file.
      */
     public async handleButtonClick(message, xmlFilePath) {
 
@@ -89,8 +88,7 @@ export class FileHandler {
     }
 
     /**
-     * createOrOpenAdaptiveScript() to Open available adaptiveScriptFile or
-     * create a new adaptive script file.
+     * Open available adaptiveScriptFile or create a new adaptive script file.
      */
     public createOrOpenAdaptiveScript(adaptiveScript, serviceName) {
 
@@ -117,7 +115,7 @@ export class FileHandler {
     }
 
     /**
-     * createDefaultAdaptiveScript() to create adaptive script when no scripts found.
+     * Create adaptive script when no scripts found.
      */
     public createDefaultAdaptiveScript(executeSteps) {
 
@@ -127,7 +125,7 @@ export class FileHandler {
     }
 
     /**
-     * bindExecuteSteps() to bind the executeStep method to the script.
+     * Bind the executeStep method to the script.
      */
     public bindExecuteSteps(executeSteps) {
 
@@ -143,7 +141,7 @@ export class FileHandler {
     }
 
     /**
-     * syncServiceProviderWithAdaptiveScript() to sync the Adaptive Script with XML File.
+     * Sync the Adaptive Script with XML File.
      */
     public async syncServiceProviderWithAdaptiveScript() {
 
@@ -204,7 +202,7 @@ ${newAdaptiveScriptCode}`,
     }
 
     /**
-     * createXMLFile() to create the xml file with of the service.
+     * Create the xml file with of the service.
      */
     public async createXMLFile(xml, serviceName) {
 
@@ -246,7 +244,7 @@ ${newAdaptiveScriptCode}`,
     }
 
     /**
-     * getFilesFromDir() to return a list of files of the specified fileTypes in the provided dir.
+     * Return a list of files of the specified fileTypes in the provided dir.
      */
     public getFilesFromDir(dir, fileTypes) {
 
@@ -269,7 +267,7 @@ ${newAdaptiveScriptCode}`,
     }
 
     /**
-     * updateService() to update the service in the productIS.
+     * Update the service in the productIS.
      */
     public async updateService(file) {
 

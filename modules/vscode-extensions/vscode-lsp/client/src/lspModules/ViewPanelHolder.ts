@@ -50,7 +50,7 @@ export class ViewPanelHolder {
     /**
      * Sets the currentHtml.
      *
-     * @param currentHtml
+     * @param currentHtml The current Html hold by the panel.
      */
     public setCurrentHtml(currentHtml) {
 

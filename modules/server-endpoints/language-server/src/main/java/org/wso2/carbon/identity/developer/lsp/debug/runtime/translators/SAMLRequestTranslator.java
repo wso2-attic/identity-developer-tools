@@ -45,7 +45,7 @@ public class SAMLRequestTranslator implements VariableTranslator {
     /**
      * This static method allow to get the instance of the SAMLRequestTranslator.
      *
-     * @return the SAMLRequestTranslatorHolder instance.
+     * @return The SAMLRequestTranslatorHolder instance.
      */
     public static SAMLRequestTranslator getInstance() {
 

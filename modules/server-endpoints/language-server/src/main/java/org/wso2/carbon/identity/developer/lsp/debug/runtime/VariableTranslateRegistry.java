@@ -65,8 +65,8 @@ public class VariableTranslateRegistry {
     /**
      * This method is to get the Variable Builder using MethodContext.
      *
-     * @param methodContext holds the intercepted method context.
-     * @return VariableBuilder
+     * @param methodContext Holds the intercepted method context.
+     * @return The corresponding Variable Builder.
      */
     public VariableBuilder getVariablesBuilder(MethodContext methodContext) {
 
@@ -80,7 +80,7 @@ public class VariableTranslateRegistry {
      * @param className       Intercepted class name.
      * @param methodName      Intercepted Method name.
      * @param methodSignature Intercepted Method Signature.
-     * @return key for the method context.
+     * @return Key for the method context.
      */
     private String getKeyFromContext(String className, String methodName, String methodSignature) {
 
@@ -90,9 +90,9 @@ public class VariableTranslateRegistry {
     /**
      * This method is to  translate the argument through reusable HttpServletRequestTranslator.
      *
-     * @param argument           which holds all the arguments from the intercepted method.
+     * @param argument           Which holds all the arguments from the intercepted method.
      * @param variablesReference Variable Reference number send from the extension.
-     * @return the translated object from HttpRequest.
+     * @return The translated object from HttpRequest.
      */
     public Object translateHttpRequest(Object argument, int variablesReference) {
 
@@ -102,9 +102,9 @@ public class VariableTranslateRegistry {
     /**
      * This method is to  translate the argument through reusable SAMLRequestTranslator.
      *
-     * @param argument           which holds all the arguments from the intercepted method.
+     * @param argument           Which holds all the arguments from the intercepted method.
      * @param variablesReference Variable Reference number send from the extension.
-     * @return the translated object from SAMLRequest.
+     * @return The translated object from SAMLRequest.
      */
     public Object translateSAMLRequest(Object argument, int variablesReference) {
 
@@ -114,9 +114,9 @@ public class VariableTranslateRegistry {
     /**
      * This method is to  translate the argument through reusable HttpServletResponseTranslator.
      *
-     * @param argument           which holds all the arguments from the intercepted method.
+     * @param argument           Which holds all the arguments from the intercepted method.
      * @param variablesReference Variable Reference number send from the extension.
-     * @return the translated object from HttpResponse.
+     * @return The translated object from HttpResponse.
      */
     public Object translateHttpResponse(Object argument, int variablesReference) {
 
@@ -126,9 +126,9 @@ public class VariableTranslateRegistry {
     /**
      * This method is to  translate the argument through reusable SAMLResponseTranslator.
      *
-     * @param argument           which holds all the arguments from the intercepted method.
+     * @param argument           Which holds all the arguments from the intercepted method.
      * @param variablesReference Variable Reference number send from the extension.
-     * @return the translated object from SAMLResponse.
+     * @return The translated object from SAMLResponse.
      */
     public Object translateSAMLResponse(Object argument, int variablesReference) {
 

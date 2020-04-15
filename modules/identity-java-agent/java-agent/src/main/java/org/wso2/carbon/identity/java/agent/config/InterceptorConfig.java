@@ -32,7 +32,7 @@ public class InterceptorConfig {
     /**
      * This method is to get the Class Name.
      *
-     * @return name of the Intercepting Class
+     * @return Name of the Intercepting Class
      */
     public String getClassName() {
 
@@ -42,7 +42,7 @@ public class InterceptorConfig {
     /**
      * This method is to set the Class Name.
      *
-     * @param className the Class name of the Config.
+     * @param className The Class name of the Config.
      */
     public void setClassName(String className) {
 
@@ -52,10 +52,10 @@ public class InterceptorConfig {
     /**
      * This method is to add the Method Configs .
      *
-     * @param methodName   the method name of the Config.
-     * @param signature    the method signature of the Config.
-     * @param insertBefore whether to intercept at start of the method body.
-     * @param insertAfter  whether to intercept at end of the method body.
+     * @param methodName   The method name of the Config.
+     * @param signature    The method signature of the Config.
+     * @param insertBefore Whether to intercept at start of the method body.
+     * @param insertAfter  Whether to intercept at end of the method body.
      */
     public void addMethodConfigs(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
@@ -65,7 +65,7 @@ public class InterceptorConfig {
     /**
      * This method is to get Method Info Configs.
      *
-     * @return methodInfoConfigs for a class list of configs.
+     * @return list of configs for a class.
      */
     public List<MethodInfoConfig> getMethodInfoConfigs() {
 

@@ -115,9 +115,9 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
      * Current Implementation doesn't consider what is inside VariablesRequest & take the current method context and
      * Build the variable using the Corresponding Builders and the Translators.
      *
-     * @param debugSession the variable Holds the details of the debug session.
-     * @param request      the request from the debugger extension.
-     * @return response  according to the method context.
+     * @param debugSession The variable Holds the details of the debug session.
+     * @param request      The request from the debugger extension.
+     * @return response  According to the method context.
      */
     private Response readVariables(DebugSession debugSession, VariablesRequest request) {
 
@@ -220,8 +220,8 @@ public class DebugSessionManagerImpl implements DebugSessionManager, Interceptio
     /**
      * Creates a new debug session associated with current session.
      *
-     * @param session the websocket session.
-     * @return debugSession
+     * @param session The websocket session.
+     * @return debugSession Which holds the currently initiated debug session.
      */
     private DebugSession createSession(Session session) {
 

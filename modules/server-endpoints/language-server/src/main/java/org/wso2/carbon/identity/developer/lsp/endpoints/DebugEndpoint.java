@@ -58,7 +58,7 @@ public class DebugEndpoint {
     /**
      * Method is called when a connection is established.
      *
-     * @param session the web socket session.
+     * @param session The web socket session.
      */
     @OnOpen
     public void onOpen(Session session) {

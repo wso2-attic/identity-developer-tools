@@ -29,7 +29,7 @@ public class BreakpointInfo {
     /**
      * Gets the resourceName.
      *
-     * @return the name of the Source.
+     * @return The name of the Source.
      */
     public String getResourceName() {
 
@@ -39,7 +39,7 @@ public class BreakpointInfo {
     /**
      * Sets the resourceName.
      *
-     * @param resourceName the name of the Source.
+     * @param resourceName The name of the Source.
      */
     public void setResourceName(String resourceName) {
 
@@ -49,7 +49,7 @@ public class BreakpointInfo {
     /**
      * Gets the breakpoint Locations.
      *
-     * @return the location of the breakpoint.
+     * @return The location of the breakpoint.
      */
     public int[] getBreakpointLocations() {
 
@@ -59,7 +59,7 @@ public class BreakpointInfo {
     /**
      * Sets the breakpoints.
      *
-     * @param breakpoints the information about the breakpoints.
+     * @param breakpoints The information about the breakpoints.
      */
     public void setBreakpoints(int[] breakpoints) {
 

@@ -42,7 +42,7 @@ public class HttpServletRequestTranslator implements VariableTranslator {
     /**
      * This static method allow to get the instance of the HttpServletRequestTranslator.
      *
-     * @return the HttpServletRequestTranslatorHolder instance.
+     * @return The HttpServletRequestTranslatorHolder instance.
      */
     public static HttpServletRequestTranslator getInstance() {
 

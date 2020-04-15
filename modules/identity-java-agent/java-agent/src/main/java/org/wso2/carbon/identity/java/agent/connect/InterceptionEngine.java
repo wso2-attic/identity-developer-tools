@@ -27,15 +27,15 @@ public interface InterceptionEngine {
      * Adds an interception listener to the engine.
      * The listener is fired if the filter is applied.
      *
-     * @param filter   filter for method entry.
-     * @param listener which is interested in the event.
+     * @param filter   Filter for method entry.
+     * @param listener Which is interested in the event.
      */
     void addListener(MethodEntryInterceptionFilter filter, InterceptionListener listener);
 
     /**
-     * Removed the listener from the engine.
+     * Removed The listener from the engine.
      *
-     * @param listener which is interested in the event.
+     * @param listener Which is interested in the event.
      */
     void removeListener(InterceptionListener listener);
 }

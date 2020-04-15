@@ -44,7 +44,7 @@ public class Response extends Message {
     /**
      * Gets the request Seq number.
      *
-     * @return requestSeq
+     * @return Sequence number of the corresponding request.
      */
     public long getRequestSeq() {
 
@@ -64,7 +64,7 @@ public class Response extends Message {
     /**
      * Gets whether success.
      *
-     * @return is success
+     * @return Whether success or not.
      */
     public boolean isSuccess() {
 
@@ -87,7 +87,7 @@ public class Response extends Message {
     /**
      * Gets the command.
      *
-     * @return the command requested.
+     * @return The command requested.
      */
     public String getCommand() {
 
@@ -107,7 +107,7 @@ public class Response extends Message {
     /**
      * Gets the message.
      *
-     * @return the response message.
+     * @return The response message.
      */
     public String getMessage() {
 
@@ -132,7 +132,7 @@ public class Response extends Message {
     /**
      * Gets the body.
      *
-     * @return result if success is true and optional error details if success is false.
+     * @return result If success is true and optional error details if success is false.
      */
     public Argument getBody() {
 

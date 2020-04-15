@@ -39,7 +39,7 @@ public class Request extends Message {
     /**
      * Gets the command.
      *
-     * @return the command to execute.
+     * @return The command to execute.
      */
     public String getCommand() {
 
@@ -49,7 +49,7 @@ public class Request extends Message {
     /**
      * Sets the command.
      *
-     * @param command the command to execute.
+     * @param command The command to execute.
      */
     public void setCommand(String command) {
 
@@ -59,7 +59,7 @@ public class Request extends Message {
     /**
      * Gets the command.
      *
-     * @return object containing arguments for the command.
+     * @return Object containing arguments for the command.
      */
     public List<Argument> getArguments() {
 

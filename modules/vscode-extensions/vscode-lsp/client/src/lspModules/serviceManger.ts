@@ -21,7 +21,7 @@ export class ServiceManger {
     }
 
     /**
-     * getServicesList() to get the services using the apis.
+     * Get the services using the apis.
      */
     public async getServicesList() {
 
@@ -56,7 +56,7 @@ export class ServiceManger {
     }
 
     /**
-     * createListOfServices() to create a list in command pallet.
+     * Create a list in command pallet.
      */
     public async createListOfServices(servicesArray) {
 
@@ -83,7 +83,7 @@ export class ServiceManger {
     }
 
     /**
-     * getIDOfService() to get the id of the selected service.
+     * Get the id of the selected service.
      */
     public getIDOfService(servicesArray, service) {
 
@@ -97,7 +97,7 @@ export class ServiceManger {
     }
 
     /**
-     * exportService() to export the xml of the service.
+     * Export the xml of the service.
      */
     public async exportService(serviceID, service) {
 

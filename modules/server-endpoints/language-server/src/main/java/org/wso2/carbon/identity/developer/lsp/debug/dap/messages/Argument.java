@@ -35,7 +35,7 @@ public class Argument<T extends Object> {
     /**
      * This method is to get the arguments.
      *
-     * @return argument value
+     * @return The values of the argument.
      */
     public T getValue() {
 
@@ -45,7 +45,7 @@ public class Argument<T extends Object> {
     /**
      * This method is to set the arguments.
      *
-     * @param value the argument
+     * @param value The values of the argument.
      */
     public void setValue(T value) {
 

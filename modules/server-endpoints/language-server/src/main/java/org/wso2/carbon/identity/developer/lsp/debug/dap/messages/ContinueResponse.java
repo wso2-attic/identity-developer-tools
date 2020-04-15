@@ -21,7 +21,7 @@ public class ContinueResponse extends Response {
     /**
      * Gets whether allThreadsContinued.
      *
-     * @return whether allThreadsContinued
+     * @return Whether allThreadsContinued
      */
     public Boolean getAllThreadsContinued() {
 

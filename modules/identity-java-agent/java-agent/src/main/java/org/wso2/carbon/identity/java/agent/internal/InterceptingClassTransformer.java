@@ -73,9 +73,9 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
      *
      * @param loader              The defining loader of the class to be transformed, may be {@code null} if the bootstrap loader.
      * @param className           The name of the class in the internal form of fully qualified class.
-     * @param classBeingRedefined if this is triggered by a redefine or re transform, the class being redefined.
-     * @param protectionDomain    the protection domain of the class being defined or redefined.
-     * @param classfileBuffer     the input byte buffer in class file format - Have to be instrumented.
+     * @param classBeingRedefined If this is triggered by a redefine or re transform, the class being redefined.
+     * @param protectionDomain    The protection domain of the class being defined or redefined.
+     * @param classfileBuffer     The input byte buffer in class file format - Have to be instrumented.
      * @return
      * @throws IllegalClassFormatException
      * @implSpec The default implementation returns null.
@@ -130,8 +130,8 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This Method is to Check whether the Agent should intercept or not.
      *
-     * @param className the name of the class in the internal form of fully qualified class.
-     * @return whether to intercept or not.
+     * @param className The name of the class in the internal form of fully qualified class.
+     * @return Whether to intercept or not.
      */
     private boolean shouldIntercept(String className) {
 
@@ -141,8 +141,8 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This method is to get the InterceptorConfig using Class name.
      *
-     * @param className the name of the class in the internal form of fully qualified class.
-     * @return the Interceptor config corresponding to the class name.
+     * @param className The name of the class in the internal form of fully qualified class.
+     * @return The Interceptor config corresponding to the class name.
      */
     private InterceptorConfig getInterceptorConfig(String className) {
 
@@ -152,7 +152,7 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
     /**
      * This method is to add the InterceptorConfig.
      *
-     * @param interceptorConfig the interceptor config corresponding to the class name.
+     * @param interceptorConfig The interceptor config corresponding to the class name.
      */
     public void addConfig(InterceptorConfig interceptorConfig) {
 

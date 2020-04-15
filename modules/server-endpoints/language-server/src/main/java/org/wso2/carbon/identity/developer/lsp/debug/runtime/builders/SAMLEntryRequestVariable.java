@@ -44,7 +44,7 @@ public class SAMLEntryRequestVariable implements SAMLEntryVariablePlan {
     /**
      * This method is to get the variables after adding the objects.
      *
-     * @return the list of variables as a key value pair.
+     * @return The list of variables corresponding to SAML Entry Request.
      */
     public HashMap<String, Object> getVariables() {
 

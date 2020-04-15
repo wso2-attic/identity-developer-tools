@@ -45,7 +45,7 @@ export class PreviewManager {
     }
 
     /**
-     * GenerateWebViewPanel() to generate the web View panel to render web view.
+     * Generate the web View panel to render web view.
      */
     public generateWebViewPanel(xmlFilePath, context) {
 
@@ -96,7 +96,7 @@ export class PreviewManager {
     }
 
     /**
-     * getWebviewContent() to generate the html of web view for the diagram.
+     * Generate the html of web view for the diagram.
      */
     public getWebviewContentForDiagram(xmlCode, pathForHtml, filepath, pathCss, pathJS) {
 
@@ -113,7 +113,7 @@ export class PreviewManager {
     }
 
     /**
-     * getWebviewContent() to generate the html of oAuth web.
+     * Generate the html of oAuth web.
      */
     public async generateOAuthPreview(context) {
 

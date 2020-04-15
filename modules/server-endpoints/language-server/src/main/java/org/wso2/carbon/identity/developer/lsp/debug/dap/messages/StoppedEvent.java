@@ -37,7 +37,7 @@ public class StoppedEvent extends Event {
     /**
      * Gets the line.
      *
-     * @return the source name of the breakpoints.
+     * @return The source name of the breakpoints.
      */
     public int getLine() {
 
@@ -47,7 +47,7 @@ public class StoppedEvent extends Event {
     /**
      * Gets the resourceName.
      *
-     * @return the source name of the breakpoints.
+     * @return The source name of the breakpoints.
      */
     public String getResourceName() {
 

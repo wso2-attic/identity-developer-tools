@@ -39,7 +39,7 @@ public class DebugListenerConfigurator {
     /**
      * This method will help to add the filters(Listeners) to the InterceptionEngine.
      *
-     * @param interceptionEngine the engine which is responsible for firing the event.
+     * @param interceptionEngine The engine which is responsible for firing the event.
      */
     public void configure(InterceptionEngine interceptionEngine) {
 

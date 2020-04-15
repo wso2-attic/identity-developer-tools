@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 /**
  * Serializes the DAP event to protocol payload.
  *
- * @param <T> generified version of class Class allows to pass Event type.
+ * @param <T> Generified version of class Class allows to pass Event type.
  */
 public abstract class EventSerializer<T extends Event> implements JsonSerializer<T> {
 

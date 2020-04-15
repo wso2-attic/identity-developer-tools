@@ -95,7 +95,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
 
     /**
      * The "initialize" request is the first request called by the frontend
-     * to interrogate the features the debug adapter provides.
+     * To interrogate the features the debug adapter provides.
      */
     protected initializeRequest(response: DebugProtocol.InitializeResponse,
                                 args: DebugProtocol.InitializeRequestArguments): void {
@@ -435,7 +435,7 @@ export class IdentityServerDebugSession extends LoggingDebugSession {
     /**
      * Sets up the event handlers for the DAP, which we are interested in to intercept.
      *
-     * @param remoteIdentityServerRuntime
+     * @param RemoteIdentityServerRuntime The Runtime for debugging remote Identity Server via WebSocket connections.
      */
     private setupEventHandlers(remoteIdentityServerRuntime: RemoteIdentityServerRuntime): void {
 

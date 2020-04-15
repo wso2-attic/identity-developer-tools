@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 /**
  * Success Response Serializer.
  *
- * @param <T>
+ * @param <T> Generified version of class Class allows to pass Response type.
  */
 public class ResponseSerializer<T extends Response> implements JsonSerializer<T> {
 

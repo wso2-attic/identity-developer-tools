@@ -34,7 +34,7 @@ public class Event extends ProtocolMessage {
     /**
      * Getter which gets the event.
      *
-     * @return type of event.
+     * @return Type of event.
      */
     public String getEvent() {
 
@@ -44,7 +44,7 @@ public class Event extends ProtocolMessage {
     /**
      * Sets the event.
      *
-     * @param event type of event.
+     * @param event Type of event.
      */
     public void setEvent(String event) {
 

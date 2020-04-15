@@ -35,7 +35,7 @@ public class DefaultVariableTranslator implements VariableTranslator {
     /**
      * This static method allow to get the instance of the DefaultVariableTranslator.
      *
-     * @return the DefaultVariableTranslatorHolder instance.
+     * @return The DefaultVariableTranslatorHolder instance.
      */
     public static DefaultVariableTranslator getInstance() {
 

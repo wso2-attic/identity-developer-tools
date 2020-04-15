@@ -33,23 +33,23 @@ public interface DebugSessionManager {
     /**
      * Adds a new debug session to manage.
      *
-     * @param session the current websocket session.
+     * @param session The current websocket session.
      */
     void addSession(Session session);
 
     /**
      * Handles the debug request.
      *
-     * @param request the current request from the extension.
-     * @return the response variable.
+     * @param request The current request from the extension.
+     * @return The response variable.
      */
     Response handle(Session session, Request request);
 
     /**
      * Handles the event coming from the instrumentation agent.
      *
-     * @param type          the type of the event.
-     * @param methodContext the currently instrumented method context.
+     * @param type          The type of the event.
+     * @param methodContext The currently instrumented method context.
      */
     void handleEvent(InterceptionEventType type, MethodContext methodContext);
 
@@ -57,15 +57,15 @@ public interface DebugSessionManager {
      * Removes the debug session.
      * We need to remove our internal references when the client is disconnected.
      *
-     * @param session the current websocket session.
+     * @param session The current websocket session.
      */
     void removeSession(Session session);
 
     /**
      * Get DebugSession using session.
      *
-     * @param session the current websocket session.
-     * @return the current debug session.
+     * @param session The current websocket session.
+     * @return The current debug session.
      */
     DebugSession getDebugSession(Session session);
 }

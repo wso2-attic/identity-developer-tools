@@ -38,9 +38,9 @@ public class DebugAgent {
      * Configs for intercepting will be read and added to Transformer so that Transformer will intercept when the
      * corresponding Java Class and Method is loaded.
      *
-     * @param agentArgs       the list of agent arguments
-     * @param instrumentation the instrumentation object
-     * @throws InstantiationException while  an instantiation of object cause an error.
+     * @param agentArgs       The list of agent arguments
+     * @param instrumentation The instrumentation object
+     * @throws InstantiationException While  an instantiation of object cause an error.
      */
     public static void premain(String agentArgs, Instrumentation instrumentation) throws InstantiationException {
 

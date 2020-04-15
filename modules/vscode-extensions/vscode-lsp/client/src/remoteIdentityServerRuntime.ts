@@ -125,6 +125,7 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
 
     /**
      * Clear all breakpoints for file.
+     *
      * @param path Logical full path to the module.
      */
     public clearBreakpoints(path: string): void {
@@ -162,7 +163,8 @@ export class RemoteIdentityServerRuntime extends EventEmitter {
     }
 
     /**
-     * Creates the variable request and returns the promise which can be used to perform the results on the request
+     * Creates the variable request and returns the promise which can be used to perform the results on the request.
+     *
      * @param response Response for fetch Variables request.
      * @param args List of arguments. The first argument is the command to run.
      * @param request for fetch Variables.
