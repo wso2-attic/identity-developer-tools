@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  ~ Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com). All Rights Reserved.
+  ~
+  ~  This software is the property of WSO2 Inc. and its suppliers, if any.
+  ~  Dissemination of any information or reproduction of any material contained
+  ~  herein is strictly forbidden,unless permitted by WSO2 expressly. You may
+  ~  not alter or remove any copyright or other notice from copies of this content.
+  ~
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -31,7 +41,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -62,6 +72,13 @@
             <artifactId>jinjava</artifactId>
             <version>${jinjava.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -87,6 +104,7 @@
                             <filtering>true</filtering>
                         </resource>
                     </webResources>
+                    <warName>artifact-service</warName>
                 </configuration>
             </plugin>
         </plugins>

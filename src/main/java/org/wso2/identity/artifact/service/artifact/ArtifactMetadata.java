@@ -8,23 +8,30 @@
  * copyright or other notice from copies of this content.
  */
 
-package org.wso2.identity.artifact.service.exception;
+package org.wso2.identity.artifact.service.artifact;
 
-public class ServiceException extends Exception {
+public class ArtifactMetadata {
 
-    public ServiceException() {
-        super();
+    private String path;
+    private String operation;
+
+    public String getPath() {
+
+        return path;
     }
 
-    public ServiceException(String message) {
-        super(message);
+    public void setPath(String path) {
+
+        this.path = path;
     }
 
-    public ServiceException(Throwable throwable) {
-        super(throwable);
+    public String getOperation() {
+
+        return operation;
     }
 
-    public ServiceException(String message, Throwable throwable) {
-        super(message, throwable);
+    public void setOperation(String operation) {
+
+        this.operation = operation;
     }
 }

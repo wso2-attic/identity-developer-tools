@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com). All Rights Reserved.
+ *
+ * This software is the property of WSO2 Inc. and its suppliers, if any.
+ *  Dissemination of any information or reproduction of any material
+ * contained herein in any form is strictly forbidden, unless
+ * permitted by WSO2 expressly. You may not alter or remove any
+ * copyright or other notice from copies of this content.
+ */
+
 package org.wso2.identity.artifact.service.artifact;
 
-import org.wso2.identity.artifact.service.artifact.builder.spring.SpringBootArtifactBuilder;
+import org.wso2.identity.artifact.service.artifact.builder.ArtifactBuilder;
+import org.wso2.identity.artifact.service.model.ArtifactRequestData;
 import org.wso2.identity.artifact.service.exception.BuilderException;
 import org.wso2.identity.artifact.service.exception.ClientException;
 
@@ -27,14 +38,11 @@ public class ArtifactsRepository {
         return instance;
     }
 
-    public Artifact findArtifact(String name, String spName) throws BuilderException, ClientException {
+    public Artifact findArtifact(String name, ArtifactRequestData artifactRequestData) throws BuilderException, ClientException {
 
-        switch (name) {
-            case "spring-boot":
-                return getSpringArtifacts(spName);
-            default:
-                throw new ClientException("Cannot find artifact name.");
-        }
+        ArtifactBuilder artifactBuilder = ArtifactRegistry.getBuilder(name, rootPath);
+        artifactBuilder.setArtifactRequestData(artifactRequestData);
+        return artifactBuilder.build();
     }
 
     public Set<String> getArtifactNames() {
@@ -42,11 +50,5 @@ public class ArtifactsRepository {
         return new HashSet<String>() {{
             add("spring-boot");
         }};
-    }
-
-    private Artifact getSpringArtifacts(String spName) throws BuilderException {
-
-        SpringBootArtifactBuilder springBootArtifactBuilder = new SpringBootArtifactBuilder(rootPath, spName);
-        return springBootArtifactBuilder.build();
     }
 }
