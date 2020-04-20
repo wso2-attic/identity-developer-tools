@@ -22,13 +22,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
 
 import java.lang.reflect.Type;
 
 /**
  * Success Response Serializer.
- * @param <T>
+ *
+ * @param <T> Generified version of class Class allows to pass Response type.
  */
 public class ResponseSerializer<T extends Response> implements JsonSerializer<T> {
 
@@ -36,12 +38,9 @@ public class ResponseSerializer<T extends Response> implements JsonSerializer<T>
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-
-        object.addProperty("command", response.getCommand());
-        object.addProperty("message", response.getMessage());
-        object.addProperty("request_seq", response.getRequestSeq());
-//        object.add("body", response.getBody());
-
+        object.addProperty(DAPConstants.JSON_KEY_FOR_COMMAND, response.getCommand());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_MESSAGE, response.getMessage());
+        object.addProperty(DAPConstants.JSON_KEY_FOR_REQ_SEQ, response.getRequestSeq());
         return object;
     }
 }

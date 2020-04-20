@@ -16,6 +16,6 @@
  * under the License.
  * ------------------------------------------------------------------------------------------ */
 
-import { IdentityServerDebugSession } from './identityServerDebug';
+import {IdentityServerDebugSession} from "./identityServerDebug";
 
 IdentityServerDebugSession.run(IdentityServerDebugSession);

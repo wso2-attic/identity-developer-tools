@@ -1,185 +1,193 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import { FileHandler } from './fileHandler';
-import { Wso2OAuth } from './oAuthService';
-import { ViewPanelHolder } from './ViewPanelHolder';
-const keytar = require('keytar');
-// Object of the FileHandler.
+import * as fs from "fs";
+import keytar = require("keytar");
+import * as path from "path";
+import format = require("string-template");
+import * as vscode from "vscode";
+import {Config} from "../Config";
+import {DebugConstants} from "../DebugConstants";
+import {FileHandler} from "./fileHandler";
+import {Wso2OAuth} from "./oAuthService";
+import {ViewPanelHolder} from "./ViewPanelHolder";
+
+const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update " +
+    "internal_application_mgt_view internal_functional_lib_view";
 const fileHandler = new FileHandler();
-var format = require("string-template");
-const scope = "internal_application_mgt_create internal_application_mgt_delete internal_application_mgt_update internal_application_mgt_view internal_functional_lib_view";
+
+/**
+ * This is the class responsible for setting the web view.
+ */
 export class PreviewManager {
 
-	private static instance: PreviewManager;
-	private _previewManagers = new Map<string, ViewPanelHolder>();
+    /**
+     * Method give access to get the instance of PreviewManager.
+     */
+    public static getInstance(): PreviewManager {
 
-	private constructor() { }
+        if (!PreviewManager.instance) {
+            PreviewManager.instance = new PreviewManager();
+        }
 
-	public static getInstance(): PreviewManager {
+        return PreviewManager.instance;
+    }
 
-		if (!PreviewManager.instance) {
-			PreviewManager.instance = new PreviewManager();
-		}
+    private static instance: PreviewManager;
+    private previewManagers = new Map<string, ViewPanelHolder>();
 
-		return PreviewManager.instance;
-	}
+    private constructor() {
+    }
 
-	public getPreviewManagers(){
+    /**
+     * This is a getter which gets all the preview managers.
+     */
+    public getPreviewManagers() {
 
-		return this._previewManagers;
-	}
+        return this.previewManagers;
+    }
 
+    /**
+     * Generate the web View panel to render web view.
+     */
+    public generateWebViewPanel(xmlFilePath, context) {
 
-	/**
-	 * generateWebViewPanel() to generate the web View panel to render web view.
-	 */
-	public generateWebViewPanel(xmlFilePath, context) {
+        const previewManager = PreviewManager.getInstance();
+        const previewManagers = previewManager.getPreviewManagers();
+        const serviceName = String(fileHandler.extractFileName(xmlFilePath));
+        // Read the XML file and generate the web view panel.
+        fs.readFile(xmlFilePath, "utf8", (err: any, data: any) => {
+            // Get the text of the file.
+            const code = String(data);
 
-		const previewManager = PreviewManager.getInstance();
-		const previewManagers = previewManager.getPreviewManagers();
-		var serviceName = String(fileHandler.extractFileName(xmlFilePath));
-		// Read the XML file and generate the web view panel.
-		fs.readFile(xmlFilePath, 'utf8', function (err: any, data: any) {
-			// Get the text of the file.
-			const code = String(data);
+            const pathUri = vscode.Uri.file(
+                path.join(context.extensionPath, "client", "src", "ui", Config.DIAGRAM_HTML_NAME),
+            ).with({scheme: "vscode-resource"});
 
-			const pathUri = vscode.Uri.file(
-				path.join(context.extensionPath, 'client', 'src', 'ui', 'diagram.html')
-			).with({ scheme: 'vscode-resource' });
+            const pathCss = vscode.Uri.file(
+                path.join(context.extensionPath, "client", "src", "ui", "css"),
+            ).with({scheme: "vscode-resource"});
 
-			const pathCss = vscode.Uri.file(
-				path.join(context.extensionPath, 'client', 'src', 'ui','css')
-			).with({ scheme: 'vscode-resource' });
+            const pathJS = vscode.Uri.file(
+                path.join(context.extensionPath, "client", "src", "ui", "js"),
+            ).with({scheme: "vscode-resource"});
 
-			const pathJS = vscode.Uri.file(
-				path.join(context.extensionPath, 'client', 'src', 'ui', 'js')
-			).with({ scheme: 'vscode-resource' });
+            const panel = vscode.window.createWebviewPanel(
+                "Diagram",
+                serviceName,
+                vscode.ViewColumn.One,
+                {
+                    enableScripts: true,
+                    retainContextWhenHidden: true,
+                },
+            );
+            // Assign html code to the web view panel.
+            const htmlGenerated = previewManager.getWebviewContentForDiagram(code,
+                pathUri, xmlFilePath, pathCss, pathJS);
+            panel.webview.html = htmlGenerated;
+            panel.webview.onDidReceiveMessage(
+                (message) => {
+                    fileHandler.handleButtonClick(message, xmlFilePath);
+                },
+                undefined,
+                context.subscriptions,
+            );
+            const key = fileHandler.extractFileName(xmlFilePath).replace("%20", " ");
+            const viewPanelHolder = new ViewPanelHolder(panel, htmlGenerated);
+            previewManagers.set(key, viewPanelHolder);
+        });
+    }
 
+    /**
+     * Generate the html of web view for the diagram.
+     */
+    public getWebviewContentForDiagram(xmlCode, pathForHtml, filepath, pathCss, pathJS) {
 
-			const panel = vscode.window.createWebviewPanel(
-				'Diagram',
-				serviceName,
-				vscode.ViewColumn.One,
-				{
-					enableScripts: true,
-					retainContextWhenHidden: true
+        const htmlCode = fileHandler.getHTMLCode(pathForHtml.fsPath);
 
-				}
-			);
-			// Assign html code to the web view panel.
-			const htmlGenerated=previewManager.getWebviewContent(code, pathUri, xmlFilePath,pathCss,pathJS);
-			panel.webview.html = htmlGenerated;
-			panel.webview.onDidReceiveMessage(
-				message => {
-						fileHandler.handleButtonClick(message, xmlFilePath);
-				},
-				undefined,
-				context.subscriptions
-			);
-			let key=fileHandler.extractFileName(xmlFilePath).replace('%20', ' ');
-			let viewPanelHolder= new ViewPanelHolder(panel,htmlGenerated);
-			previewManagers.set(key,viewPanelHolder);
-		});
-	}
+        return format(htmlCode, {
+            SAML_REQUEST: DebugConstants.SAML_REQUEST_HTML,
+            SAML_RESPONSE: DebugConstants.SAML_RESPONSE_HTML,
+            myXML: xmlCode,
+            myfilepath: filepath,
+            pathCss,
+            pathJS,
+        });
+    }
 
+    /**
+     * Generate the html of oAuth web.
+     */
+    public async generateOAuthPreview(context) {
 
-	/**
-	 * getWebviewContent() to generate the html of web view.
-	 */
-	public getWebviewContent(xmlCode, path, filepath,pathCss,pathJS) {
+        const htmlFilePath = vscode.Uri.file(
+            path.join(context.extensionPath, "client", "src", "ui", Config.AUTHENTICATION_HTML_NAME),
+        );
+        const html = fileHandler.getHTMLCode(htmlFilePath.fsPath);
+        const panel = vscode.window.createWebviewPanel(
+            "WSO2 Login",
+            "WSO2 Login",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            },
+        );
 
-		var htmlCode = fileHandler.getHTMLCode(path.fsPath);
+        const preClientId = vscode.workspace.getConfiguration().get(DebugConstants.IAM_SERVICE_CLIENT_ID);
+        const preTenant = vscode.workspace.getConfiguration().get(DebugConstants.IAM_TENANT);
+        let preClientSecret;
+        const secret = keytar.getPassword(DebugConstants.CLIENT_SECRET, DebugConstants.CLIENT_SECRET);
+        await secret.then((result) => {
+            preClientSecret = result;
+        });
 
-		let newHtml = format(htmlCode, {
-			myXML: xmlCode,
-			myfilepath:filepath,
-			pathCss:pathCss,
-			pathJS:pathJS,
-			SAML_REQUEST:"{SAML_REQUEST}",
-			SAML_RESPONSE:"{SAML_RESPONSE}"
-		});
+        panel.webview.html = format(html, {
+            wso2ISClientID: String(preClientId),
+            wso2ISClientSecret: String(preClientSecret),
+            wso2isTenant: String(preTenant),
+            wso2isurl: vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL),
+        });
 
-		return newHtml;
-	}
+        const url = vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL);
+        panel.webview.onDidReceiveMessage(
+            async (message) => {
+                if (message.command === "login") {
+                    // To start the server.
+                     await new Wso2OAuth(8010, context).StartProcess();
 
-	/**
-	 * getWebviewContent() to generate the html of oAuth web.
-	 */
-	public async generateOAuthPreview(context) {
+                    // Set the url to extension configuration.
+                     vscode.workspace.getConfiguration().update(DebugConstants.IAM_URL, message.url);
 
-		var htmlFilePath = vscode.Uri.file(
-			path.join(context.extensionPath, 'client', 'src', 'ui', 'oAuth.html')
-		);
-		var html = fileHandler.getHTMLCode(htmlFilePath.fsPath);
-		const panel = vscode.window.createWebviewPanel(
-			'WSO2 Login',
-			'WSO2 Login',
-			vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				retainContextWhenHidden: true
+                    // Set the tenant domain to extension configuration.
+                     vscode.workspace.getConfiguration().update(DebugConstants.IAM_TENANT, message.tenant);
 
-			}
-		);
+                    // Set the client id to extension configurations.
+                     vscode.workspace.getConfiguration().update(DebugConstants.IAM_SERVICE_CLIENT_ID, message.clientID);
 
-		var replaceURL = /wso2isurl/gi;
-		var replaceTenant = /wso2isTenant/gi;
-		var replaceID = /wso2ISClientID/gi;
-		var replaceSecret = /wso2ISClientSecret/gi;
-		var preClientId = vscode.workspace.getConfiguration().get('IAM.ServiceClientID');
-		var preTenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
-		var preClientSecret;
-		var secret = keytar.getPassword("clientSecret", "clientSecret");
-		await secret.then((result) => {
-			preClientSecret = result;
-		});
+                    // Set Client Secret to system key chain.
+                     await keytar.setPassword(DebugConstants.CLIENT_SECRET,
+                        DebugConstants.CLIENT_SECRET, message.clientSecret);
 
-		// Get the new code.
-		var newHtml = html.replace(replaceURL, vscode.workspace.getConfiguration().get('IAM.URL'))
-			.replace(replaceID, String(preClientId)).replace(replaceSecret, String(preClientSecret))
-			.replace(replaceTenant,String(preTenant));
-		panel.webview.html = newHtml;
+                    // Open the login page.
+                     vscode.commands.executeCommand(
+                        "vscode.open",
+                        vscode.Uri.parse(Config.PATH_GET_AUTH_CODE(url, message.clientID,
+                            Config.VSCODE_SP_REDIRECT_URL, scope)),
+                    );
+                    // TODO check typo changes broke anything
+                } else if (message.command === "access") {
+                    // Set Access Token to system key chain.
+                    await keytar.setPassword(DebugConstants.ACCESS_TOKEN, DebugConstants.ACCESS_TOKEN,
+                        message.accessToken);
+                    // Close the webview
+                    await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+                    // Show the success message
+                    vscode.window.showInformationMessage(DebugConstants.MESSAGE_CONFIGURATION_SUCCESS);
+                }
 
-		var url = vscode.workspace.getConfiguration().get('IAM.URL');
-		panel.webview.onDidReceiveMessage(
-			async message => {
-				if (message.command == 'login') {
-					// To start the server.
-					new Wso2OAuth(8010, context).StartProcess();
+            },
+            undefined,
+            context.subscriptions,
+        );
 
-					// Set the url to extension configuration.
-					vscode.workspace.getConfiguration().update("IAM.URL", message.url);
-
-					// Set the tenant domain to extension configuration.
-					vscode.workspace.getConfiguration().update("IAM.Tenant", message.tenant);
-
-					// Set the client id to extension configurations.
-					vscode.workspace.getConfiguration().update("IAM.ServiceClientID", message.clientID);
-
-					// Set Client Secret to system key chain.
-					await keytar.setPassword("clientSecret", "clientSecret", message.clientSecret);
-
-					// Open the login page.
-					vscode.commands.executeCommand(
-						"vscode.open",
-						vscode.Uri.parse(
-							url + "/oauth2/authorize?response_type=code&redirect_uri=http://localhost:8010/oauth&client_id=" + message.clientID + "&scope=" + scope)
-					);
-				} else if (message.command == 'acess') {
-					// Set Acess Token to system key chain.
-					keytar.setPassword("acessToken", "acessToken", message.acessToken);
-					// Close the webview
-					await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-					// Show the sucess message
-					vscode.window.showInformationMessage("Successfully Configued your Extension");
-				}
-
-			},
-			undefined,
-			context.subscriptions
-		);
-
-	}
+    }
 
 }

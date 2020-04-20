@@ -26,5 +26,14 @@ import java.util.Map;
  * Interface for the builder.
  */
 public interface VariableBuilder {
-    public Argument<Map<String, Object>> build(Object[] arguments, int variablesReference);
+
+    /**
+     * This method will help to build the variables by taking all the set of arguments intercepted from Method context.
+     * This will help to select what are the arguments we need to take from the Method context arguments.
+     *
+     * @param arguments          Set of arguments intercepted.
+     * @param variablesReference Reference to the Variable container.
+     * @return Map with the name of the object as key  and the object.
+     */
+    Argument<Map<String, Object>> build(Object[] arguments, int variablesReference);
 }

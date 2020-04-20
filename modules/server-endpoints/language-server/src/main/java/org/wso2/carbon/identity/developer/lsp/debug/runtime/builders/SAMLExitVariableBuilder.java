@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Argument;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.VariableTranslateRegistry;
+
 import java.util.Map;
 
 /**
@@ -31,6 +32,7 @@ public class SAMLExitVariableBuilder implements VariableBuilder {
     private VariableTranslateRegistry variableTranslateRegistry;
 
     public SAMLExitVariableBuilder(VariableTranslateRegistry variableTranslateRegistry) {
+
         this.samlExitResponseVariable = new SAMLExitResponseVariable();
         this.variableTranslateRegistry = variableTranslateRegistry;
     }
@@ -40,11 +42,10 @@ public class SAMLExitVariableBuilder implements VariableBuilder {
 
         this.samlExitResponseVariable.setHttpServletResponse(
                 variableTranslateRegistry.translateHttpResponse(arguments[1],
-                variablesReference));
+                        variablesReference));
         this.samlExitResponseVariable.setSAMLResponse(variableTranslateRegistry.translateSAMLResponse(arguments[3],
                 variablesReference));
-        return new Argument<Map<String, Object>>(samlExitResponseVariable.getVariables());
+        return new Argument<>(samlExitResponseVariable.getVariables());
     }
-
 
 }

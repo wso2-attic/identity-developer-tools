@@ -1,150 +1,133 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-const axios = require('axios');
-import { FileHandler } from './fileHandler';
-import { Wso2OAuth } from './oAuthService';
+import * as vscode from "vscode";
+
+import axios from "axios";
+import keytar = require("keytar");
+import {Config} from "../Config";
+import {DebugConstants} from "../DebugConstants";
+import {ExtensionConstants} from "../ExtensionConstants";
+import {FileHandler} from "./fileHandler";
 import {PreviewManager} from "./PreviewManager";
-const keytar = require('keytar');
+
 // Object of the FileHandler.
 const fileHandler = new FileHandler();
 
 export class ServiceManger {
-	private context;
 
-	constructor(context) {
+    private readonly context;
 
-		this.context = context;
-	}
-	/**
-	 * getServicesList() to get the services using the apis.
-	 */
-	public async getServicesList() {
+    constructor(context) {
 
-		var url = vscode.workspace.getConfiguration().get('IAM.URL');
-		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
-		var acessToken;
-		// Get the acess token from the system key chain.
-		var secret = keytar.getPassword("acessToken", "acessToken");
-		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.					
-		});
+        this.context = context;
+    }
 
-		// To bypass the self signed server error.
-		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+    /**
+     * Get the services using the apis.
+     */
+    public async getServicesList() {
 
-		axios({
+        const url = vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL);
+        const tenant = vscode.workspace.getConfiguration().get(DebugConstants.IAM_TENANT);
+        let accessToken;
+        // Get the access token from the system key chain.
+        const secret = keytar.getPassword(DebugConstants.ACCESS_TOKEN, DebugConstants.ACCESS_TOKEN);
+        await secret.then((result) => {
+            accessToken = result; // Assign the value to access toke.
+        });
 
-			method: 'get',
-			url: url + `/t/${tenant}/api/server/v1/applications`,
+        // To bypass the self signed server error.
+        process.env[ExtensionConstants.NODE_TLS_REJECT_UNAUTHORIZED] = "0";
 
-			// Set the content type header, so that we get the response in JSOn
-			headers: {
-				Authorization: 'Bearer ' + acessToken,
-				accept: '*/*'
+        axios({
+            method: "get",
+            url: Config.PATH_APPLICATIONS(url, tenant),
 
-			}
-		}).then(async (response) => {
-			// Once we get the response, extract the access token from
-			// the response body
-			this.createListOfServices(response.data.applications);
-			
-		}).catch((err) => {
-			// Do somthing
-			console.log(err);
-			vscode.window.showErrorMessage(err);
-			// Show the sucess message in the vscode.
-			PreviewManager.getInstance().generateOAuthPreview(this.context);
-			vscode.window.showErrorMessage("Access Token has expired.");
+            // Set the content type header, so that we get the response in JSOn
+            headers: {
+                Authorization: "Bearer " + accessToken,
+                accept: "*/*",
+            },
+        }).then(async (response) => {
+            this.createListOfServices(response.data.applications);
+        })
+            .catch((err) => {
+                PreviewManager.getInstance().generateOAuthPreview(this.context);
+                vscode.window.showErrorMessage(DebugConstants.MESSAGE_ACCESS_TOKEN_EXPIRED);
+            });
+    }
 
-		});
-	}
+    /**
+     * Create a list in command pallet.
+     */
+    public async createListOfServices(servicesArray) {
 
-	/**
-	 * createListOfServices() to create a list in command pallete.
-	 */
-	public async createListOfServices(servicesArray) {
+        const services = [];
+        try {
+            for (const service of servicesArray) {
+                services.push(service.name);
+            }
+        } catch (err) {
+            vscode.window.showErrorMessage(DebugConstants.MESSAGE_SERVICE_IMPORT_ERROR);
+        }
 
-		var services = [];
-		try {
-			for (let index = 0; index < servicesArray.length; index++) {
-				services.push(servicesArray[index].name);	
-			}			
-		} catch (err) {
-			console.log(err);
-		}
-		
-		// Show the list of services in command pallet.
-		var result = await vscode.window.showQuickPick(
-			services,
-			{ placeHolder: 'Select Service' }
-		);
-		if(result != undefined){
-			this.getIDOfService(servicesArray,result);
-		}else{
-			vscode.window.showInformationMessage("You do not select any service");
-		}
-		
-	}	
+        // Show the list of services in command pallet.
+        const result = await vscode.window.showQuickPick(
+            services,
+            {placeHolder: "Select Service"},
+        );
+        if (result !== undefined) {
+            this.getIDOfService(servicesArray, result);
+        } else {
+            vscode.window.showInformationMessage(DebugConstants.MESSAGE_SELECT_SERVICE_INFO);
+        }
 
-	/**
-	 * getIDOfService() to get the id of the selected service.
-	 */
-	public getIDOfService(servicesArray,service) {
+    }
 
-		var serviceID;
-		for (let index = 0; index < servicesArray.length; index++) {
-			if(service==servicesArray[index].name){
-				serviceID = servicesArray[index].id;
-			}
-		}
-		this.exportService(serviceID , service);	
-	}	
+    /**
+     * Get the id of the selected service.
+     */
+    public getIDOfService(servicesArray, service) {
 
-	/**
-	 * exportService() to export the xml of the service.
-	 */
-	public async exportService(serviceID , service) {
+        let serviceID;
+        for (const serviceEntity of servicesArray) {
+            if (service === serviceEntity.name) {
+                serviceID = serviceEntity.id;
+            }
+        }
+        this.exportService(serviceID, service);
+    }
 
-		var url = vscode.workspace.getConfiguration().get('IAM.URL');
-		var tenant = vscode.workspace.getConfiguration().get('IAM.Tenant');
-		var acessToken;
-		// Get the acess token from the system key chain.
-		var secret = keytar.getPassword("acessToken", "acessToken");
-		await secret.then((result) => {
-			acessToken = result; // Assign the value to acess toke.					
-		});
+    /**
+     * Export the xml of the service.
+     */
+    public async exportService(serviceID, service) {
 
-		// To bypass the self signed server error.
-		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+        const url = vscode.workspace.getConfiguration().get(DebugConstants.IAM_URL);
+        const tenant = vscode.workspace.getConfiguration().get(DebugConstants.IAM_TENANT);
+        let accessToken;
+        // Get the access token from the system key chain.
+        const secret = keytar.getPassword(DebugConstants.ACCESS_TOKEN, DebugConstants.ACCESS_TOKEN);
+        await secret.then((result) => {
+            accessToken = result; 		// Assign the value to access token.
+        });
 
-		axios({
+        // To bypass the self signed server error.
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-			method: 'get',
-			url: url + `/t/${tenant}/api/server/v1/applications/${serviceID}/export`,
+        axios({
+            headers: {
+                Authorization: "Bearer " + accessToken,
+                accept: "*/*",
 
-			// Set the content type header, so that we get the response in JSOn
-			headers: {
-				Authorization: 'Bearer ' + acessToken,
-				accept: '*/*'
-
-			},
-			query: {
-				exportSecrets: false
-			}
-		}).then(async (response) => {
-			// Once we get the response, extract the access token from
-			// the response body
-			// Pass data to the method of the file handler.
-			fileHandler.createXMLFile(response.data,service);
-		}).catch((err) => {
-			// Do somthing
-			console.log(err);
-
-			// Show the sucess message in the vscode.
-			vscode.window.showErrorMessage("Error..");
-
-		});
-	}	
-	
+            },
+            method: "get",
+            params: {
+                exportSecrets: false,
+            },
+            url: Config.PATH_APPLICATION_EXPORT(url, tenant, serviceID),
+        }).then(async (response) => {
+            await fileHandler.createXMLFile(response.data, service);
+        }).catch((err) => {
+            vscode.window.showErrorMessage(DebugConstants.MESSAGE_ACCESS_TOKEN_EXPIRED);
+        });
+    }
 }

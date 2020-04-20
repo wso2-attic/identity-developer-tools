@@ -25,38 +25,50 @@ import java.util.List;
  * Debug interceptor configuration.
  */
 public class InterceptorConfig {
+
     private String className;
     private List<MethodInfoConfig> methodInfoConfigs = new ArrayList<>();
 
-
+    /**
+     * This method is to get the Class Name.
+     *
+     * @return Name of the Intercepting Class
+     */
     public String getClassName() {
 
         return className;
     }
 
+    /**
+     * This method is to set the Class Name.
+     *
+     * @param className The Class name of the Config.
+     */
     public void setClassName(String className) {
 
         this.className = className;
     }
 
+    /**
+     * This method is to add the Method Configs .
+     *
+     * @param methodName   The method name of the Config.
+     * @param signature    The method signature of the Config.
+     * @param insertBefore Whether to intercept at start of the method body.
+     * @param insertAfter  Whether to intercept at end of the method body.
+     */
     public void addMethodConfigs(String methodName, String signature, boolean insertBefore, boolean insertAfter) {
 
         methodInfoConfigs.add(new MethodInfoConfig(methodName, signature, insertBefore, insertAfter));
     }
 
+    /**
+     * This method is to get Method Info Configs.
+     *
+     * @return list of configs for a class.
+     */
     public List<MethodInfoConfig> getMethodInfoConfigs() {
 
         return methodInfoConfigs;
-    }
-
-    public boolean hasMethodSignature(String methodName, String signature) {
-
-        for (MethodInfoConfig methodInfoConfig: methodInfoConfigs) {
-            if (methodInfoConfig.getMethodName().equals(methodName) && methodInfoConfig.getSignature()
-                    .equals(signature)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

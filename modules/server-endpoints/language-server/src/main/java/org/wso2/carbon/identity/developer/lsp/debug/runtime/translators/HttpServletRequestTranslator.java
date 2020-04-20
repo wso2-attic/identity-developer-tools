@@ -22,26 +22,36 @@ import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 
 import java.util.Enumeration;
 import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Translator to translate the Http Servlet Request arguments.
  */
 public class HttpServletRequestTranslator implements VariableTranslator {
 
-    private HttpServletRequestTranslator() {}
+    private HttpServletRequestTranslator() {
+
+    }
 
     private static class HttpServletRequestTranslatorHolder {
+
         private static final HttpServletRequestTranslator INSTANCE = new HttpServletRequestTranslator();
     }
 
+    /**
+     * This static method allow to get the instance of the HttpServletRequestTranslator.
+     *
+     * @return The HttpServletRequestTranslatorHolder instance.
+     */
     public static HttpServletRequestTranslator getInstance() {
+
         return HttpServletRequestTranslatorHolder.INSTANCE;
     }
 
     @Override
     public Object translate(Object object, int variablesReference) {
+
         HashMap<String, Object> requestdetails = new HashMap<>();
         if (object != null && object instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) object;

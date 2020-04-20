@@ -17,30 +17,41 @@
  */
 
 /**
- * This class is to hold the panel variable so that It can be acessed afte the panel variable is created.
- * It holds the panel variable and the currrent html because current html can't be accessed after it is set to panel.
+ * This class is to hold the panel variable so that It can be accessed after the panel variable is created.
+ * It holds the panel variable and the current html because current html can't be accessed after it is set to panel.
  */
 export class ViewPanelHolder {
 
-    private panel;
+    private readonly panel;
     private currentHtml;
 
-    constructor(panel, currentHtml: String, ) {
+    constructor(panel, currentHtml: string) {
 
         this.panel = panel;
         this.currentHtml = currentHtml;
     }
 
+    /**
+     * This is a getter to get the panel.
+     */
     public getPanel() {
 
         return this.panel;
     }
 
+    /**
+     * Gets the currentHtml.
+     */
     public getCurrentHtml() {
 
         return this.currentHtml;
     }
 
+    /**
+     * Sets the currentHtml.
+     *
+     * @param currentHtml The current Html hold by the panel.
+     */
     public setCurrentHtml(currentHtml) {
 
         this.currentHtml = currentHtml;

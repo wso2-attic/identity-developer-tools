@@ -16,19 +16,34 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.developer.lsp.debug.runtime.translators;
+import * as vscode from "vscode";
 
 /**
- * Variables translator for an internal object to external form.
+ * Helper class for Tree View.
+ * Implemented to return UI representation (TreeItem) of the elements that gets displayed in vi.
  */
-public interface VariableTranslator {
+export class Dependency extends vscode.TreeItem {
+
+    constructor(
+        public readonly label: string,
+        public readonly task: string,
+        public readonly command: vscode.Command,
+    ) {
+        super(label);
+    }
 
     /**
-     * This method allow to translate the variable from the argument.
-     *
-     * @param object The Request or Response Variables to be translated.
-     * @param variablesReference  Reference to the Variable container.
-     * @return The translated object.
+     * Get the label of the tag.
      */
-    Object translate(Object object, int variablesReference);
+    public get tooltip(): string {
+        return `${this.label}`;
+    }
+
+    /**
+     * Get the description of the tag.
+     */
+    public get description(): string {
+        return this.task;
+    }
+
 }

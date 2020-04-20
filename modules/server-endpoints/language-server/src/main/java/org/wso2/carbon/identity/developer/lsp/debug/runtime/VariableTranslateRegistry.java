@@ -32,10 +32,11 @@ import java.util.HashMap;
 
 /**
  * Registry to get the relevant Translator for the Method Context.
- *  This class is used to get the corresponding Builder for the Method Context and
- *  Get relavant Translators for the arguments.
+ * This class is used to get the corresponding Builder for the Method Context and Get relevant Translators for the
+ * arguments.
  */
 public class VariableTranslateRegistry {
+
     private HashMap<String, VariableBuilder> registry = new HashMap<>();
 
     public VariableTranslateRegistry() {
@@ -45,48 +46,92 @@ public class VariableTranslateRegistry {
 
     private void readConfig() {
 
-        String samlEntrykey = getKeyFromContext(DAPConstants.SAML_ENTRY_CLASS, DAPConstants.SAML_ENTRY_METHOD,
+        addSAMLConfig();
+
+    }
+
+    private void addSAMLConfig() {
+
+        String samlEntryKey = getKeyFromContext(DAPConstants.SAML_ENTRY_CLASS, DAPConstants.SAML_ENTRY_METHOD,
                 DAPConstants.SAML_ENTRY_SIGNATURE);
 
-        String samlExitkey =
-                getKeyFromContext(DAPConstants.SAML_EXIT_CLASS,
-                        DAPConstants.SAML_EXIT_METHOD, DAPConstants.SAML_EXIT_SIGNATURE);
+        String samlExitKey = getKeyFromContext(DAPConstants.SAML_EXIT_CLASS, DAPConstants.SAML_EXIT_METHOD,
+                DAPConstants.SAML_EXIT_SIGNATURE);
 
-        registry.put(samlEntrykey, new SAMLEntryVariableBuilder(this));
-        registry.put(samlExitkey, new SAMLExitVariableBuilder(this));
+        registry.put(samlEntryKey, new SAMLEntryVariableBuilder(this));
+        registry.put(samlExitKey, new SAMLExitVariableBuilder(this));
     }
 
+    /**
+     * This method is to get the Variable Builder using MethodContext.
+     *
+     * @param methodContext Holds the intercepted method context.
+     * @return The corresponding Variable Builder.
+     */
     public VariableBuilder getVariablesBuilder(MethodContext methodContext) {
 
-        return registry.get(
-                getKeyFromContext(methodContext.getClassName(),
-                        methodContext.getMethodName(), methodContext.getMethodSignature()));
+        return registry.get(getKeyFromContext(methodContext.getClassName(), methodContext.getMethodName(),
+                methodContext.getMethodSignature()));
     }
 
+    /**
+     * This method is to generate the key for the method Signature.
+     *
+     * @param className       Intercepted class name.
+     * @param methodName      Intercepted Method name.
+     * @param methodSignature Intercepted Method Signature.
+     * @return Key for the method context.
+     */
     private String getKeyFromContext(String className, String methodName, String methodSignature) {
 
         return className + "#" + methodName + "#" + methodSignature;
     }
 
+    /**
+     * This method is to  translate the argument through reusable HttpServletRequestTranslator.
+     *
+     * @param argument           Which holds all the arguments from the intercepted method.
+     * @param variablesReference Variable Reference number send from the extension.
+     * @return The translated object from HttpRequest.
+     */
     public Object translateHttpRequest(Object argument, int variablesReference) {
-        return HttpServletRequestTranslator.getInstance().translate(argument,
-                variablesReference);
+
+        return HttpServletRequestTranslator.getInstance().translate(argument, variablesReference);
     }
 
+    /**
+     * This method is to  translate the argument through reusable SAMLRequestTranslator.
+     *
+     * @param argument           Which holds all the arguments from the intercepted method.
+     * @param variablesReference Variable Reference number send from the extension.
+     * @return The translated object from SAMLRequest.
+     */
     public Object translateSAMLRequest(Object argument, int variablesReference) {
-        return SAMLRequestTranslator.getInstance().translate(argument,
-                variablesReference);
+
+        return SAMLRequestTranslator.getInstance().translate(argument, variablesReference);
     }
 
+    /**
+     * This method is to  translate the argument through reusable HttpServletResponseTranslator.
+     *
+     * @param argument           Which holds all the arguments from the intercepted method.
+     * @param variablesReference Variable Reference number send from the extension.
+     * @return The translated object from HttpResponse.
+     */
     public Object translateHttpResponse(Object argument, int variablesReference) {
-        return HttpServletResponseTranslator.getInstance().translate(argument,
-                variablesReference);
+
+        return HttpServletResponseTranslator.getInstance().translate(argument, variablesReference);
     }
 
+    /**
+     * This method is to  translate the argument through reusable SAMLResponseTranslator.
+     *
+     * @param argument           Which holds all the arguments from the intercepted method.
+     * @param variablesReference Variable Reference number send from the extension.
+     * @return The translated object from SAMLResponse.
+     */
     public Object translateSAMLResponse(Object argument, int variablesReference) {
-        return SAMLResponseTranslator.getInstance().translate(argument,
-                variablesReference);
+
+        return SAMLResponseTranslator.getInstance().translate(argument, variablesReference);
     }
-
 }
-

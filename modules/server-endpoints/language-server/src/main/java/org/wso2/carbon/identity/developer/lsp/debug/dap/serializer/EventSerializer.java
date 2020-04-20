@@ -22,13 +22,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Event;
 
 import java.lang.reflect.Type;
 
 /**
  * Serializes the DAP event to protocol payload.
- * @param <T>
+ *
+ * @param <T> Generified version of class Class allows to pass Event type.
  */
 public abstract class EventSerializer<T extends Event> implements JsonSerializer<T> {
 
@@ -36,10 +38,10 @@ public abstract class EventSerializer<T extends Event> implements JsonSerializer
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject object = new JsonObject();
-        object.addProperty("jsonrpc", "2.0");
-        object.addProperty("method", event.getEvent()); //This is the type of event
-        object.addProperty("event", event.getEvent());
-        object.add("params", formatParams(event));
+        object.addProperty(DAPConstants.JSON_KEY_FOR_JSONRPC, DAPConstants.JSON_RPC_VERSION);
+        object.addProperty(DAPConstants.JSON_KEY_FOR_METHOD, event.getEvent());     //This is the type of event
+        object.addProperty(DAPConstants.JSON_KEY_FOR_EVENT, event.getEvent());
+        object.add(DAPConstants.JSON_KEY_FOR_PARAMS, formatParams(event));
         return object;
     }
 

@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.developer.lsp.endpoints;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.developer.lsp.debug.DAPConstants;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.ProtocolMessage;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Request;
 import org.wso2.carbon.identity.developer.lsp.debug.dap.messages.Response;
@@ -27,7 +28,6 @@ import org.wso2.carbon.identity.developer.lsp.debug.dap.serializer.JsonDap;
 import org.wso2.carbon.identity.developer.lsp.debug.runtime.DebugSessionManager;
 
 import java.io.IOException;
-import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -53,13 +53,12 @@ public class DebugEndpoint {
 
         this.jsonDap = new JsonDap();
         jsonDap.init();
-
     }
 
     /**
      * Method is called when a connection is established.
      *
-     * @param session
+     * @param session The web socket session.
      */
     @OnOpen
     public void onOpen(Session session) {
@@ -68,11 +67,11 @@ public class DebugEndpoint {
         try {
             JsonDap jsonDap = new JsonDap();
             jsonDap.init();
-            ProtocolMessage message = new ProtocolMessage("connected");
+            ProtocolMessage message = new ProtocolMessage(DAPConstants.DEBUG_CONNECTED);
             String text = jsonDap.encode(message);
             session.getBasicRemote().sendText(text);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("Error on Encoding the message", ex);
         }
     }
 
@@ -90,25 +89,28 @@ public class DebugEndpoint {
 
     /**
      * Method is called when a user sends a message to this server endpoint.
-     * Method intercepts the message and allows us to react accordingly.var onLoginRequest = function (context) {
-
+     * Method intercepts the message and allows us to react accordingly.
+     * TODO Handle the Message errors and send the response.
      */
     @OnMessage
-    public void onMessage(String message, Session session) throws IOException, EncodeException {
+    public void onMessage(String message, Session session) throws IOException {
 
         try {
             Request request = jsonDap.decode(message);
             Response response = debugSessionManager.handle(session, request);
-            session.getBasicRemote().sendText(jsonDap.encode(response));
+            if (response != null) {
+                session.getBasicRemote().sendText(jsonDap.encode(response));
+            }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("Error on decoding the message", ex);
+            throw ex;
         }
     }
 
     /**
      * Method is called when an error occurs.
      *
-     * @param e
+     * @param e The exception thrown on the Error.
      */
 
     @OnError

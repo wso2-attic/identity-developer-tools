@@ -19,9 +19,10 @@
 package org.wso2.carbon.identity.developer.lsp.debug;
 
 /**
- * Constants Describes about the Variables.
+ * This class holds the constants for the Debug.
  */
 public class DAPConstants {
+
     public static final String HTTP_SERVLET_REQUEST = "HttpServletRequest";
     public static final String HTTP_SERVLET_RESPONSE = "HttpServletResponse";
     public static final String SAML_REQUEST = "SAMLRequest";
@@ -38,6 +39,12 @@ public class DAPConstants {
             "HttpServletResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;" +
             "Ljava/lang/String;Ljava/lang/String;)V";
 
+    public static final String DEBUG_CONTINUE = "continue";
+    public static final String DEBUG_CONNECTED = "connected";
+    public static final String DEBUG_BREAKPOINT = "breakpoint";
+    public static final String DEBUG_SET_BREAKPOINT = "setBreakpoint";
+    public static final String DEBUG_VARIABLES = "variables";
+    public static final String DEBUG_ALL_THREAD_CONTINUED = "allThreadsContinued";
 
     public static final String JSON_KEY_FOR_COOKIES = "cookies";
     public static final String JSON_KEY_FOR_HEADERS = "headers";
@@ -58,13 +65,24 @@ public class DAPConstants {
     public static final String JSON_KEY_FOR_ID = "id";
     public static final String JSON_KEY_FOR_JSONRPC = "jsonrpc";
     public static final String JSON_KEY_FOR_COMMAND = "command";
+    public static final String JSON_KEY_FOR_METHOD = "method";
+    public static final String JSON_KEY_FOR_EVENT = "event";
+    public static final String JSON_KEY_FOR_PARAMS = "params";
+    public static final String JSON_KEY_FOR_SEQ = "seq";
+    public static final String JSON_KEY_FOR_CONTINUE = "continue";
+    public static final String JSON_KEY_FOR_ARGUMENTS = "arguments";
+    public static final String JSON_KEY_FOR_SET_BREAKPOINT = "setBreakpoint";
+    public static final String JSON_KEY_FOR_LINES = "lines";
+    public static final String JSON_KEY_FOR_SOURCE = "source";
+    public static final String JSON_KEY_FOR_LINE = "line";
+    public static final String JSON_KEY_FOR_BREAKPOINTS = "breakpoints";
+    public static final String JSON_KEY_FOR_SOURCE_MODIFIED = "sourceModified";
+    public static final String JSON_KEY_FOR_UNKNOWN = "unknown";
+    public static final String JSON_KEY_FOR_REQ_SEQ = "request_seq";
 
-    public static final String VARAIBLE_TYPE_STRING = "String";
-    public static final String VARAIBLE_TYPE_OBJECT = "Object";
-    public static final String VARAIBLE_TYPE_UNKNOWN = "Unknown";
+    public static final String VARIABLE_TYPE_STRING = "String";
+    public static final String VARIABLE_TYPE_OBJECT = "Object";
+    public static final String VARIABLE_TYPE_UNKNOWN = "Unknown";
 
-    public static final String JSONRPC_VERSION = "2.0";
-
-
-
+    public static final String JSON_RPC_VERSION = "2.0";
 }

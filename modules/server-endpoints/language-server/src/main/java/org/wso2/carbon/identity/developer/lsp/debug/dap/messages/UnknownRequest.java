@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * An unknown request for the debug protocol.
- * This is the case where any unknownm message arrives.
+ * This is the case where any unknown message arrives.
  */
 public class UnknownRequest extends Request {
 

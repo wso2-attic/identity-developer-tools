@@ -21,10 +21,6 @@ package org.wso2.carbon.identity.java.agent.internal;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.NotFoundException;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.LocalVariableAttribute;
-import javassist.bytecode.MethodInfo;
 import javassist.runtime.Desc;
 import javassist.scopedpool.ScopedClassPoolFactoryImpl;
 import javassist.scopedpool.ScopedClassPoolRepositoryImpl;
@@ -50,9 +46,15 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
      * We use JUL as this is an java agent which should not depend on any other framework than java.
      */
     private static final Logger log = Logger.getLogger(InterceptingClassTransformer.class.getName());
+    public static final String METHOD_LISTENER_TEMPLATE = "org.wso2.carbon.identity.java.agent.internal." +
+            "MethodEntryListener.methodEntered(\"%s\", \"%s\",\"%s\", $sig, $args );";
 
     private final Map<String, InterceptorConfig> interceptorMap = new HashMap<>();
     private ScopedClassPoolFactoryImpl scopedClassPoolFactory = new ScopedClassPoolFactoryImpl();
+
+    /* MethodEntryListener has to be created before it's static method being injected to the transformed class. Hence
+     we instantiate the Method Listener class at this point. So that it will be available for the subsequence class
+     interception. */
     private MethodEntryListener methodEntryListener = new MethodEntryListener();
     private ClassPool rootPool;
 
@@ -63,6 +65,21 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
         rootPool = ClassPool.getDefault();
     }
 
+    /**
+     * An agent provides an implementation of this interface method in order to transform class files.
+     * Transforms the given class file and returns a new replacement class file.
+     * We check our config with classes and intercept only when the Corresponding Class Name, Method Name, Method
+     * Signature matches.
+     *
+     * @param loader              The defining loader of the class to be transformed, may be {@code null} if the bootstrap loader.
+     * @param className           The name of the class in the internal form of fully qualified class.
+     * @param classBeingRedefined If this is triggered by a redefine or re transform, the class being redefined.
+     * @param protectionDomain    The protection domain of the class being defined or redefined.
+     * @param classfileBuffer     The input byte buffer in class file format - Have to be instrumented.
+     * @return
+     * @throws IllegalClassFormatException
+     * @implSpec The default implementation returns null.
+     */
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer)
@@ -70,15 +87,13 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
 
         byte[] byteCode = classfileBuffer;
 
-        if (shouldIntercept(loader, className)) {
-            log.fine("Transforming the class " + className);
-            boolean isTransformed = false;
+        if (shouldIntercept(className)) {
+            log.info("Transforming the class " + className);
 
             try {
                 ClassPool classPool = scopedClassPoolFactory.create(loader, rootPool,
                         ScopedClassPoolRepositoryImpl.getInstance());
-                CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(
-                        classfileBuffer));
+                CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 CtMethod[] methods = ctClass.getDeclaredMethods();
                 InterceptorConfig config = getInterceptorConfig(className);
                 List<MethodInfoConfig> methodInfoConfigs = config.getMethodInfoConfigs();
@@ -88,19 +103,12 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
                     for (MethodInfoConfig methodInfoConfig : methodInfoConfigs) {
                         if (methodInfoConfig.verifyMethod(method.getName(), method.getSignature())) {
                             if (methodInfoConfig.isInsertBefore()) {
-                                method.insertBefore(
-                                        "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener." +
-                                                "methodEntered(\""
-                                                + className + "\", \"" + method.getName() + "\"," +
-                                                " \"" + method.getSignature()
-                                                + "\", $sig, $args );");
+                                method.insertBefore(String.format(METHOD_LISTENER_TEMPLATE, className, method.getName(),
+                                        method.getSignature()));
                             }
                             if (methodInfoConfig.isInsertAfter()) {
-                                method.insertAfter(
-                                        "org.wso2.carbon.identity.java.agent.internal.MethodEntryListener." +
-                                                "methodEntered(\""
-                                                + className + "\", \"" + method.getName() + "\", \"" +
-                                                 method.getSignature()  + "\", $sig, $args );");
+                                method.insertAfter(String.format(METHOD_LISTENER_TEMPLATE, className, method.getName(),
+                                        method.getSignature()));
                             }
                             transformedMethodCounts++;
                         }
@@ -111,46 +119,42 @@ public class InterceptingClassTransformer implements ClassFileTransformer {
                     byteCode = ctClass.toBytecode();
                 }
 
-              ctClass.detach();
+                ctClass.detach();
             } catch (Throwable ex) {
                 log.log(Level.SEVERE, "Error in transforming the class: " + className, ex);
             }
         }
         return byteCode;
-
     }
 
-    private String[] getVariableNames(CtMethod method) throws NotFoundException {
+    /**
+     * This Method is to Check whether the Agent should intercept or not.
+     *
+     * @param className The name of the class in the internal form of fully qualified class.
+     * @return Whether to intercept or not.
+     */
+    private boolean shouldIntercept(String className) {
 
-        MethodInfo methodInfo = method.getMethodInfo();
-        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
-        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
-        if (attr == null) {
-            return new String[0];
-        }
-        CtClass[] paramTypes = method.getParameterTypes();
-        String[] paramNames = new String[method.getParameterTypes().length];
-        for (int i = 0; i < paramNames.length; i++) {
-            paramNames[i] = paramTypes[i].getSimpleName() + (i);
-        }
-        return paramNames;
+        return interceptorMap.containsKey(className);
     }
 
-    private boolean shouldIntercept(ClassLoader loader, String className) {
-
-        if (interceptorMap.keySet().contains(className)) {
-            return true;
-        }
-        return false;
-    }
-
+    /**
+     * This method is to get the InterceptorConfig using Class name.
+     *
+     * @param className The name of the class in the internal form of fully qualified class.
+     * @return The Interceptor config corresponding to the class name.
+     */
     private InterceptorConfig getInterceptorConfig(String className) {
 
         return interceptorMap.get(className);
     }
 
+    /**
+     * This method is to add the InterceptorConfig.
+     *
+     * @param interceptorConfig The interceptor config corresponding to the class name.
+     */
     public void addConfig(InterceptorConfig interceptorConfig) {
-
 
         interceptorMap.put(interceptorConfig.getClassName(), interceptorConfig);
     }

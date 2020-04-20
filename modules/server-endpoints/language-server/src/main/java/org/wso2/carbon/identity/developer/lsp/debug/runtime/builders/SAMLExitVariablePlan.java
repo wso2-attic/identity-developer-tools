@@ -22,6 +22,18 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
  * Interface to help build the SAMLEntryVariable.
  */
 public interface SAMLExitVariablePlan {
-    public void setHttpServletResponse(Object httpServletResponse);
-    public void setSAMLResponse(Object samlResponse);
+
+    /**
+     * This method is to add httpServletResponse to variables list  After the argument is proceeded.
+     *
+     * @param httpServletResponse The HttpServletResponse object, known as "response" in a JSP page.
+     */
+    void setHttpServletResponse(Object httpServletResponse);
+
+    /**
+     * This method is to add SAML Response to variables list  After the argument is proceeded.
+     *
+     * @param samlResponse The SAML Response string.
+     */
+    void setSAMLResponse(Object samlResponse);
 }

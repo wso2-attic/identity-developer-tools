@@ -26,21 +26,41 @@ public class BreakpointInfo {
     private String resourceName;
     private int[] breakpointLocations;
 
+    /**
+     * Gets the resourceName.
+     *
+     * @return The name of the Source.
+     */
     public String getResourceName() {
 
         return resourceName;
     }
 
+    /**
+     * Sets the resourceName.
+     *
+     * @param resourceName The name of the Source.
+     */
     public void setResourceName(String resourceName) {
 
         this.resourceName = resourceName;
     }
 
+    /**
+     * Gets the breakpoint Locations.
+     *
+     * @return The location of the breakpoint.
+     */
     public int[] getBreakpointLocations() {
 
         return breakpointLocations;
     }
 
+    /**
+     * Sets the breakpoints.
+     *
+     * @param breakpoints The information about the breakpoints.
+     */
     public void setBreakpoints(int[] breakpoints) {
 
         breakpointLocations = breakpoints;

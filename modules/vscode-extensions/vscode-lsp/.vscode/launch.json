@@ -27,7 +27,8 @@
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
-			]
+			],
+			"skipFiles": ["<node_internals>/**"]
 		},
 		{
 			"type": "extensionHost",

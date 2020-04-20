@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.websocket.Session;
 
 /**
@@ -33,25 +34,42 @@ import javax.websocket.Session;
  * Contains the information about the breakpoints.
  */
 public class DebugSession {
+
     private static final Log log = LogFactory.getLog(DebugSession.class);
 
     private Session session;
     private Map<String, BreakpointInfo> breakpointInfoMap = new HashMap<>();
     private MethodContext currentMethodContext;
     private List<Object> calledObjectStack = new ArrayList<>();
-    private Object waitObject = new Object();
+    private final Object waitObject = new Object();
     private static final long MAX_THREAD_SUSPEND_TIME_MILLIS = 5000;
 
+    /**
+     * This is the getter which gets the  Websocket session.
+     *
+     * @return The websocket session initiated.
+     */
     public Session getSession() {
 
         return session;
     }
 
+    /**
+     * This is the setter which sets the  Websocket session.
+     *
+     * @param session The websocket session initiated.
+     */
     public void setSession(Session session) {
 
         this.session = session;
     }
 
+    /**
+     * This is the setter which adds breakpointInfo.
+     *
+     * @param resource    The name of the resource.
+     * @param breakpoints The information about the breakpoints.
+     */
     public void setBreakpoints(String resource, int[] breakpoints) {
 
         BreakpointInfo breakpointInfo = breakpointInfoMap.get(resource);
@@ -63,6 +81,12 @@ public class DebugSession {
         breakpointInfo.setBreakpoints(breakpoints);
     }
 
+    /**
+     * Gets Breakpoint Info.
+     *
+     * @param source The name of the source.
+     * @return The information about the breakpoints.
+     */
     public BreakpointInfo getBreakpointInfo(String source) {
 
         BreakpointInfo result = breakpointInfoMap.get(source);
@@ -72,7 +96,7 @@ public class DebugSession {
     /**
      * This is temporary method, needs to be removed once created correct breakpoint identification logic.
      *
-     * @return
+     * @return The BreakpointInfo from the breakpointInfoMap.
      */
     @Deprecated
     public BreakpointInfo[] getBreakpointInfos() {
@@ -86,20 +110,29 @@ public class DebugSession {
         return result;
     }
 
+    /**
+     * Gets the currentMethodContext.
+     *
+     * @return The currently instrumented method context.
+     */
     public MethodContext getCurrentMethodContext() {
 
         return currentMethodContext;
     }
 
+    /**
+     * Sets the currentMethodContext.
+     *
+     * @param currentMethodContext The currently instrumented method context.
+     */
     public void setCurrentMethodContext(MethodContext currentMethodContext) {
 
         this.currentMethodContext = currentMethodContext;
     }
 
     /**
-     * Processes the method entry event.
-     *
-     * @param methodContext
+     * @param methodContext Instrumented method details.
+     * @return The DebugProcessingResult if breakpointInfo else null .
      */
     public DebugProcessingResult processMethodEntry(MethodContext methodContext) {
 
@@ -114,15 +147,25 @@ public class DebugSession {
         return null;
     }
 
+    /**
+     * This method is to get the breakpointInfoMap.
+     *
+     * @param methodContext The instrumented method details.
+     * @return The information about the break point.
+     */
     private BreakpointInfo findAnyStoppableBreakpoint(MethodContext methodContext) {
+
         if (breakpointInfoMap == null || breakpointInfoMap.isEmpty()) {
             return null;
         }
         return breakpointInfoMap.values().stream().findFirst().get();
     }
 
-
+    /**
+     * This method is to suspend the current Thread.
+     */
     public void suspendCurrentThread() {
+
         try {
             synchronized (this.waitObject) {
                 this.waitObject.wait(MAX_THREAD_SUSPEND_TIME_MILLIS);
@@ -134,52 +177,24 @@ public class DebugSession {
         }
     }
 
+    /**
+     * This method is to get the  Websocket session ID.
+     *
+     * @return The id of the session.
+     */
     private String getSessionInfo() {
 
         return session.getId();
     }
 
+    /**
+     * This method is to resume the current Thread.
+     */
     public void resumeSuspendedThread() {
+
         synchronized (this.waitObject) {
             this.waitObject.notify();
         }
     }
 
-
-    private int getCurrentJavascriptFunctionObject(List<Object> calledObjectStack) {
-
-        return 0;
-    }
-
-    private boolean isJavascriptFunctionExit(MethodContext methodContext) {
-
-        return false;
-
-    }
-
-    private Object createJsFunctionCallObject(MethodContext methodContext) {
-
-        return null;
-    }
-
-    private boolean isJavascriptFunctionCall(MethodContext methodContext) {
-
-        return false;
-    }
-
-    private Object createHttpRequestDataObject(MethodContext methodContext) {
-
-        return null;
-    }
-
-    private boolean isHttpRequestEntry(MethodContext methodContext) {
-
-        if (("org/wso2/carbon/identity/application/authentication/framework/handler/request" +
-                "/impl/DefaultRequestCoordinator").equals(
-                methodContext.getClassName())) {
-            return "handle".equals(
-                    methodContext.getMethodName());
-        }
-        return false;
-    }
 }

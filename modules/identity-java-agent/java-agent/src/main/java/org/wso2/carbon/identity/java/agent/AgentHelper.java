@@ -30,14 +30,27 @@ public class AgentHelper {
     private static AgentHelper instance = new AgentHelper();
 
     private AgentHelper() {
+
         interceptionEngine = new DefaultInterceptionEngine();
     }
 
-    public static AgentHelper getInstance () {
+    /**
+     * This method helps to get the AgentHelper instance without instantiating.
+     *
+     * @return The Agent Helper instance.
+     */
+    public static AgentHelper getInstance() {
+
         return instance;
     }
 
+    /**
+     * This method is to get the InterceptionEngine.
+     *
+     * @return The engine which handles firing the event to listener.
+     */
     public InterceptionEngine getInterceptionEngine() {
+
         return interceptionEngine;
     }
 

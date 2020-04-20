@@ -18,17 +18,12 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.dap.messages;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.List;
 
 /**
  * JSON Debug Request.
  */
 public class Request extends Message {
-
-    private static final Log log = LogFactory.getLog(Request.class);
 
     private String command;
     private List<Argument> arguments;
@@ -41,21 +36,41 @@ public class Request extends Message {
         this.arguments = arguments;
     }
 
+    /**
+     * Gets the command.
+     *
+     * @return The command to execute.
+     */
     public String getCommand() {
 
         return command;
     }
 
+    /**
+     * Sets the command.
+     *
+     * @param command The command to execute.
+     */
     public void setCommand(String command) {
 
         this.command = command;
     }
 
+    /**
+     * Gets the command.
+     *
+     * @return Object containing arguments for the command.
+     */
     public List<Argument> getArguments() {
 
         return arguments;
     }
 
+    /**
+     * Sets the arguments.
+     *
+     * @param arguments Object containing arguments for the command.
+     */
     public void setArguments(List<Argument> arguments) {
 
         this.arguments = arguments;

@@ -24,7 +24,7 @@ package org.wso2.carbon.identity.developer.lsp.debug.runtime;
 public class DebugProcessingResult {
 
     /**
-     *InstructionTypes that can be used.
+     * InstructionTypes that can be used.
      */
     public enum InstructionType {
         STOP,
@@ -40,16 +40,31 @@ public class DebugProcessingResult {
         this.instructionType = instructionType;
     }
 
+    /**
+     * Gets the breakpoint Info.
+     *
+     * @return The breakpoint information.
+     */
     public BreakpointInfo getBreakpointInfo() {
 
         return breakpointInfo;
     }
 
+    /**
+     * Sets the breakpoint Info.
+     *
+     * @param breakpointInfo The breakpoint information.
+     */
     public void setBreakpointInfo(BreakpointInfo breakpointInfo) {
 
         this.breakpointInfo = breakpointInfo;
     }
 
+    /**
+     * Gets the Instruction Type.
+     *
+     * @return The type of the instruction Eg:  STOP, CONTINUE.
+     */
     public InstructionType getInstructionType() {
 
         return instructionType;

@@ -18,9 +18,7 @@
 
 package org.wso2.carbon.identity.java.agent.config;
 
-
 import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -29,10 +27,11 @@ import java.util.List;
 public class InterceptorConfigReader {
 
     /**
-     * Reads the configs in the class resource
-     * "instrumentation-config.json".
+     * Reads the configs in the class resource.
+     * As per the documentation have to pass the Method signature in binary format.
+     * use this link https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html to add the binary format.
      *
-     * @return
+     * @return Result which carry the configuration.
      */
     public List<InterceptorConfig> readConfig() {
 

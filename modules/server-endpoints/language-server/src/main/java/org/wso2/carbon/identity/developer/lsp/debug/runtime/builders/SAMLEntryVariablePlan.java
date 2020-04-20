@@ -18,11 +18,22 @@
 
 package org.wso2.carbon.identity.developer.lsp.debug.runtime.builders;
 
-
 /**
  * Interface to help build the SAMLEntryVariable.
  */
 public interface SAMLEntryVariablePlan {
-     void setHttpServletRequest (Object httpServletRequest);
-     void setSAMLRequest (Object samlRequest);
+
+    /**
+     * This method is add httpServletRequest to variables list  After the argument is proceeded.
+     *
+     * @param httpServletRequest The HttpServletRequest object, known as "request" in a JSP page.
+     */
+    void setHttpServletRequest(Object httpServletRequest);
+
+    /**
+     * This method is add SAML Request to variables list  After the argument is proceeded.
+     *
+     * @param samlRequest The SAML Request string.
+     */
+    void setSAMLRequest(Object samlRequest);
 }
