@@ -189,7 +189,7 @@
         <carbon.identity.framework.version>5.14.35</carbon.identity.framework.version>
         <antlr4.version>4.7</antlr4.version>
         <developer.java-agent.version>1.0.0-SNAPSHOT</developer.java-agent.version>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <identity.inbound.auth.saml.version>5.8.3</identity.inbound.auth.saml.version>
         <commons-logging.imp.pkg.version.range>[1.2, 2.0)</commons-logging.imp.pkg.version.range>
         <websocket.version>1.1</websocket.version>
