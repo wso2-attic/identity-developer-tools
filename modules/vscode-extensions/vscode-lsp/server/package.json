@@ -13,7 +13,7 @@
 		"temp": "^0.9.1",
 		"vscode-languageserver": "^5.2.1",
 		"vscode-ws-jsonrpc": "^0.1.1",
-		"ws": "^7.1.2",
+		"ws": "^7.4.6",
 		"xml2js": "^0.4.22"
 	},
 	"devDependencies": {
