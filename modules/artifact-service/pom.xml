@@ -30,7 +30,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <resteasy.version>3.11.0.Final</resteasy.version>
+        <resteasy.version>4.5.7.Final</resteasy.version>
         <jinjava.version>2.5.3</jinjava.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
